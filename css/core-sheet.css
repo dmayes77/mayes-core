@@ -1,4 +1,4 @@
-/* Mayes Core – Sheet v1.1.1
+/* Mayes Core – Sheet v1.1.2
  * Shared presentation styles for the Core Sheet engine.
  */
 [data-sheet]{position:fixed;inset:0;z-index:1002;display:none}
@@ -19,7 +19,8 @@ html.sheet-lock,html.sheet-lock body{overflow:hidden}
 [data-sheet-x]{display:inline-flex;align-items:center;justify-content:center;width:2.75rem;height:2.75rem;margin:0;padding:0;border:0;border-radius:999px;background:var(--_theme---background--secondary,#f5f3ee);color:var(--_theme---text--primary,#111);cursor:pointer}
 [data-sheet-x]:hover{background:var(--_theme---background--secondary,#f5f3ee)}
 [data-sheet-x]:focus-visible{outline:2px solid var(--_theme---focus--ring,#f60);outline-offset:2px}
-[data-sheet-body]{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:0 1.25rem 1.25rem}
+[data-sheet-body]{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:0 1.25rem 1.25rem;scrollbar-width:none;-ms-overflow-style:none}
+[data-sheet-body]::-webkit-scrollbar{display:none;width:0;height:0}
 [data-sheet-footer]{display:flex;flex-direction:column;gap:.625rem;flex:none;padding:1rem 1.25rem 1.25rem;border-top:1px solid var(--_theme---border--subtle,#e5e5e5);background:var(--_theme---background--primary,#fff)}
 [data-sheet-footer]:empty{display:none}
 [data-sheet-grabber]{display:none}
