@@ -1,4 +1,4 @@
-/* Mayes Core – Sheet v1.0.0
+/* Mayes Core – Sheet v1.1.1
  * Shared presentation styles for the Core Sheet engine.
  */
 [data-sheet]{position:fixed;inset:0;z-index:1002;display:none}
@@ -16,7 +16,7 @@ html.sheet-lock,html.sheet-lock body{overflow:hidden}
 [data-sheet-head][data-sheet-default] [data-sheet-title]:empty{display:none}
 [data-sheet-head] [data-sheet-close]{display:inline-flex;margin-left:auto}
 /* close button: 44×44 touch target (Apple HIG) */
-[data-sheet-x]{display:inline-flex;align-items:center;justify-content:center;width:2.75rem;height:2.75rem;margin:0;padding:0;border:0;border-radius:999px;background:none;color:inherit;cursor:pointer}
+[data-sheet-x]{display:inline-flex;align-items:center;justify-content:center;width:2.75rem;height:2.75rem;margin:0;padding:0;border:0;border-radius:999px;background:var(--_theme---background--secondary,#f5f3ee);color:var(--_theme---text--primary,#111);cursor:pointer}
 [data-sheet-x]:hover{background:var(--_theme---background--secondary,#f5f3ee)}
 [data-sheet-x]:focus-visible{outline:2px solid var(--_theme---focus--ring,#f60);outline-offset:2px}
 [data-sheet-body]{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:0 1.25rem 1.25rem}
