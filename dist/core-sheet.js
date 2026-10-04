@@ -1,4 +1,4 @@
-/* Mayes Core – Sheet v1.1.0
+/* Mayes Core – Sheet v1.2.0
  * Reusable attribute-driven sheet, dialog, and drawer engine.
  * Supports responsive presentations, focus management, inert background,
  * scroll locking, swipe-to-close, and reduced-motion friendly styling.
@@ -90,21 +90,22 @@
     var title = (block && block.getAttribute('data-sheet-title')) || opts.title || '';
     defTitle.textContent = title;
     defHead.hidden = false;
+    defBody.innerHTML = '';
+    defFoot.innerHTML = '';
     if(head){
       var customTitle = head.querySelector('[data-sheet-title]');
       if(customTitle && !title) defTitle.textContent = (customTitle.textContent || '').trim();
-      head.querySelectorAll('[data-sheet-close],[data-sheet-x]').forEach(function(x){ x.hidden = true; });
-      borrow(head, defBody);
     }
-    defBody.innerHTML = '';
-    if(body){ defBody.hidden = true; borrow(body, defBody); }
-    else {
+    if(body){
       defBody.hidden = false;
-      if(block){ Array.prototype.slice.call(block.childNodes).forEach(function(n){ if(n !== foot && !(n.matches && n.matches('[data-sheet-overlay],[data-sheet-panel]'))) { var m = document.createComment('sheet'); block.insertBefore(m, n); defBody.appendChild(n); current.moved.push([n, m]); } }); }
+      borrow(body, defBody);
+    } else {
+      defBody.hidden = false;
+      if(block){ Array.prototype.slice.call(block.childNodes).forEach(function(n){ if(n !== head && n !== foot && !(n.matches && n.matches('[data-sheet-overlay],[data-sheet-panel]'))) { var m = document.createComment('sheet'); block.insertBefore(m, n); defBody.appendChild(n); current.moved.push([n, m]); } }); }
       else if(opts.node){ defBody.appendChild(opts.node); }
       else if(opts.html){ defBody.innerHTML = opts.html; }
     }
-    if(foot) borrow(foot, null);
+    if(foot) borrow(foot, defFoot);
     if(defTitle.textContent){ panel.setAttribute('aria-labelledby', defTitle.id); panel.removeAttribute('aria-label'); }
     else { panel.removeAttribute('aria-labelledby'); panel.setAttribute('aria-label', title || name.replace(/-/g,' ')); }
   }
@@ -115,7 +116,7 @@
     current.attrs.forEach(function(a){ host.removeAttribute(a); });
     host.className = '';                               // drop state classes a feature added (e.g. is-invalid)
     host.removeAttribute('data-sheet-height');
-    defHead.hidden = false; defBody.hidden = false; defBody.innerHTML = '';
+    defHead.hidden = false; defBody.hidden = false; defBody.innerHTML = ''; defFoot.innerHTML = '';
     current = null;
   }
 
@@ -214,7 +215,7 @@
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', build); else build();
 
   window.CoreSheet = {
-    version: '1.1.0',
+    version: '1.2.0',
     open: open, show: show, close: close,
     top: function(){ return host && host.classList.contains('is-open') ? host : null; },
     current: function(){ return current ? current.block : null; },
