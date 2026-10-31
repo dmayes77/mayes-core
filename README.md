@@ -1,65 +1,55 @@
 # Mayes Core
 
-Shared frontend systems and reusable Webflow code for Mayes Digital projects.
+The main repository for Mayes Digital's website system: Core Design System 2.0.
 
-## Purpose
+Every Mayes Digital website is built from one Webflow master (Core Design System 2.0) and loads its shared behavior from this repo by release tag. This repo is the single source of truth for that system: the code, the spec, the decisions, and the kit for building a client site.
 
-Mayes Core contains project-independent functionality that can be reused across Mayes Digital websites.
+## What lives here
 
-Project-specific behavior, styling, ecommerce logic, and client implementations should remain in their individual project repositories.
-
-## Architecture
-
-Mayes Core
-├── javascript/
-│   ├── motion/
-│   ├── components/
-│   ├── privacy/
-│   └── utilities/
-├── css/
-├── dist/
+```
+mayes-core/
+├── docs/
+│   ├── ARCHITECTURE.md   how the system fits together (Webflow master, code, products, clients)
+│   ├── RELEASES.md       tagging and pinning rules; how Webflow loads this repo
+│   ├── DECISIONS.md      decisions log
+│   ├── AUDIT_2026-10-31.md  state of every site and repo when this became the main repo
+│   └── spec/             Core Design System 2.0 framework + Implementation Addendum
+├── base/                 the $500 Base site kit (pages, mobile app layer, CMS, client checklist)
+├── products/             where ShopFlow and DetailFlow will live once re-based on Core v2
+├── javascript/           source: motion, components, privacy, utilities
+├── css/                  source styles
+├── dist/                 built files Webflow loads from jsDelivr
 └── build.sh
+```
+
+## Layers
+
+| Layer | Where | Owns |
+|---|---|---|
+| Core | this repo + the Core Design System 2.0 Webflow site | tokens, Page Shell, navigation, mobile app layer (bottom nav, sheets, Site Settings), sections, cards, icons, motion, consent, business record |
+| Product | `base/` now; `products/` later | a sellable configuration of Core: the $500 Base site, ShopFlow (commerce), DetailFlow (detailing) |
+| Client | a Webflow site duplicated from a product | brand, copy, imagery, CMS content |
+
+Core contains no product names, no commerce logic and no client content.
 
 ## Core Motion
 
-Core Motion is the reusable motion and interaction layer for Mayes Digital projects.
+Core Motion is the reusable motion and interaction layer.
 
-Webflow
-→ HTML data attributes
-→ Core Motion
-→ GSAP / ScrollTrigger
+Webflow → HTML data attributes → Core Motion → GSAP / ScrollTrigger
 
-Core Motion owns reusable behavior such as:
-
-- reveal animations
-- scroll states
-- parallax
-- stagger
-- text animation
-- reduced-motion handling
-
-Core Motion does not contain project-specific selectors or visual styling.
-
-Example:
-
-data-scroll-state
-→ Core Motion toggles `is-scrolled`
-→ project CSS determines what `is-scrolled` looks like
+It owns reveal animations, scroll states, parallax, stagger, text animation and reduced-motion handling. It contains no project selectors or visual styling: for example, `data-scroll-state` makes Core Motion toggle `is-scrolled`, and the project's Webflow classes decide what `is-scrolled` looks like.
 
 ## Development
 
-Edit source files inside `javascript/` or `css/`.
-
-Run:
+Edit source files in `javascript/` or `css/`, then run:
 
     ./build.sh
 
-Generated files are written to `dist/`.
-
-Files in `dist/` are the production assets intended for CDN delivery.
+Built files go to `dist/`, which is what Webflow loads.
 
 ## Versioning
 
-Development may reference the `main` branch.
+Webflow sites load tagged releases only — never `@main`. See `docs/RELEASES.md`.
 
-Production projects should use tagged releases so updates to Mayes Core do not unexpectedly change existing client websites.
+> Transition note (2026-10-31): ShopFlow and DetailFlow still load `@main` and `@stable`. The file paths in `dist/` are kept unchanged on this branch so those sites keep working until they are pinned to `v1.1.0`.
