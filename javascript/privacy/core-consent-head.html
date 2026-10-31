@@ -1,0 +1,9 @@
+<!-- Mayes Core – Consent head snippet v1.1.0 – Site settings › Custom code › Head, ABOVE the Google tag.
+     Sets Google Consent Mode v2 defaults from the visitor's saved choice (denied until they accept).
+     Uses the storage key core-consent-v1. If a site sets <html data-consent-key="…">, change the key below to match. -->
+<script>
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+(function(){var c={};try{c=JSON.parse(localStorage.getItem('core-consent-v1'))||{};}catch(e){}
+var a=c.analytics?'granted':'denied',m=c.marketing?'granted':'denied';
+gtag('consent','default',{analytics_storage:a,ad_storage:m,ad_user_data:m,ad_personalization:m,wait_for_update:500});})();
+</script>

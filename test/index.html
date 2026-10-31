@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mayes Core test page</title>
+<link rel="icon" href="data:,">
+<script>window.__gtagCalls = []; window.dataLayer = { push: function(a){ window.__gtagCalls.push(Array.prototype.slice.call(a)); } };</script>
+<!--CONSENT_HEAD-->
+<link rel="stylesheet" href="../dist/core.css">
+<style>
+  body { margin: 0; font-family: system-ui, sans-serif; }
+  .navbar-compact { position: fixed; left: 0; right: 0; height: 56px; background: #fff; border-bottom: 1px solid #ddd; }
+  .navbar-compact.is-scrolled { box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+  main { padding: 120px 16px 1600px; }
+  [data-bottom-nav] { height: 64px; }
+  .bottom-nav_bar { position: fixed; left: 0; right: 0; bottom: 0; display: flex; background: #fff; border-top: 1px solid #ddd; }
+  .bottom-nav_tab { flex: 1; text-align: center; position: relative; }
+  .bottom-nav_tab a { display: block; padding: 12px 0; }
+  [hidden], .is-hidden { display: none; }
+</style>
+</head>
+<body>
+  <!-- Page Shell: hidden business record (Business Settings + Business Hours) -->
+  <div class="is-hidden" aria-hidden="true">
+    <span data-business-field="business-name">Test Plumbing Co.</span>
+    <span data-business-field="phone">(423) 555-0100</span>
+    <span data-business-field="email">hello@example.com</span>
+    <span data-business-field="street-address">100 Market St</span>
+    <span data-business-field="city">Chattanooga</span>
+    <span data-business-field="state">TN</span>
+    <span data-business-field="zip-code">37402</span>
+    <img data-business-field="logo" class="w-dyn-bind-empty" src="">
+    <div data-business-hours-entry><span data-business-hours-day>Monday</span><span data-business-hours-order>1</span><span data-business-hours-open>8 AM</span><span data-business-hours-close>5 PM</span></div>
+    <div data-business-hours-entry><span data-business-hours-day>Tuesday</span><span data-business-hours-order>2</span><span data-business-hours-open>8 AM</span><span data-business-hours-close>5 PM</span></div>
+    <div data-business-hours-entry><span data-business-hours-day>Wednesday</span><span data-business-hours-order>3</span><span data-business-hours-open>8 AM</span><span data-business-hours-close>5 PM</span></div>
+    <div data-business-hours-entry><span data-business-hours-day>Thursday</span><span data-business-hours-order>4</span><span data-business-hours-open>8 AM</span><span data-business-hours-close>5 PM</span></div>
+    <div data-business-hours-entry><span data-business-hours-day>Friday</span><span data-business-hours-order>5</span><span data-business-hours-open>8 AM</span><span data-business-hours-close>5 PM</span></div>
+    <div data-business-hours-entry><span data-business-hours-day>Saturday</span><span data-business-hours-order>6</span><span data-business-hours-open>9 AM</span><span data-business-hours-close>1 PM</span></div>
+    <div data-business-hours-entry><span data-business-hours-day>Sunday</span><span data-business-hours-order>7</span><span data-business-hours-closed>true</span><span class="w-condition-invisible" data-business-hours-open>never shown</span></div>
+  </div>
+
+  <div data-announcement id="bar" style="height:40px;background:#f60">Announcement</div>
+  <header class="navbar-compact" data-scroll-state id="nav">
+    <img data-business="logo" id="logo" alt="" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-test="fallback">
+    <a data-business="phone" id="phone" href="#">(000) 000-0000</a>
+  </header>
+
+  <main>
+    <h1 data-motion="rise" id="rise">Heading</h1>
+    <div data-motion="stagger" id="stagger"><p data-motion-item>One</p><p data-motion-item>Two</p></div>
+    <a data-business="email" id="email" href="#">email</a>
+    <p data-business="address" id="address"></p>
+    <a data-business="directions-url" id="directions" href="#">Directions</a>
+    <p data-business="tagline" data-business-empty="hide" id="tagline">fallback tagline</p>
+    <div data-business-hours id="hours"></div>
+    <p data-business-today id="today"></p>
+    <button data-sheet-open="services" id="open-services">Services</button>
+  </main>
+
+  <!-- Overlay slot: sheet content blocks -->
+  <div data-sheet="services" data-sheet-title="Services" data-sheet-height="medium" class="is-hidden">
+    <a href="#drains" id="svc-first">Drain cleaning</a>
+    <a href="#heaters">Water heaters</a>
+  </div>
+  <div data-sheet="location" data-sheet-title="Location" class="is-hidden">
+    <p data-business="address"></p>
+  </div>
+  <div data-sheet="site-settings" data-sheet-title="Settings" class="is-hidden">
+    <div data-settings-section="privacy">
+      <div data-settings-row><span data-settings-row-title>Analytics</span><button data-consent-switch="analytics" id="sw-analytics"></button></div>
+      <div data-settings-row><span data-settings-row-title>Marketing</span><button data-consent-switch="marketing" id="sw-marketing"></button></div>
+      <button data-consent-action="save" id="save">Save</button>
+    </div>
+  </div>
+  <div data-sheet="cookie-notice" data-sheet-mode="bottom" data-sheet-height="compact" class="is-hidden">
+    <p>We use cookies.</p>
+    <button data-consent-action="accept-all" id="accept-all">Accept all</button>
+    <button data-consent-action="necessary" id="necessary">Necessary only</button>
+  </div>
+
+  <!-- Mobile Nav slot -->
+  <div data-bottom-nav>
+    <nav class="bottom-nav_bar">
+      <div class="bottom-nav_tab" data-bottom-nav-tab data-tab-action="" id="tab-home"><a data-bottom-nav-link href="/test/index.html" aria-label="Home">Home</a></div>
+      <div class="bottom-nav_tab" data-bottom-nav-tab data-tab-action="sheet:services" id="tab-services"><a data-bottom-nav-link href="/services" aria-label="Services">Services</a></div>
+      <div class="bottom-nav_tab" data-bottom-nav-tab data-tab-action="sheet:location" id="tab-location"><a data-bottom-nav-link href="/contact" aria-label="Location">Location</a></div>
+      <div class="bottom-nav_tab" data-bottom-nav-tab data-tab-action="click:#open-services" id="tab-click"><a data-bottom-nav-link href="/services" aria-label="Book">Book</a><span class="bottom-nav_badge" id="badge">0</span></div>
+      <div class="bottom-nav_tab" data-bottom-nav-tab data-tab-action="sheet:site-settings" id="tab-more"><a data-bottom-nav-link href="#" aria-label="More">More</a></div>
+    </nav>
+  </div>
+
+  <!--GSAP-->
+  <script src="../dist/core.js" defer></script>
+</body>
+</html>

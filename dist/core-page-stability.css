@@ -1,0 +1,12 @@
+/* Mayes Core – Page stability v1.1.0
+ * Reserve scrollbar space so vertical scroll locking does not shift layout,
+ * and suppress root-level horizontal overscroll when the document itself
+ * has no horizontal overflow. Horizontal component scrollers remain unaffected.
+ */
+html{
+  scrollbar-gutter:stable;
+  overscroll-behavior-x:none;
+}
+body{
+  overscroll-behavior-x:none;
+}
