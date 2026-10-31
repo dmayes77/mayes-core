@@ -25,6 +25,33 @@ Core Design System 2.0 master (Webflow)
 | Southern Reflexions | `southern-reflexions-mayesdigital` | Client build on Core 2.0 (Apex demo) |
 | ServicePro, ProofBook, Mayes Digital, Core 1.0 | — | Older, separate token systems; not on Core 2.0 |
 
+## How a site loads code
+
+One base serves every project. A project adds its own script only when it needs behavior Core doesn't have.
+
+```
+Head    1. consent head snippet          (dist/core-consent-head.html, pasted inline, above any Google tag)
+        2. core.css                       every site
+        3. <project>.css                  only if the project has one
+Footer  4. GSAP                           only if the site uses motion (Webflow Settings › GSAP)
+        5. core.js                        every site
+        6. <project>.js                   only if the project has one
+```
+
+| Layer | File | Lives in | Example |
+|---|---|---|---|
+| Base | `dist/core.css`, `dist/core.js` | this repo | sheet, bottom nav, consent, business record, motion |
+| Product | `products/<name>/dist/<name>.css` / `.js` | this repo, `products/` | ShopFlow cart and product page; DetailFlow booking |
+| Client | none by default | Webflow inline custom code, kept tiny | a one-off tweak for one client |
+
+Rules:
+
+- Everything a site loads comes from this repo through jsDelivr, pinned to a release tag (or a commit until the tag exists). One repo, one version number, so base and product code are always released together.
+- `defer` keeps the order: project scripts run after `core.js` and can use `CoreSheet`, `CoreBusiness`, `CoreConsent` directly.
+- Project code never copies or re-implements a Core module. If a project needs a generic feature, it goes into Core first.
+- The $500 Base site loads only the base (steps 1, 2, 5, and 4 if it uses motion).
+- Private repos (`shopflow`, `detailflow`) can't be served by jsDelivr, so product code moves into `products/` here when each product is re-based on Core.
+
 ## Tokens (Webflow variable collections)
 
 Primitives (brand colors, fonts, base sizes) · Core 2.0 (responsive type and spacing, 4 modes: Base, Tablet, Mobile Landscape, Mobile Portrait) · Theme (semantic colors) · Surface · Motion.
