@@ -14,6 +14,7 @@ Never `@main`, never `@stable`, never a bare commit. A push to `main` must never
 |---|---|---|
 | `v0.1.0` | Core Motion (early) | the `stable` branch points here; ShopFlow and DetailFlow load `core-motion.js@stable` |
 | `v1.1.0` | Core Sheet v1.1 + Core Motion v0.3 (main as of 2026-10-04) | to be pinned by ShopFlow and DetailFlow before Core 2.0 work merges |
+| `v1.2.0` | adds bottom nav, consent, business, announcement, page stability, `core.js`/`core.css` bundles; Core Motion v0.4 — see `CHANGELOG.md` | the $500 Base site |
 | `v2.0.0` | planned: merged sheet engine, bottom nav, consent, business fill, hours, motion, page stability | the $500 Base site, then every new site |
 
 ## Cutting a release

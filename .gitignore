@@ -1,1 +1,4 @@
 .DS_Store
+test/node_modules/
+test/package*.json
+test/_*.html

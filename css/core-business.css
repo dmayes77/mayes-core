@@ -1,0 +1,4 @@
+/* Mayes Core – Business v1.0.0 – layout for generated hours rows (the rest is styled with Webflow classes). */
+[data-business-hours]{display:grid;gap:.3rem}
+[data-business-hours-line]{display:grid;grid-template-columns:minmax(7rem,1fr) auto;gap:1rem}
+[data-business-hours-line] > :last-child{text-align:right}

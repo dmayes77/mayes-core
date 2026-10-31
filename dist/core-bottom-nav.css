@@ -1,0 +1,10 @@
+/* Mayes Core – Bottom Nav v1.1.0 – runtime states for Navigation / Bottom Nav (base styles live on the Webflow bottom-nav_* classes). */
+.bottom-nav_tab{-webkit-tap-highlight-color:transparent;transition:color .15s ease}
+.bottom-nav_tab.is-active{color:var(--_theme---text--brand,#f60)}
+.bottom-nav_tab.is-active .bottom-nav_label{font-weight:700}
+.bottom-nav_indicator{transition:opacity .15s ease}
+.bottom-nav_tab.is-active .bottom-nav_indicator{opacity:1}
+.bottom-nav_badge.is-empty{display:none!important}
+.bottom-nav_tab:active .bottom-nav_icon{transform:scale(.92)}
+.bottom-nav_icon{transition:transform .12s ease}
+@media (prefers-reduced-motion:reduce){.bottom-nav_tab,.bottom-nav_indicator,.bottom-nav_icon{transition:none}}
