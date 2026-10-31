@@ -26,12 +26,14 @@ Never `@main`, never `@stable`, never a bare commit. A push to `main` must never
 
 Semver: a patch fixes behavior without changing markup or attributes; a minor adds attributes or files; a major changes or removes an attribute, class or file path a site depends on.
 
-## Pinning the live sites (do before merging Core 2.0)
+## Live sites (pinned 2026-10-31)
 
-ShopFlow (`shopflow-mayesdigital`) and DetailFlow (`detailflow-mayesdigital`) site custom code:
+ShopFlow (`shopflow-mayesdigital`) and DetailFlow (`detailflow-mayesdigital`) site custom code was changed on 2026-10-31 (saved in Webflow; takes effect on each site's next publish):
 
-| Now | Change to |
+| Was | Now |
 |---|---|
-| `mayes-core@main/dist/core-sheet.css` | `mayes-core@v1.1.0/dist/core-sheet.css` |
-| `mayes-core@main/dist/core-sheet.js` | `mayes-core@v1.1.0/dist/core-sheet.js` |
-| `mayes-core@stable/dist/core-motion.js` | unchanged until v2 (or `@v0.1.0`) |
+| `mayes-core@main/dist/core-sheet.css` | `mayes-core@0407d104f26c5d3de24415e7bc00fde9ce26ccc6/dist/core-sheet.css` |
+| `mayes-core@main/dist/core-sheet.js` | `mayes-core@0407d104f26c5d3de24415e7bc00fde9ce26ccc6/dist/core-sheet.js` |
+| `mayes-core@stable/dist/core-motion.js` | `mayes-core@v0.1.0/dist/core-motion.js` |
+
+Commit `0407d10` is exactly what `v1.1.0` will point to. When the `v1.1.0` tag exists, swap the long commit hash for `@v1.1.0`; nothing else changes.
