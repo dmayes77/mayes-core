@@ -12,10 +12,10 @@ Never `@main`, never `@stable`, never a bare commit. A push to `main` must never
 
 | Tag | Contents | Used by |
 |---|---|---|
-| `v0.1.0` | Core Motion (early) | the `stable` branch points here; ShopFlow and DetailFlow load `core-motion.js@stable` |
-| `v1.1.0` | Core Sheet v1.1 + Core Motion v0.3 (main as of 2026-10-04) | to be pinned by ShopFlow and DetailFlow before Core 2.0 work merges |
-| `v1.2.0` | adds bottom nav, consent, business, announcement, page stability, `core.js`/`core.css` bundles; Core Motion v0.4 — see `CHANGELOG.md` | the $500 Base site |
-| `v2.0.0` | planned: merged sheet engine, bottom nav, consent, business fill, hours, motion, page stability | the $500 Base site, then every new site |
+| `v0.1.0` | Core Motion (early) | ShopFlow and DetailFlow (motion); the `stable` branch also points here |
+| `v1.1.0` | Core Sheet v1.1 + Core Motion v0.3 (commit `0407d10`) | ShopFlow and DetailFlow (sheet) |
+| `v1.2.0` | adds bottom nav, consent, business, announcement, page stability, `core.js`/`core.css` bundles; Core Motion v0.4 — see `CHANGELOG.md` | latest; the $500 Base site and every new site |
+| `v1.3.0` | planned: merged sheet engine (GSAP motion, iOS scroll lock), Before and After module | — |
 
 ## Cutting a release
 
@@ -27,14 +27,13 @@ Never `@main`, never `@stable`, never a bare commit. A push to `main` must never
 
 Semver: a patch fixes behavior without changing markup or attributes; a minor adds attributes or files; a major changes or removes an attribute, class or file path a site depends on.
 
-## Live sites (pinned 2026-10-31)
+## Live sites
 
-ShopFlow (`shopflow-mayesdigital`) and DetailFlow (`detailflow-mayesdigital`) site custom code was changed on 2026-10-31 (saved in Webflow; takes effect on each site's next publish):
+ShopFlow (`shopflow-mayesdigital`) and DetailFlow (`detailflow-mayesdigital`) custom code, updated 2026-11-03 (saved in Webflow; takes effect on each site's next publish):
 
-| Was | Now |
+| File | Loaded from |
 |---|---|
-| `mayes-core@main/dist/core-sheet.css` | `mayes-core@0407d104f26c5d3de24415e7bc00fde9ce26ccc6/dist/core-sheet.css` |
-| `mayes-core@main/dist/core-sheet.js` | `mayes-core@0407d104f26c5d3de24415e7bc00fde9ce26ccc6/dist/core-sheet.js` |
-| `mayes-core@stable/dist/core-motion.js` | `mayes-core@v0.1.0/dist/core-motion.js` |
+| `core-sheet.css`, `core-sheet.js` | `mayes-core@v1.1.0` |
+| `core-motion.js` | `mayes-core@v0.1.0` |
 
-Commit `0407d10` is exactly what `v1.1.0` will point to. When the `v1.1.0` tag exists, swap the long commit hash for `@v1.1.0`; nothing else changes.
+Neither site loads `@main` or `@stable` any more.
