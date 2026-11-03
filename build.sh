@@ -25,6 +25,9 @@ cp "$CSS/core-business.css"             "$OUT/core-business.css"
 cp "$JS/utilities/core-announcement.js" "$OUT/core-announcement.js"
 cp "$CSS/core-announcement.css"         "$OUT/core-announcement.css"
 cp "$CSS/core-page-stability.css"       "$OUT/core-page-stability.css"
+# Optional modules (not in the bundles): load only on sites that use them.
+cp "$JS/components/core-before-after.js" "$OUT/core-before-after.js"
+cp "$CSS/core-before-after.css"         "$OUT/core-before-after.css"
 
 # Bundles: everything a Core site needs, in load order. One <link> + one <script defer>.
 bundle() { # bundle <output> <files...>

@@ -42,22 +42,23 @@ Webflow → Site settings → Custom code. Use a release tag, never `@main`.
 Head (consent snippet first, above any Google tag; then the styles):
 
     <!-- paste dist/core-consent-head.html here -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v1.2.0/dist/core.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v1.3.0/dist/core.css">
 
 Footer (after GSAP, if the site uses it):
 
-    <script src="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v1.2.0/dist/core.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v1.3.0/dist/core.js" defer></script>
 
 `core.js` = sheet + bottom nav + consent + business + announcement + motion. Each module also ships alone in `dist/`.
 
 | Module | Public API | Main attributes |
 |---|---|---|
-| Sheet | `CoreSheet.open/close/show` | `data-sheet`, `data-sheet-open`, `data-sheet-mode`, `data-sheet-height` |
+| Sheet | `CoreSheet.open/close/show` | `data-sheet`, `data-sheet-open`, `data-sheet-mode`, `data-sheet-height`; optional designed host `data-sheet-host` |
 | Bottom nav | — | `data-bottom-nav`, `data-bottom-nav-tab`, `data-tab-action`, `data-bottom-nav-link` |
 | Consent | `CoreConsent.get/set/open` | `data-consent-switch`, `data-consent-action`, `data-consent` (gated scripts) |
 | Business | `CoreBusiness.get/all/hours/fill` | `data-business-field` (source), `data-business` (target), `data-business-hours`, `data-business-today` |
 | Announcement | `CoreAnnouncement.refresh` | `data-announcement`, `data-announcement-follow` |
 | Motion | `CoreMotion` | `data-motion`, `data-scroll-state`, `data-animate` (older) |
+| Before and After (optional, separate file) | `CoreBeforeAfter.init` | `data-before-after`, `data-before-after-range` |
 
 ## Checks and tests
 
