@@ -1,4 +1,4 @@
-/* Mayes Core – Bottom Nav v1.1.0 – behavior for Navigation / Bottom Nav + Navigation / Bottom Nav Tab.
+/* Mayes Core – Bottom Nav v1.2.0 – behavior for Navigation / Bottom Nav + Navigation / Bottom Nav Tab.
    Works with the Sheet engine (window.CoreSheet). Optional GSAP tap feedback when GSAP is loaded.
 
    Markup contract (built by the Webflow components):
@@ -10,7 +10,7 @@
 
    Tab actions (Action prop):
      ""                    normal link (active when the current page matches)
-     "sheet:NAME"          opens the sheet [data-sheet="NAME"]
+     "sheet:NAME"          opens the sheet [data-sheet="NAME"]; add data-tab-sheet-mode="bottom" on the tab to force a presentation
      "click:SELECTOR"      clicks an existing control, e.g. click:[data-booking-open]
    Badges whose text is empty or 0 get .is-empty (hidden); the tab's accessible name includes the count. */
 (function(){
@@ -33,7 +33,7 @@
     if(!action) return;                                   // plain link: let it navigate
     var i = action.indexOf(':'), kind = action.slice(0, i), arg = action.slice(i + 1).trim();
     if(kind === 'sheet' && sheetApi()){
-      e.preventDefault(); sheetApi().open(arg, {returnFocus: link});
+      e.preventDefault(); sheetApi().open(arg, {returnFocus: link, mode: tab.getAttribute('data-tab-sheet-mode') || undefined});
     } else if(kind === 'click'){
       var target = null; try{ target = document.querySelector(arg); }catch(err){}
       if(target){ e.preventDefault(); target.click(); }     // missing target: fall back to the link

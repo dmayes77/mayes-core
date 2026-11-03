@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Before and After</title><link rel="icon" href="data:,">
+<link rel="stylesheet" href="../dist/core-before-after.css">
+</head>
+<body style="margin:0;padding:16px">
+  <div class="ba-slider" data-before-after id="ba">
+    <div class="ba-after-layer"><span class="ba-photo-placeholder" id="ph-after">Add after photo</span><img class="ba-image-after" alt="After"></div>
+    <div class="ba-before-layer"><span class="ba-photo-placeholder" id="ph-before">Add before photo</span><img class="ba-image-before" alt="Before" src="data:image/gif;base64,R0lGODlhAQABAAAAACw="></div>
+    <span class="ba-label-before" aria-hidden="true">Before</span><span class="ba-label-after" aria-hidden="true">After</span>
+    <span class="ba-handle" aria-hidden="true"><span class="ba-handle-dot">↔</span></span>
+    <form class="ba-range-form"><input class="ba-range" data-before-after-range type="range" min="0" max="100" value="50" aria-label="Drag to compare before and after photos" id="range"></form>
+  </div>
+  <div id="later"></div>
+  <script src="../dist/core-before-after.js" defer></script>
+</body>
+</html>

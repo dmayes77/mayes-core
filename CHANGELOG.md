@@ -1,5 +1,24 @@
 # Changelog
 
+## v1.3.0 — 2026-11-03
+
+Finishes the code-side promotion: the sheet engine now carries everything that was still living in DetailFlow's inline custom code, and Before and After becomes an optional Core module.
+
+**Sheet v1.3.0**
+- **GSAP motion:** sheets slide and fade with GSAP when it is loaded; CSS transitions otherwise; nothing moves for visitors who prefer reduced motion. A swiped sheet closes from where the finger let go; a short swipe springs back.
+- **iPhone-safe scroll lock:** the page is pinned while a sheet is open and returns to the same scroll position on close (overflow alone let the page scroll behind the sheet on iOS).
+- **Webflow-authored host:** if the page has a designed host (`[data-sheet-host]` with `[data-sheet-panel]`, e.g. the Overlay / Sheet Native component), the engine adopts it instead of building its own, keeps its Webflow classes, and makes a link-style Close behave as a button.
+- **Per-open presentation:** `CoreSheet.open(name, {mode})`, `data-sheet-open-mode` on a trigger, and `data-tab-sheet-mode` on a bottom-nav tab force a presentation for that open (e.g. More as a bottom sheet). An explicit `mode` / `height` / `width` / `title` option now wins over the block's own attribute.
+- **Reopen while closing:** opening a sheet during a close animation now finishes the close cleanly and opens the new one.
+
+**Bottom nav v1.2.0:** `data-tab-sheet-mode`.
+
+**New optional module:** `core-before-after.js` / `.css` v1.0.0 — before/after photo comparison (drag, tap, keyboard), placeholders for missing photos, `CoreBeforeAfter.init(container)` for sliders added later. Not in `core.js`; load it only where it is used. Colors come from Core tokens.
+
+**Tests:** 84 browser checks (was 48), adding scroll lock, GSAP open/close, reopen during close, mode overrides, the authored host, and Before and After.
+
+Replaces on DetailFlow (when it moves to v1.3.0): the inline "DetailFlow Sheet motion" script and its `df-gsap-motion` style rule, and the Webflow-hosted `before_and_after_slider-1.0.1.js`.
+
 ## v1.2.0 — 2026-10-31
 
 Brings `mayes-core` up to date with the newest generic code that had been living in ShopFlow and DetailFlow, renamed for Core. Additive: the files live sites load today (`dist/core-sheet.js`, `dist/core-sheet.css`) are byte-identical to v1.1.0.

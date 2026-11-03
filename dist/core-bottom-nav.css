@@ -1,4 +1,4 @@
-/* Mayes Core – Bottom Nav v1.1.0 – runtime states for Navigation / Bottom Nav (base styles live on the Webflow bottom-nav_* classes). */
+/* Mayes Core – Bottom Nav v1.2.0 – runtime states for Navigation / Bottom Nav (base styles live on the Webflow bottom-nav_* classes). */
 .bottom-nav_tab{-webkit-tap-highlight-color:transparent;transition:color .15s ease}
 .bottom-nav_tab.is-active{color:var(--_theme---text--brand,#f60)}
 .bottom-nav_tab.is-active .bottom-nav_label{font-weight:700}

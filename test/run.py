@@ -4,7 +4,8 @@ Run from the repo root after ./build.sh:
     python3 test/run.py
 Serves the repo locally, opens test/index.html in headless Chrome at phone and desktop widths,
 and exercises business fill, hours, the sheet, bottom nav, consent, announcement offset,
-scroll state and motion (with and without GSAP, and with reduced motion).
+scroll state and motion (with and without GSAP, and with reduced motion), plus the sheet's
+GSAP motion and iPhone-safe scroll lock, a Webflow-authored sheet host, and the Before and After module.
 """
 import http.server, os, socketserver, sys, threading, tempfile, shutil
 from functools import partial
@@ -85,7 +86,8 @@ def run():
         check("accept-all saved", bool(saved and saved["analytics"] and saved["marketing"]), saved)
         check("consent update sent to gtag", pg.evaluate("__gtagCalls.some(c => c[0]==='consent' && c[1]==='update' && c[2].analytics_storage==='granted')"))
 
-        # bottom sheet from a tab
+        # bottom sheet from a tab (opened while scrolled down, to test the scroll lock)
+        pg.evaluate("window.scrollTo(0, 300)"); pg.wait_for_timeout(100)
         pg.click("#tab-services a"); pg.wait_for_timeout(400)
         host = "[data-sheet-host]"
         check("services sheet open", pg.evaluate(f"document.querySelector('{host}').classList.contains('is-open')"))
@@ -94,8 +96,10 @@ def run():
         check("focus moved into sheet", pg.evaluate(f"document.querySelector('{host}').contains(document.activeElement)"))
         check("page behind is inert", pg.evaluate("document.querySelector('main').closest('[inert]') !== null || document.querySelector('main').hasAttribute('inert') || [...document.body.children].some(e => e.contains(document.querySelector('main')) && e.hasAttribute('inert'))"))
         check("scroll locked", pg.evaluate("document.documentElement.classList.contains('sheet-lock')"))
+        check("body pinned (iPhone-safe lock)", pg.evaluate("document.body.style.position === 'fixed' && document.body.style.top === '-300px'"), pg.evaluate("[document.body.style.position, document.body.style.top]"))
         pg.keyboard.press("Escape"); pg.wait_for_timeout(400)
         check("Escape closes", not pg.evaluate(f"document.querySelector('{host}').classList.contains('is-open')"))
+        check("scroll position restored", pg.evaluate("window.scrollY") == 300 and pg.evaluate("document.body.style.position") == "", pg.evaluate("window.scrollY"))
         check("focus returned to tab", pg.evaluate("document.activeElement === document.querySelector('#tab-services a')"))
         check("content block restored", pg.evaluate("document.querySelector('[data-sheet=\"services\"]').contains(document.getElementById('svc-first'))"))
 
@@ -112,6 +116,7 @@ def run():
         check("save writes switch state", saved["analytics"] is True and saved["marketing"] is False, saved)
 
         # announcement + scroll state
+        pg.evaluate("window.scrollTo(0, 0)"); pg.wait_for_timeout(200)
         off = pg.evaluate("getComputedStyle(document.documentElement).getPropertyValue('--core-announcement-offset').trim()")
         check("announcement offset = bar height", off == "40px", off)
         pg.evaluate("window.scrollTo(0, 400)"); pg.wait_for_timeout(300)
@@ -129,6 +134,15 @@ def run():
         pg.evaluate("localStorage.setItem('core-consent-v1', JSON.stringify({analytics:false,marketing:false}))")
         pg.click("#open-services"); pg.wait_for_timeout(400)
         check("center dialog on desktop", pg.get_attribute("[data-sheet-host]", "data-sheet-as") == "center", pg.get_attribute("[data-sheet-host]", "data-sheet-as"))
+        pg.keyboard.press("Escape"); pg.wait_for_timeout(400)
+        pg.click("#open-right"); pg.wait_for_timeout(400)
+        check("data-sheet-open-mode overrides", pg.get_attribute("[data-sheet-host]", "data-sheet-as") == "right", pg.get_attribute("[data-sheet-host]", "data-sheet-as"))
+        pg.keyboard.press("Escape"); pg.wait_for_timeout(400)
+        pg.click("#tab-more a"); pg.wait_for_timeout(400)
+        check("tab data-tab-sheet-mode overrides", pg.get_attribute("[data-sheet-host]", "data-sheet-as") == "bottom", pg.get_attribute("[data-sheet-host]", "data-sheet-as"))
+        pg.keyboard.press("Escape"); pg.wait_for_timeout(400)
+        check("block mode restored after override", pg.evaluate("CoreSheet.open('services'), document.querySelector('[data-sheet-host]').getAttribute('data-sheet-as')") == "center")
+        pg.keyboard.press("Escape"); pg.wait_for_timeout(400)
         check("no JS errors (desktop)", not errors, errors)
         ctx.close()
 
@@ -144,12 +158,67 @@ def run():
                 check(f"{label}: gsap loaded", pg.evaluate("!!window.gsap"))
                 check(f"{label}: rise ends visible", pg.evaluate("getComputedStyle(document.getElementById('rise')).opacity") == "1")
                 check(f"{label}: stagger items end visible", pg.evaluate("[...document.querySelectorAll('#stagger [data-motion-item]')].every(e => getComputedStyle(e).opacity === '1')"))
-                pg.click("#tab-services a"); pg.wait_for_timeout(500)
-                check(f"{label}: sheet opens", pg.evaluate("document.querySelector('[data-sheet-host]').classList.contains('is-open')"))
+                H = "document.querySelector('[data-sheet-host]')"
+                pg.click("#tab-services a"); pg.wait_for_timeout(60)
+                animating = pg.evaluate(f"{H}.classList.contains('is-gsap')")
+                check(f"{label}: sheet motion {'skipped' if reduced else 'runs on GSAP'}", animating == (not reduced), animating)
+                pg.wait_for_timeout(500)
+                check(f"{label}: sheet opens", pg.evaluate(f"{H}.classList.contains('is-open') && {H}.classList.contains('is-visible')"))
+                check(f"{label}: panel at rest after open", pg.evaluate(f"{H}.querySelector('[data-sheet-panel]').style.transform === '' && !{H}.classList.contains('is-gsap')"))
+                pg.keyboard.press("Escape"); pg.wait_for_timeout(60)
+                if not reduced:
+                    check("GSAP: close animates before hiding", pg.evaluate(f"{H}.classList.contains('is-open') && CoreSheet.top() === null"))
+                pg.wait_for_timeout(450)
+                check(f"{label}: sheet closed", not pg.evaluate(f"{H}.classList.contains('is-open')"))
+                check(f"{label}: content restored", pg.evaluate("document.querySelector('[data-sheet=\"services\"]').contains(document.getElementById('svc-first'))"))
+                # reopen while the close is still animating: must end open, not closed
+                pg.evaluate("CoreSheet.open('services')"); pg.wait_for_timeout(400)
+                pg.evaluate("CoreSheet.close(); CoreSheet.open('location')"); pg.wait_for_timeout(600)
+                check(f"{label}: reopen during close ends open", pg.evaluate(f"{H}.classList.contains('is-open') && CoreSheet.current() && CoreSheet.current().getAttribute('data-sheet') === 'location'"))
+                check(f"{label}: services content back home", pg.evaluate("document.querySelector('[data-sheet=\"services\"]').contains(document.getElementById('svc-first'))"))
+                pg.keyboard.press("Escape"); pg.wait_for_timeout(500)
                 check(f"{label}: no JS errors", not errors, errors)
                 ctx.close()
         else:
             print("SKIP GSAP tests (run: npm install --prefix test gsap)")
+
+        # ---------- Webflow-authored sheet host ----------
+        ctx = browser.new_context(viewport={"width": 390, "height": 844})
+        pg = ctx.new_page(); errors = []
+        pg.on("pageerror", lambda e: errors.append(str(e)))
+        pg.goto(base + "/test/authored.html"); pg.wait_for_load_state("load")
+        check("authored: one host, adopted", pg.evaluate("document.querySelectorAll('[data-sheet-host]').length") == 1)
+        check("authored: moved to <body>", pg.evaluate("document.querySelector('[data-sheet-host]').parentNode === document.body"))
+        check("authored: aria-hidden removed", pg.evaluate("!document.querySelector('[data-sheet-host]').hasAttribute('aria-hidden')"))
+        check("authored: placeholder cleared", "Slot placeholder" not in pg.text_content("[data-sheet-host]"))
+        check("authored: close link is a button", pg.get_attribute("#authored-close", "role") == "button" and pg.get_attribute("#authored-close", "href") is None)
+        pg.click("#open-location"); pg.wait_for_timeout(400)
+        check("authored: opens with content", pg.evaluate("document.querySelector('.sheet_body').contains(document.getElementById('loc-text'))"))
+        check("authored: title set", pg.text_content(".sheet_title") == "Location", pg.text_content(".sheet_title"))
+        check("authored: Webflow classes kept while open", pg.evaluate("document.querySelector('[data-sheet-host]').classList.contains('sheet_component')"))
+        pg.click("#authored-close"); pg.wait_for_timeout(400)
+        check("authored: close link closes", not pg.evaluate("document.querySelector('[data-sheet-host]').classList.contains('is-open')"))
+        check("authored: Webflow classes kept after close", pg.evaluate("document.querySelector('[data-sheet-host]').className") == "sheet_component")
+        check("authored: no JS errors", not errors, errors)
+        ctx.close()
+
+        # ---------- Before and After (optional module) ----------
+        ctx = browser.new_context(viewport={"width": 390, "height": 844})
+        pg = ctx.new_page(); errors = []
+        pg.on("pageerror", lambda e: errors.append(str(e)))
+        pg.goto(base + "/test/before-after.html"); pg.wait_for_load_state("load")
+        pos = lambda: pg.evaluate("getComputedStyle(document.getElementById('ba')).getPropertyValue('--pos').trim()")
+        check("before/after: starts at 50%", pos() == "50%", pos())
+        pg.fill("#range", "30"); pg.wait_for_timeout(50)
+        check("before/after: input moves split", pos() == "30%", pos())
+        pg.focus("#range"); pg.keyboard.press("ArrowRight"); pg.wait_for_timeout(50)
+        check("before/after: keyboard moves split", pos() == "31%", pos())
+        check("before/after: missing photo shows placeholder", pg.evaluate("getComputedStyle(document.getElementById('ph-after')).display") == "grid")
+        check("before/after: present photo hides placeholder", pg.evaluate("getComputedStyle(document.getElementById('ph-before')).display") == "none")
+        pg.evaluate("document.getElementById('later').innerHTML = document.getElementById('ba').outerHTML.replace('id=\"ba\"','id=\"ba2\"').replace(/data-ba-ready=\"1\"/,''); CoreBeforeAfter.init(document.getElementById('later'))")
+        check("before/after: init() wires later sliders", pg.get_attribute("#ba2", "data-ba-ready") == "1")
+        check("before/after: no JS errors", not errors, errors)
+        ctx.close()
 
         browser.close()
     httpd.shutdown()

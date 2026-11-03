@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Authored sheet host</title><link rel="icon" href="data:,">
+<link rel="stylesheet" href="../dist/core.css">
+<style>body{margin:0;font-family:system-ui,sans-serif} main{padding:16px 16px 1200px} .is-hidden{display:none}</style>
+</head>
+<body>
+  <!-- Webflow Page Shell › Overlay slot: a designed host (Overlay / Sheet Native), nested as Webflow nests it -->
+  <div class="page-shell_overlay">
+    <div class="sheet_component" data-sheet="drawer" data-sheet-host aria-hidden="true">
+      <div class="sheet_backdrop" data-sheet-overlay></div>
+      <div class="sheet_panel" data-sheet-panel>
+        <div class="sheet_grabber" data-sheet-grabber></div>
+        <div class="sheet_header" data-sheet-head>
+          <h2 class="sheet_title" data-sheet-title>More</h2>
+          <a href="#" class="sheet_close" data-sheet-close id="authored-close">Close</a>
+        </div>
+        <div class="sheet_body" data-sheet-body><p>Slot placeholder</p></div>
+      </div>
+    </div>
+  </div>
+  <main>
+    <button data-sheet-open="location" id="open-location">Location</button>
+  </main>
+  <div data-sheet="location" data-sheet-title="Location" class="is-hidden"><p id="loc-text">100 Market St</p><a href="#map">Map</a></div>
+  <script src="../dist/core.js" defer></script>
+</body>
+</html>

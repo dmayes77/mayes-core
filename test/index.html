@@ -56,6 +56,7 @@
     <div data-business-hours id="hours"></div>
     <p data-business-today id="today"></p>
     <button data-sheet-open="services" id="open-services">Services</button>
+    <button data-sheet-open="services" data-sheet-open-mode="right" id="open-right">Services in a drawer</button>
   </main>
 
   <!-- Overlay slot: sheet content blocks -->
@@ -86,7 +87,7 @@
       <div class="bottom-nav_tab" data-bottom-nav-tab data-tab-action="sheet:services" id="tab-services"><a data-bottom-nav-link href="/services" aria-label="Services">Services</a></div>
       <div class="bottom-nav_tab" data-bottom-nav-tab data-tab-action="sheet:location" id="tab-location"><a data-bottom-nav-link href="/contact" aria-label="Location">Location</a></div>
       <div class="bottom-nav_tab" data-bottom-nav-tab data-tab-action="click:#open-services" id="tab-click"><a data-bottom-nav-link href="/services" aria-label="Book">Book</a><span class="bottom-nav_badge" id="badge">0</span></div>
-      <div class="bottom-nav_tab" data-bottom-nav-tab data-tab-action="sheet:site-settings" id="tab-more"><a data-bottom-nav-link href="#" aria-label="More">More</a></div>
+      <div class="bottom-nav_tab" data-bottom-nav-tab data-tab-action="sheet:site-settings" data-tab-sheet-mode="bottom" id="tab-more"><a data-bottom-nav-link href="#" aria-label="More">More</a></div>
     </nav>
   </div>
 

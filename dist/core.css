@@ -13,8 +13,9 @@ body{
   overscroll-behavior-x:none;
 }
 
-/* Mayes Core – Sheet v1.1.2
- * Shared presentation styles for the Core Sheet engine.
+/* Mayes Core – Sheet v1.3.0
+ * Presentation styles for the Core Sheet engine. Keyed off data-sheet-as = bottom | center | left | right.
+ * While GSAP animates a sheet the host carries .is-gsap and the CSS transitions step aside.
  */
 [data-sheet]{position:fixed;inset:0;z-index:1002;display:none}
 [data-sheet-content]{display:none}
@@ -54,7 +55,7 @@ html.sheet-lock,html.sheet-lock body{overflow:hidden}
 [data-sheet-host][data-sheet-as="bottom"] [data-sheet-head]{touch-action:none}
 [data-sheet-host][data-sheet-as="bottom"] [data-sheet-footer]{padding-bottom:calc(1rem + env(safe-area-inset-bottom,0px))}
 [data-sheet-host][data-sheet-as="bottom"] [data-sheet-panel]:not(:has(> [data-sheet-footer])) > [data-sheet-body]{padding-bottom:calc(1.25rem + env(safe-area-inset-bottom,0px))}
-/* heights (v1.3.0) */
+/* heights */
 [data-sheet-host][data-sheet-as="bottom"][data-sheet-height="compact"] [data-sheet-panel]{max-height:45vh;max-height:45dvh}
 [data-sheet-host][data-sheet-as="bottom"][data-sheet-height="medium"] [data-sheet-panel]{max-height:70vh;max-height:70dvh}
 [data-sheet-host][data-sheet-as="bottom"][data-sheet-height="tall"] [data-sheet-panel]{height:88vh;height:88dvh;max-height:none}
@@ -71,9 +72,11 @@ html.sheet-lock,html.sheet-lock body{overflow:hidden}
 [data-sheet-host][data-sheet-as="left"] [data-sheet-footer],
 [data-sheet-host][data-sheet-as="right"] [data-sheet-footer]{padding-bottom:calc(1rem + env(safe-area-inset-bottom,0px))}
 
+[data-sheet-host].is-gsap [data-sheet-panel],[data-sheet-host].is-gsap [data-sheet-overlay]{transition:none!important}
+
 @media (prefers-reduced-motion:reduce){[data-sheet-panel],[data-sheet-overlay]{transition:none!important}}
 
-/* Mayes Core – Bottom Nav v1.1.0 – runtime states for Navigation / Bottom Nav (base styles live on the Webflow bottom-nav_* classes). */
+/* Mayes Core – Bottom Nav v1.2.0 – runtime states for Navigation / Bottom Nav (base styles live on the Webflow bottom-nav_* classes). */
 .bottom-nav_tab{-webkit-tap-highlight-color:transparent;transition:color .15s ease}
 .bottom-nav_tab.is-active{color:var(--_theme---text--brand,#f60)}
 .bottom-nav_tab.is-active .bottom-nav_label{font-weight:700}
