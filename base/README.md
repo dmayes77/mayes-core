@@ -15,9 +15,21 @@ The Launch & Own offer: a professional 3-page website, mobile-first, with 30 day
 
 Brand bar (logo, Call) · bottom nav: Home · Services (sheet) · Call or Book · Location (sheet) · More (sheet). Desktop keeps a normal header, dropdown and footer.
 
+In the Webflow master (built 2026-11-03):
+
+| Component | Goes in | Notes |
+|---|---|---|
+| Page Shell | page body | Slots: Nav / Header, Main Content, Footer, Overlay, Mobile Nav |
+| Navigation / Bottom Nav | Page Shell › Mobile Nav | Tabs slot takes 3–5 tabs; columns size themselves; hidden above 991px |
+| Navigation / Bottom Nav Tab | Bottom Nav › Tabs | Props: Label, Link, Action (`sheet:NAME`, `click:SELECTOR`), Sheet Mode. Slots: Icon, Badge |
+| Sheet / Content | Page Shell › Overlay | Props: Name, Title, Height, Mode. Content slot for links, text, a form |
+| Core / Site Settings | Page Shell › Overlay, once | Settings sheet (`site-settings`) + cookie notice; More tab opens it with Sheet Mode `bottom` |
+
+Site custom code loads the consent snippet, `core.css`, GSAP, and `core.js`, all pinned to `@v1.3.0`.
+
 ## CMS
 
-Business Settings (1 item) and Business Hours (7 items) only. Services, reviews and FAQs are component props at this tier; a Services collection is added only on plans with per-service pages. GoHighLevel embeds stay dormant until the client moves to a managed plan.
+Business Settings (1 item) and Business Hours (7 items) only. Both exist in the master with placeholder content. Business Settings field slugs match `data-business` names in `core-business.js` (business-name, phone, email, booking-url, street-address, city, state, zip-code, directions-url, google-business-url, announcement, social URLs, and more). Business Hours: Day Order, Open, Close, Closed, Note. Services, reviews and FAQs are component props at this tier; a Services collection is added only on plans with per-service pages. GoHighLevel embeds stay dormant until the client moves to a managed plan.
 
 ## Per-client checklist
 
