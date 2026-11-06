@@ -39,16 +39,17 @@ Core contains no product names, no commerce logic and no client content.
 
 Webflow → Site settings → Custom code. Use a release tag, never `@main`.
 
-Head (consent snippet first, above any Google tag; then the styles):
+Head (consent snippet first, above any Google tag; then the app snippet; then the styles):
 
     <!-- paste dist/core-consent-head.html here -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v1.3.0/dist/core.css">
+    <!-- paste dist/core-app-head.html here (set the short name and theme color) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v1.4.0/dist/core.css">
 
 Footer (after GSAP, if the site uses it):
 
-    <script src="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v1.3.0/dist/core.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v1.4.0/dist/core.js" defer></script>
 
-`core.js` = sheet + bottom nav + consent + business + announcement + motion. Each module also ships alone in `dist/`.
+`core.js` = sheet + bottom nav + consent + business + announcement + install + motion. Each module also ships alone in `dist/`.
 
 | Module | Public API | Main attributes |
 |---|---|---|
@@ -57,6 +58,7 @@ Footer (after GSAP, if the site uses it):
 | Consent | `CoreConsent.get/set/open` | `data-consent-switch`, `data-consent-action`, `data-consent` (gated scripts) |
 | Business | `CoreBusiness.get/all/hours/fill` | `data-business-field` (source), `data-business` (target), `data-business-hours`, `data-business-today` |
 | Announcement | `CoreAnnouncement.refresh` | `data-announcement`, `data-announcement-follow` |
+| Install (Add to Home Screen) | `CoreInstall.show/hide/state` | none required (builds its own banner); `data-install-open` trigger; `<html data-install="off">`, `data-install-name`, `data-install-delay` |
 | Motion | `CoreMotion` | `data-motion`, `data-scroll-state`, `data-animate` (older) |
 | Before and After (optional, separate file) | `CoreBeforeAfter.init` | `data-before-after`, `data-before-after-range` |
 
