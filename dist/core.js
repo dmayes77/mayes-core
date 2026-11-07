@@ -1,6 +1,6 @@
 /* Mayes Core – core.js – built from: javascript/components/core-sheet.js javascript/components/core-bottom-nav.js javascript/privacy/core-consent.js javascript/utilities/core-business.js javascript/utilities/core-announcement.js javascript/components/core-install.js javascript/motion/core-motion.js */
 
-/* Mayes Core – Sheet v1.4.0
+/* Mayes Core – Sheet v1.4.1
  * One shared sheet for the whole site: bottom sheet, centered dialog, or left/right drawer.
  *
  * CONTENT BLOCKS – anything the site shows in a sheet is a hidden block somewhere on the page:
@@ -129,6 +129,18 @@
     } else { inerted.forEach(function(e){ e.removeAttribute('inert'); }); inerted = []; }
   }
 
+  /* desktop browsers with classic scrollbars keep a reserved gutter (page stability) that no overlay can paint over;
+     it shows the root background, so give that the overlay's color while a sheet is open (only when the body has its
+     own background, so the page behind the overlay is never darkened twice) */
+  function tintGutter(on){
+    var root = document.documentElement;
+    if(!on){ root.style.removeProperty('--sheet-tint'); return; }
+    var bodyBg = getComputedStyle(document.body).backgroundColor, tint = overlay ? getComputedStyle(overlay).backgroundColor : '';
+    var transparent = function(c){ return !c || c === 'transparent' || /rgba\([^)]*,\s*0\)$/.test(c); };
+    if(transparent(bodyBg) || transparent(tint) || root.scrollHeight <= root.clientHeight) return;
+    root.style.setProperty('--sheet-tint', tint);
+  }
+
   /* scroll lock: overflow alone does not stop the page scrolling behind a sheet on iPhone, so the body is pinned */
   var lockedY = null, saved = null;
   function lockScroll(){
@@ -136,6 +148,7 @@
     lockedY = window.pageYOffset || document.documentElement.scrollTop || 0;
     var b = document.body.style;
     saved = {position: b.position, top: b.top, left: b.left, right: b.right, width: b.width};
+    tintGutter(true);                                  // measure before the body is pinned
     b.position = 'fixed'; b.top = (-lockedY) + 'px'; b.left = '0'; b.right = '0'; b.width = '100%';
     document.documentElement.classList.add('sheet-lock');
   }
@@ -145,6 +158,7 @@
     lockedY = null;
     b.position = saved.position; b.top = saved.top; b.left = saved.left; b.right = saved.right; b.width = saved.width;
     root.classList.remove('sheet-lock');
+    tintGutter(false);
     root.style.scrollBehavior = 'auto'; window.scrollTo(0, y); root.style.scrollBehavior = behavior;
   }
 
@@ -354,7 +368,7 @@
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', build); else build();
 
   window.CoreSheet = {
-    version: '1.4.0',
+    version: '1.4.1',
     open: open, show: show, close: close,
     top: function(){ return host && host.classList.contains('is-open') && !finishClose ? host : null; },
     current: function(){ return current && !finishClose ? current.block : null; },
