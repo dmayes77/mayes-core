@@ -1,5 +1,22 @@
 # Changelog
 
+## v1.4.1 — 2026-11-06
+
+First release with Add to Home Screen. (The `v1.4.0` tag was created before this change was merged and points at the v1.3.0 code; do not use it.)
+
+Add to Home Screen. Webflow cannot host a service worker, so a full installable web app is out of reach; this gets the parts that matter: the site opens full screen from the home screen, and visitors are shown how to put it there.
+
+**New module:** `core-install.js` / `.css` v1.0.0, in the `core.js` / `core.css` bundles.
+- A small banner above the bottom nav, on phones and tablets, from the visitor's 2nd page view. Never on desktop, never when the site is already open from the home screen, never while a sheet is open; waits for the cookie notice to be answered. Closing it hides it for 30 days.
+- The message fits the browser: iPhone/iPad ("Tap Share, then Add to Home Screen"), Android (the ⋮ menu), Android with the browser's install prompt (an Install button), and Instagram, TikTok, Facebook and other in-app browsers ("open in your browser first").
+- Uses the Business Settings name and the Webflow webclip icon. No markup needed.
+- `[data-install-open]` on any element (e.g. a row in the More sheet) shows it on demand; such triggers hide themselves on desktop and when already on the home screen (`html.is-standalone`).
+- `CoreInstall.show/hide/state`; `core:install` event.
+
+**New head snippet:** `core-app-head.html` v1.0.0 — full-screen launch, status bar, short name and theme color.
+
+**Tests:** 25 new browser checks (iPhone, Android prompt, in-app browser, consent order, standalone, desktop).
+
 ## v1.3.0 — 2026-11-03
 
 Finishes the code-side promotion: the sheet engine now carries everything that was still living in DetailFlow's inline custom code, and Before and After becomes an optional Core module.

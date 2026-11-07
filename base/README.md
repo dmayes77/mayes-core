@@ -25,7 +25,9 @@ In the Webflow master (built 2026-11-03):
 | Sheet / Content | Page Shell › Overlay | Props: Name, Title, Height, Mode. Content slot for links, text, a form |
 | Core / Site Settings | Page Shell › Overlay, once | Settings sheet (`site-settings`) + cookie notice; More tab opens it with Sheet Mode `bottom` |
 
-Site custom code loads the consent snippet, `core.css`, GSAP, and `core.js`, all pinned to `@v1.3.0`.
+Site custom code loads the consent snippet, `core.css`, GSAP, and `core.js`, all pinned to `@v1.3.0`. To turn on Add to Home Screen, move them to `@v1.4.1` and add the app head snippet.
+
+Add to Home Screen: the app head snippet makes the saved site open full screen, and Core shows phone visitors a banner on their second page view. The More sheet carries an "Add to Home Screen" row (`data-install-open`). Opened from the home screen there is no browser back button, so every page keeps the bottom nav.
 
 ## CMS
 
@@ -36,7 +38,8 @@ Business Settings (1 item) and Business Hours (7 items) only. Both exist in the 
 - [ ] Duplicate the Base site in Webflow; name it `<client>-mayesdigital`.
 - [ ] Primitives: brand colors and fonts.
 - [ ] Business Settings and Business Hours items.
-- [ ] Logos, favicon, share image.
+- [ ] Logos, favicon, share image, webclip (180×180 PNG, no transparency).
+- [ ] App head snippet: short name (max ~12 characters) and theme color.
 - [ ] Choose Home sections; write copy; add imagery with alt text.
 - [ ] Services page content.
 - [ ] Contact form recipient and thank-you message.
