@@ -94,6 +94,7 @@ def run():
         pg.evaluate("window.scrollTo(0, 300)"); pg.wait_for_timeout(100)
         pg.click("#tab-services a"); pg.wait_for_timeout(400)
         host = "[data-sheet-host]"
+        check("built host has Core look", pg.get_attribute(host, "data-sheet-look") == "core" and pg.evaluate("getComputedStyle(document.querySelector('[data-sheet-panel]')).backgroundColor") == "rgb(255, 255, 255)")
         check("services sheet open", pg.evaluate(f"document.querySelector('{host}').classList.contains('is-open')"))
         check("bottom presentation on phone", pg.get_attribute(host, "data-sheet-as") == "bottom", pg.get_attribute(host, "data-sheet-as"))
         check("height attribute mirrored", pg.get_attribute(host, "data-sheet-height") == "medium")
@@ -150,6 +151,17 @@ def run():
         check("no JS errors (desktop)", not errors, errors)
         ctx.close()
 
+        # ---------- with GSAP, Webflow Interactions own motion ----------
+        if gsap:
+            ctx = browser.new_context(viewport={"width": 390, "height": 844})
+            ctx.add_init_script("new MutationObserver((m, o) => { if (document.head) { const t = document.createElement('meta'); t.name = 'core-motion'; t.content = 'webflow'; document.head.appendChild(t); o.disconnect(); } }).observe(document, {childList: true, subtree: true});")
+            pg = ctx.new_page()
+            pg.goto(base + gsap); pg.wait_for_load_state("load"); pg.wait_for_timeout(800)
+            check("native motion: Core Motion steps aside", pg.evaluate("CoreMotion.native() && !document.getElementById('rise').getAttribute('style') && [...document.querySelectorAll('#stagger [data-motion-item]')].every(e => !e.getAttribute('style'))"))
+            pg.evaluate("window.scrollTo(0, 400)"); pg.wait_for_timeout(200)
+            check("native motion: scroll state still works", pg.evaluate("!!document.querySelector('[data-scroll-state].is-scrolled, [data-scroll-state][class*=scrolled]')"))
+            ctx.close()
+
         # ---------- with GSAP ----------
         if gsap:
             for reduced in (False, True):
@@ -202,8 +214,25 @@ def run():
         check("authored: Webflow classes kept while open", pg.evaluate("document.querySelector('[data-sheet-host]').classList.contains('sheet_component')"))
         pg.click("#authored-close"); pg.wait_for_timeout(400)
         check("authored: close link closes", not pg.evaluate("document.querySelector('[data-sheet-host]').classList.contains('is-open')"))
+        check("authored: look comes from Webflow classes", not pg.evaluate("document.querySelector('[data-sheet-host]').hasAttribute('data-sheet-look')") and pg.evaluate("getComputedStyle(document.querySelector('[data-sheet-panel]')).backgroundColor") == "rgb(250, 250, 250)")
         check("authored: Webflow classes kept after close", pg.evaluate("document.querySelector('[data-sheet-host]').className") == "sheet_component")
+        check("authored: hidden when closed", pg.evaluate("getComputedStyle(document.querySelector('[data-sheet-host]')).display") == "none")
+        R = "(() => { const r = document.querySelector('[data-sheet-panel]').getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top), Math.round(r.right), Math.round(r.bottom)]; })()"
+        pg.click("#open-location"); pg.wait_for_timeout(500)
+        check("authored: bottom sheet on phone, full width at the bottom", pg.evaluate(R)[0] == 0 and pg.evaluate(R)[2] == pg.evaluate("document.querySelector('[data-sheet-host]').getBoundingClientRect().width") and pg.evaluate(R)[3] == 844, pg.evaluate(R))
+        pg.keyboard.press("Escape"); pg.wait_for_timeout(400)
         check("authored: no JS errors", not errors, errors)
+        ctx.close()
+        ctx = browser.new_context(viewport={"width": 1280, "height": 800})
+        pg = ctx.new_page()
+        pg.goto(base + "/test/authored.html"); pg.wait_for_load_state("load")
+        pg.evaluate("CoreSheet.open('location')"); pg.wait_for_timeout(500)
+        r = pg.evaluate(R); cw = pg.evaluate("document.querySelector('[data-sheet-host]').getBoundingClientRect().width")
+        check("authored: centered dialog on desktop despite the preview position", abs((r[0] + r[2]) / 2 - cw / 2) <= 1 and abs((r[1] + r[3]) / 2 - 400) <= 1 and r[2] - r[0] <= 480, r)
+        check("authored: corners from the Radius token", pg.evaluate("getComputedStyle(document.querySelector('[data-sheet-panel]')).borderBottomLeftRadius") == "16px")
+        pg.evaluate("CoreSheet.close(null, {instant: true}); CoreSheet.open('location', {mode: 'right'})"); pg.wait_for_timeout(500)
+        r = pg.evaluate(R)
+        check("authored: right drawer runs full height at the right edge", r[1] == 0 and r[2] == cw and r[3] == 800 and r[0] >= cw - 448, r)
         ctx.close()
 
         # ---------- Before and After (optional module) ----------
@@ -252,8 +281,12 @@ def run():
         check("safe area: header clear of the notch", px(pg, "#shell-header", "paddingLeft") == 47 and px(pg, "#shell-header", "paddingRight") == 47)
         check("safe area: bottom nav clear of the notch", px(pg, ".bottom-nav_bar", "paddingLeft") == 47 and px(pg, ".bottom-nav_bar", "paddingRight") == 47)
         pg.evaluate("CoreSheet.open('services', {mode: 'bottom'})"); pg.wait_for_timeout(500)
-        check("safe area: sheet content clear of the notch", px(pg, "[data-sheet-host].is-open [data-sheet-body]", "paddingLeft") == 47)
-        check("safe area: sheet clear of the home bar", px(pg, "[data-sheet-host].is-open [data-sheet-body]", "paddingBottom") >= 21 + 20)
+        pg.evaluate("CoreSheet.close(null, {instant: true}); CoreSheet.open('services', {mode: 'left'})"); pg.wait_for_timeout(500)
+        content_left = pg.evaluate("(() => { const b = document.querySelector('[data-sheet-host].is-open [data-sheet-body]'); return b.getBoundingClientRect().left + parseFloat(getComputedStyle(b).paddingLeft); })()")
+        check("safe area: sheet content clear of the notch", content_left >= 47 + 16, content_left)
+        pg.evaluate("CoreSheet.close(null, {instant: true}); CoreSheet.open('services', {mode: 'bottom'})"); pg.wait_for_timeout(500)
+        body_bottom = pg.evaluate("document.querySelector('[data-sheet-host].is-open [data-sheet-body]').getBoundingClientRect().bottom")
+        check("safe area: sheet clear of the home bar", body_bottom <= 390 - 21, body_bottom)
         pg.evaluate("CoreSheet.close()"); pg.wait_for_timeout(400)
         pg.evaluate("CoreInstall.show(true)"); pg.wait_for_timeout(400)
         check("safe area: install banner clear of the notch", pg.evaluate("document.querySelector('.core-install').getBoundingClientRect().left") >= 47)
@@ -262,7 +295,8 @@ def run():
         ctx, pg = notched(390, 844, {"left": 0, "right": 0, "top": 47, "bottom": 34})
         check("safe area: portrait spacing unchanged", px(pg, "body", "paddingLeft") == 0 and px(pg, ".bottom-nav_bar", "paddingLeft") == 6)
         pg.evaluate("CoreSheet.open('services', {mode: 'left'})"); pg.wait_for_timeout(500)
-        check("safe area: side drawer clear of the status bar", px(pg, "[data-sheet-host].is-open [data-sheet-head]", "paddingTop") == 47)
+        head_top = pg.evaluate("document.querySelector('[data-sheet-host].is-open [data-sheet-head]').getBoundingClientRect().top")
+        check("safe area: side drawer clear of the status bar", head_top >= 47, head_top)
         ctx.close()
 
         # ---------- Add to Home Screen ----------

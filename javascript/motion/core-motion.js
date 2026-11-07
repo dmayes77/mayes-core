@@ -1,4 +1,9 @@
-/* Mayes Core – Motion v0.4.0 – attribute-driven motion and scroll state.
+/* Mayes Core – Motion v0.5.0 – attribute-driven motion and scroll state.
+ *
+ * NATIVE FIRST: on sites where Webflow Interactions animate the data-motion attributes (the master's
+ * "Core / Fade", "Core / Rise", … interactions), add this to the head so Core stays out of the way:
+ *   <meta name="core-motion" content="webflow">
+ * Core then skips data-motion and data-animate (Webflow animates them) and keeps only data-scroll-state.
  *
  * Scroll state (no GSAP needed):
  *   data-scroll-state                  toggles a class once the page scrolls past a threshold
@@ -86,8 +91,11 @@
     });
   }
 
+  function native(){ var m = document.querySelector('meta[name="core-motion"]'); return !!m && /^webflow$/i.test(m.getAttribute('content') || ''); }
+
   function init(){
     scrollStates();
+    if(native()) return;
     var gsap = window.gsap, ST = window.ScrollTrigger;
     if(!gsap || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     if(ST) gsap.registerPlugin(ST);
@@ -96,5 +104,5 @@
   }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 
-  window.CoreMotion = { version: '0.4.0' };
+  window.CoreMotion = { version: '0.5.0', native: native };
 })();

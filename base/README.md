@@ -26,6 +26,7 @@ In the Webflow master:
 | Page Shell | page body | Slots: Nav / Header, Main Content, Footer, Mobile Nav (fixed, 991px and below), Sheets. (The old Overlay slot is no longer used.) |
 | Navigation / Glass | Page Shell › Nav / Header | Flush top bar; ⋯ button (`data-sheet-open="site-settings"`) on phones |
 | Navigation / Site Bottom Nav | Page Shell › Mobile Nav | Home, Services, Call, Location, Quote. A tab opens a sheet with `data-tab-action="sheet:NAME"` |
+| Sheet / Host | Page Shell root (not a slot), once | The frame every sheet opens in; its look is the `sheet-host_*` classes. Preview it by adding the `is-open` combo to `sheet-host` |
 | Sheet / Site Settings | Page Shell › Sheets, once | `site-settings` sheet + `cookie-notice` sheet |
 | Sheet / Services | Page Shell › Sheets | `services` sheet |
 | Sheet / Location | Page Shell › Sheets | `location` sheet: today's hours, address, Directions, Call, the week's hours |
@@ -36,6 +37,8 @@ In the Webflow master:
 **Sheet naming:** the component is `Sheet / Name`; the sheet's root class is the sheet's own name with the `is-hidden` combo (`settings is-hidden`, `location is-hidden`), and its inner parts use that name as a prefix (`location_hours`, `location_actions`). `data-sheet` is the lowercase name that openers use (`data-sheet-open="location"`).
 
 **Business data layer:** a hidden `shell-data` div with two Collection Lists (Business Settings, limit 1; Business Hours, limit 7). Each field is a native element bound to the CMS with `data-business-field="slug"`; each hours item is `[data-business-hours-entry]` with `data-business-hours-day / -order / -open / -close`, plus a "true" text whose visibility is bound to Closed. Webflow can't put a live Collection List inside a component created through the API, so the layer sits on the page. Copy it onto every new static page (or duplicate pages from Home) until it is moved into the Page Shell in the Designer.
+
+**Motion:** the site-wide Webflow Interactions Core / Fade, Rise, Scale, Stagger (each direct child in turn) and Hero (on load) animate any element with `data-motion="fade|rise|scale|stagger|hero"`. The head carries `<meta name="core-motion" content="webflow">` so Core Motion stays out of the way. Edit the motion in the Interactions panel.
 
 Site custom code loads the consent snippet, the app head snippet, `core.css` and GSAP in the head, and `core.js` before `</body>`, all pinned to the same release tag.
 
