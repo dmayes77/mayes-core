@@ -758,7 +758,7 @@
  * WHAT IT SAYS – picked from the browser:
  *   · Android Chrome with an install prompt available → an "Install" button that opens the browser's own prompt
  *   · iPhone / iPad → "Tap Share, then Add to Home Screen"
- *   · Android without a prompt → "Tap the ⋮ menu, then Add to Home screen"
+ *   · Android without a prompt → "Tap the ⋮ menu, then Install or Add to Home screen" (newer Chrome: "Install and create shortcut")
  *   · Instagram, TikTok, Facebook and other in-app browsers (which cannot add to the home screen)
  *     → "Open this page in your browser first"
  *
@@ -832,7 +832,7 @@
   function message(p){
     if(p === 'prompt') return 'Install it for one-tap access, like an app.';
     if(p === 'ios') return 'Tap <span class="core-install_glyph">' + SVG.share + '<span class="core-install_sr">Share</span></span> then <b>Add to Home Screen</b>.';
-    if(p === 'android') return 'Tap <span class="core-install_glyph">' + SVG.dots + '<span class="core-install_sr">the menu</span></span> then <b>Add to Home screen</b>.';
+    if(p === 'android') return 'Tap <span class="core-install_glyph">' + SVG.dots + '<span class="core-install_sr">the menu</span></span> then <b>Install</b> or <b>Add to Home screen</b>.';
     if(p === 'in-app') return 'Open this page in your browser first, then add it to your Home Screen.';
     return 'Use your browser menu to add it to your Home Screen.';
   }

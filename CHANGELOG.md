@@ -4,6 +4,8 @@
 
 **Fix:** `core-install.js` v1.0.1. The Add to Home Screen banner waited for a saved cookie choice, so visitors who closed or ignored the cookie notice never saw it. It now waits only while the cookie notice (or any sheet) is open, and shows once it closes, with or without a choice. 3 new browser checks.
 
+Android wording: newer Chrome calls the menu item "Install and create shortcut", so the banner now says "Tap ⋮ then Install or Add to Home screen".
+
 ## v1.4.1 — 2026-11-06
 
 First release with Add to Home Screen. (The `v1.4.0` tag was created before this change was merged and points at the v1.3.0 code; do not use it.)
