@@ -5,7 +5,8 @@ Run from the repo root after ./build.sh:
 Serves the repo locally, opens test/index.html in headless Chrome at phone and desktop widths,
 and exercises business fill, hours, the sheet, bottom nav, consent, announcement offset,
 scroll state and motion (with and without GSAP, and with reduced motion), plus the sheet's
-GSAP motion and iPhone-safe scroll lock, a Webflow-authored sheet host, and the Before and After module.
+GSAP motion and iPhone-safe scroll lock, a Webflow-authored sheet host, the Before and After module,
+and the Add to Home Screen banner (iPhone, Android prompt, in-app browser, standalone, desktop).
 """
 import http.server, os, socketserver, sys, threading, tempfile, shutil
 from functools import partial
@@ -57,7 +58,7 @@ def run():
         pg.on("response", lambda r: r.status >= 400 and errors.append(f"{r.status} {r.url}"))
         pg.goto(base + plain); pg.wait_for_load_state("load")
 
-        check("globals present", pg.evaluate("!!(window.CoreSheet && window.CoreConsent && window.CoreBusiness && window.CoreAnnouncement && window.CoreMotion)"))
+        check("globals present", pg.evaluate("!!(window.CoreSheet && window.CoreConsent && window.CoreBusiness && window.CoreAnnouncement && window.CoreInstall && window.CoreMotion)"))
         check("phone filled", pg.text_content("#phone") == "(423) 555-0100", pg.text_content("#phone"))
         check("phone link", pg.get_attribute("#phone", "href") == "tel:4235550100", pg.get_attribute("#phone", "href"))
         check("email link", pg.get_attribute("#email", "href") == "mailto:hello@example.com")
@@ -218,6 +219,88 @@ def run():
         pg.evaluate("document.getElementById('later').innerHTML = document.getElementById('ba').outerHTML.replace('id=\"ba\"','id=\"ba2\"').replace(/data-ba-ready=\"1\"/,''); CoreBeforeAfter.init(document.getElementById('later'))")
         check("before/after: init() wires later sliders", pg.get_attribute("#ba2", "data-ba-ready") == "1")
         check("before/after: no JS errors", not errors, errors)
+        ctx.close()
+
+        # ---------- Add to Home Screen ----------
+        IPHONE = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1"
+        ANDROID = "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36"
+        INSTA = IPHONE + " Instagram 350.0.0.0"
+        CONSENTED = "localStorage.setItem('core-consent-v1', JSON.stringify({analytics:false,marketing:false}));"
+        BANNER = "document.querySelector('[data-install-banner]')"
+        def phone(ua, init=""):
+            c = browser.new_context(viewport={"width": 390, "height": 844}, user_agent=ua, is_mobile=True, has_touch=True)
+            if init: c.add_init_script(init)
+            pg = c.new_page(); errs = []
+            pg.on("pageerror", lambda e: errs.append(str(e)))
+            return c, pg, errs
+        visible = lambda pg: pg.evaluate(f"!!{BANNER} && {BANNER}.classList.contains('is-visible')")
+
+        # iPhone: first view no banner; second view shows it above the bottom nav
+        ctx, pg, errors = phone(IPHONE, "if(!sessionStorage.getItem('seeded')){" + CONSENTED + "sessionStorage.setItem('seeded','1');}")
+        pg.goto(base + plain); pg.wait_for_load_state("load"); pg.wait_for_timeout(3500)
+        check("install: no banner on first view", not pg.evaluate(f"!!{BANNER}"))
+        pg.reload(); pg.wait_for_load_state("load"); pg.wait_for_timeout(3500)
+        check("install: banner on second view (iPhone)", visible(pg))
+        check("install: iOS instructions", pg.get_attribute("[data-install-banner]", "data-install-platform") == "ios" and "Add to Home Screen" in pg.text_content(".core-install_hint"), pg.text_content("[data-install-banner]"))
+        check("install: business name used", "Test Plumbing Co." in pg.text_content(".core-install_title"), pg.text_content(".core-install_title"))
+        check("install: webclip icon shown", pg.evaluate("!!document.querySelector('.core-install_icon')"))
+        check("install: sits above bottom nav", pg.evaluate(f"{BANNER}.getBoundingClientRect().bottom <= document.querySelector('.bottom-nav_bar').getBoundingClientRect().top"),
+              pg.evaluate(f"[{BANNER}.getBoundingClientRect().bottom, document.querySelector('.bottom-nav_bar').getBoundingClientRect().top]"))
+        check("install: does not take focus", pg.evaluate(f"!{BANNER}.contains(document.activeElement)"))
+        pg.click(".core-install_close"); pg.wait_for_timeout(400)
+        check("install: close removes banner", not pg.evaluate(f"!!{BANNER}"))
+        check("install: close remembered", pg.evaluate("CoreInstall.state().snoozed"))
+        pg.reload(); pg.wait_for_load_state("load"); pg.wait_for_timeout(3500)
+        check("install: stays closed after reload", not pg.evaluate(f"!!{BANNER}"))
+        pg.click("#tab-more a"); pg.wait_for_timeout(400)
+        check("install: trigger is a button", pg.get_attribute("#install-open", "role") == "button" and pg.get_attribute("#install-open", "href") is None)
+        pg.click("#install-open"); pg.wait_for_timeout(900)
+        check("install: trigger shows banner even when closed", visible(pg) and not pg.evaluate("CoreSheet.current()"))
+        check("install: no JS errors (iPhone)", not errors, errors)
+        ctx.close()
+
+        # waits for the cookie notice to be answered
+        ctx, pg, errors = phone(IPHONE, "localStorage.setItem('core-install-v1', JSON.stringify({views:1}));")
+        pg.goto(base + plain); pg.wait_for_load_state("load"); pg.wait_for_timeout(3500)
+        check("install: waits while cookie notice is open", not pg.evaluate(f"!!{BANNER}") and pg.evaluate("CoreSheet.current() && CoreSheet.current().getAttribute('data-sheet') === 'cookie-notice'"))
+        pg.click("#necessary"); pg.wait_for_timeout(2400)
+        check("install: shows after consent answered", visible(pg))
+        check("install: no JS errors (consent)", not errors, errors)
+        ctx.close()
+
+        # Android with the browser's install prompt
+        ctx, pg, errors = phone(ANDROID, CONSENTED + "localStorage.setItem('core-install-v1', JSON.stringify({views:1}));")
+        pg.goto(base + plain); pg.wait_for_load_state("load")
+        pg.evaluate("""() => { const e = new Event('beforeinstallprompt', {cancelable: true});
+            e.prompt = () => { window.__prompted = true; }; e.userChoice = Promise.resolve({outcome: 'accepted'});
+            window.dispatchEvent(e); }""")
+        pg.wait_for_timeout(3500)
+        check("install: Android prompt shows Install button", visible(pg) and pg.evaluate("!!document.querySelector('[data-install-action=prompt]')"))
+        pg.click("[data-install-action=prompt]"); pg.wait_for_timeout(500)
+        check("install: Install opens browser prompt", pg.evaluate("window.__prompted === true"))
+        check("install: accepted hides banner", not pg.evaluate(f"!!{BANNER}"))
+        check("install: no JS errors (Android)", not errors, errors)
+        ctx.close()
+
+        # Instagram in-app browser
+        ctx, pg, errors = phone(INSTA, CONSENTED + "localStorage.setItem('core-install-v1', JSON.stringify({views:1}));")
+        pg.goto(base + plain); pg.wait_for_load_state("load"); pg.wait_for_timeout(3500)
+        check("install: in-app browser told to open in browser", pg.get_attribute("[data-install-banner]", "data-install-platform") == "in-app" and "browser" in pg.text_content(".core-install_hint"))
+        ctx.close()
+
+        # already opened from the home screen
+        ctx, pg, errors = phone(IPHONE, CONSENTED + "localStorage.setItem('core-install-v1', JSON.stringify({views:5})); Object.defineProperty(navigator, 'standalone', {value: true});")
+        pg.goto(base + plain); pg.wait_for_load_state("load"); pg.wait_for_timeout(3500)
+        check("install: never shown when standalone", not pg.evaluate(f"!!{BANNER}") and pg.evaluate("document.documentElement.classList.contains('is-standalone')"))
+        check("install: trigger hidden when standalone", pg.evaluate("getComputedStyle(document.getElementById('install-open')).display") == "none")
+        ctx.close()
+
+        # desktop: nothing
+        ctx = browser.new_context(viewport={"width": 1280, "height": 900})
+        ctx.add_init_script(CONSENTED + "localStorage.setItem('core-install-v1', JSON.stringify({views:5}));")
+        pg = ctx.new_page(); pg.goto(base + plain); pg.wait_for_load_state("load"); pg.wait_for_timeout(3500)
+        check("install: no banner on desktop", not pg.evaluate(f"!!{BANNER}"))
+        check("install: trigger hidden on desktop", pg.evaluate("document.getElementById('install-open').hidden"))
         ctx.close()
 
         browser.close()

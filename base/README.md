@@ -15,6 +15,8 @@ The Launch & Own offer: a professional 3-page website, mobile-first, with 30 day
 
 Brand bar (logo, Call) · bottom nav: Home · Services (sheet) · Call or Book · Location (sheet) · More (sheet). Desktop keeps a normal header, dropdown and footer.
 
+Add to Home Screen: the app head snippet makes the saved site open full screen, and Core shows phone visitors a banner on their second page view. The More sheet carries an "Add to Home Screen" row (`data-install-open`). Opened from the home screen there is no browser back button, so every page keeps the bottom nav.
+
 ## CMS
 
 Business Settings (1 item) and Business Hours (7 items) only. Services, reviews and FAQs are component props at this tier; a Services collection is added only on plans with per-service pages. GoHighLevel embeds stay dormant until the client moves to a managed plan.
@@ -24,7 +26,8 @@ Business Settings (1 item) and Business Hours (7 items) only. Services, reviews 
 - [ ] Duplicate the Base site in Webflow; name it `<client>-mayesdigital`.
 - [ ] Primitives: brand colors and fonts.
 - [ ] Business Settings and Business Hours items.
-- [ ] Logos, favicon, share image.
+- [ ] Logos, favicon, share image, webclip (180×180 PNG, no transparency).
+- [ ] App head snippet: short name (max ~12 characters) and theme color.
 - [ ] Choose Home sections; write copy; add imagery with alt text.
 - [ ] Services page content.
 - [ ] Contact form recipient and thank-you message.

@@ -15,7 +15,9 @@ Never `@main`, never `@stable`, never a bare commit. A push to `main` must never
 | `v0.1.0` | Core Motion (early) | ShopFlow and DetailFlow (motion); the `stable` branch also points here |
 | `v1.1.0` | Core Sheet v1.1 + Core Motion v0.3 (commit `0407d10`) | ShopFlow and DetailFlow (sheet) |
 | `v1.2.0` | adds bottom nav, consent, business, announcement, page stability, `core.js`/`core.css` bundles; Core Motion v0.4 — see `CHANGELOG.md` | — |
-| `v1.3.0` | sheet v1.3 (GSAP motion, iPhone-safe scroll lock, Webflow-authored host, per-open mode), optional Before and After | latest; the $500 Base site and every new site |
+| `v1.3.0` | sheet v1.3 (GSAP motion, iPhone-safe scroll lock, Webflow-authored host, per-open mode), optional Before and After | — |
+| `v1.4.0` | **do not use**: tagged by mistake on the v1.3.0 commit, same code as `v1.3.0` | — |
+| `v1.4.1` | Add to Home Screen banner (`core-install`) in the bundles; `core-app-head.html` snippet | latest; the $500 Base site and every new site |
 
 ## Cutting a release
 
