@@ -27,6 +27,7 @@ cp "$CSS/core-announcement.css"         "$OUT/core-announcement.css"
 cp "$CSS/core-page-stability.css"       "$OUT/core-page-stability.css"
 cp "$JS/components/core-install.js"     "$OUT/core-install.js"
 cp "$CSS/core-install.css"              "$OUT/core-install.css"
+cp "$CSS/core-safe-area.css"            "$OUT/core-safe-area.css"
 cp "$JS/components/core-app-head.html"  "$OUT/core-app-head.html"
 # Optional modules (not in the bundles): load only on sites that use them.
 cp "$JS/components/core-before-after.js" "$OUT/core-before-after.js"
@@ -41,7 +42,8 @@ bundle() { # bundle <output> <files...>
   } > "$OUT/$out"
 }
 bundle core.css "$CSS/core-page-stability.css" "$CSS/core-sheet.css" "$CSS/core-bottom-nav.css" \
-                "$CSS/core-consent.css" "$CSS/core-business.css" "$CSS/core-announcement.css" "$CSS/core-install.css"
+                "$CSS/core-consent.css" "$CSS/core-business.css" "$CSS/core-announcement.css" "$CSS/core-install.css" \
+                "$CSS/core-safe-area.css"
 bundle core.js  "$JS/components/core-sheet.js" "$JS/components/core-bottom-nav.js" "$JS/privacy/core-consent.js" \
                 "$JS/utilities/core-business.js" "$JS/utilities/core-announcement.js" "$JS/components/core-install.js" \
                 "$JS/motion/core-motion.js"

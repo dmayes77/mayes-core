@@ -233,6 +233,35 @@ def run():
         check("stability: desktop scrolling unchanged", pg.evaluate("getComputedStyle(document.documentElement).overscrollBehaviorY") == "auto")
         ctx.close()
 
+        # ---------- safe areas (iPhone notch + home bar, emulated) ----------
+        def notched(w, h, insets):
+            c = browser.new_context(viewport={"width": w, "height": h}, is_mobile=True, has_touch=True)
+            c.add_init_script("localStorage.setItem('core-consent-v1','{}');")
+            pg = c.new_page()
+            cdp = c.new_cdp_session(pg)
+            cdp.send("Emulation.setSafeAreaInsetsOverride", {"insets": insets})
+            pg.goto(base + plain); pg.wait_for_load_state("load"); pg.wait_for_timeout(300)
+            return c, pg
+        px = lambda pg, sel, prop: pg.evaluate(f"parseFloat(getComputedStyle(document.querySelector('{sel}'))['{prop}'])")
+        # landscape: notch on the left and right, home bar at the bottom
+        ctx, pg = notched(844, 390, {"left": 47, "right": 47, "top": 0, "bottom": 21})
+        check("safe area: page content clear of the notch", px(pg, "body", "paddingLeft") == 47 and px(pg, "body", "paddingRight") == 47)
+        check("safe area: header clear of the notch", px(pg, "#shell-header", "paddingLeft") == 47 and px(pg, "#shell-header", "paddingRight") == 47)
+        check("safe area: bottom nav clear of the notch", px(pg, ".bottom-nav_bar", "paddingLeft") == 47 and px(pg, ".bottom-nav_bar", "paddingRight") == 47)
+        pg.evaluate("CoreSheet.open('services', {mode: 'bottom'})"); pg.wait_for_timeout(500)
+        check("safe area: sheet content clear of the notch", px(pg, "[data-sheet-host].is-open [data-sheet-body]", "paddingLeft") == 47)
+        check("safe area: sheet clear of the home bar", px(pg, "[data-sheet-host].is-open [data-sheet-body]", "paddingBottom") >= 21 + 20)
+        pg.evaluate("CoreSheet.close()"); pg.wait_for_timeout(400)
+        pg.evaluate("CoreInstall.show(true)"); pg.wait_for_timeout(400)
+        check("safe area: install banner clear of the notch", pg.evaluate("document.querySelector('.core-install').getBoundingClientRect().left") >= 47)
+        ctx.close()
+        # portrait: no side insets, so spacing is unchanged; home bar at the bottom
+        ctx, pg = notched(390, 844, {"left": 0, "right": 0, "top": 47, "bottom": 34})
+        check("safe area: portrait spacing unchanged", px(pg, "body", "paddingLeft") == 0 and px(pg, ".bottom-nav_bar", "paddingLeft") == 6)
+        pg.evaluate("CoreSheet.open('services', {mode: 'left'})"); pg.wait_for_timeout(500)
+        check("safe area: side drawer clear of the status bar", px(pg, "[data-sheet-host].is-open [data-sheet-head]", "paddingTop") == 47)
+        ctx.close()
+
         # ---------- Add to Home Screen ----------
         IPHONE = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1"
         ANDROID = "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36"
