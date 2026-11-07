@@ -128,15 +128,19 @@
   }
 
   /* desktop browsers with classic scrollbars keep a reserved gutter (page stability) that no overlay can paint over;
-     it shows the root background, so give that the overlay's color while a sheet is open (only when the body has its
-     own background, so the page behind the overlay is never darkened twice) */
+     it shows the root background color, so while a sheet is open that color becomes the overlay blended over the body's
+     background. Skipped when the body has no background of its own or is shorter than the window (the root would show
+     below it, under the overlay). */
+  var savedRootBg = null;
+  function rgba(c){ var m = /rgba?\(([^)]+)\)/.exec(c || ''); if(!m) return null; var p = m[1].split(/[\s,\/]+/).filter(Boolean).map(parseFloat); return {r:p[0], g:p[1], b:p[2], a: p.length > 3 ? p[3] : 1}; }
   function tintGutter(on){
     var root = document.documentElement;
-    if(!on){ root.style.removeProperty('--sheet-tint'); return; }
-    var bodyBg = getComputedStyle(document.body).backgroundColor, tint = overlay ? getComputedStyle(overlay).backgroundColor : '';
-    var transparent = function(c){ return !c || c === 'transparent' || /rgba\([^)]*,\s*0\)$/.test(c); };
-    if(transparent(bodyBg) || transparent(tint) || root.scrollHeight <= root.clientHeight) return;
-    root.style.setProperty('--sheet-tint', tint);
+    if(!on){ if(savedRootBg !== null){ root.style.backgroundColor = savedRootBg; savedRootBg = null; } return; }
+    var body = rgba(getComputedStyle(document.body).backgroundColor), tint = rgba(overlay ? getComputedStyle(overlay).backgroundColor : '');
+    if(!body || !tint || body.a < 1 || tint.a === 0 || document.body.offsetHeight < window.innerHeight) return;
+    var mix = function(k){ return Math.round(tint[k] * tint.a + body[k] * (1 - tint.a)); };
+    savedRootBg = root.style.backgroundColor;
+    root.style.backgroundColor = 'rgb(' + mix('r') + ', ' + mix('g') + ', ' + mix('b') + ')';
   }
 
   /* scroll lock: overflow alone does not stop the page scrolling behind a sheet on iPhone, so the body is pinned */

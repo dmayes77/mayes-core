@@ -14,8 +14,6 @@
 
 /* ---------- behavior ---------- */
 [data-sheet]{position:fixed;inset:0;z-index:1002;display:none}
-/* the reserved scrollbar gutter (desktop) takes the overlay's color while a sheet is open; see tintGutter() */
-html.sheet-lock{background-image:linear-gradient(var(--sheet-tint,transparent),var(--sheet-tint,transparent))}
 [data-sheet-content]{display:none}
 [data-sheet-host] [hidden]{display:none!important}
 [data-sheet].is-open{display:block}
