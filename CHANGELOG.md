@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.4.4 — 2026-11-07
+
+Safe areas: content stays clear of the iPhone notch, rounded corners and home bar.
+
+- **App head snippet v1.1.0** adds `<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">`. Without `viewport-fit=cover` iPhones report every safe-area inset as 0, so Core's existing `env(safe-area-inset-*)` rules did nothing. It replaces Webflow's default viewport tag because it comes later in the head. **Update the snippet on every site.**
+- **New `core-safe-area.css` v1.0.0** (in `core.css`): sides (the notch in landscape) for page content, the fixed header (`.shell-header`), the bottom nav, sheets and the install banner; the status bar for side drawers and the header; center dialogs stay inside the safe area. Insets are 0 where a device has none, so nothing moves elsewhere.
+- Bottom (home bar) spacing was already in the bottom nav, Page Shell, sheets and install banner; it now takes effect.
+- 8 new browser checks with emulated notch and home-bar insets (landscape and portrait).
+
 ## v1.4.3 — 2026-11-07
 
 **Page stability v1.2.0:** on phones and tablets (991px and below, where the bottom nav shows) the page no longer bounces past its top and bottom or triggers pull-to-refresh, so the pinned bottom nav stays still while scrolling. Sheets and carousels keep their own scrolling. Desktop is unchanged. 2 new browser checks.

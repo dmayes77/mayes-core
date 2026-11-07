@@ -1,7 +1,10 @@
-<!-- Mayes Core – App head snippet v1.0.0 – Site settings › Custom code › Head (after the consent snippet).
+<!-- Mayes Core – App head snippet v1.1.0 – Site settings › Custom code › Head (after the consent snippet).
      Makes the site open full screen, like an app, when a visitor adds it to their home screen.
      The home-screen icon is the Webclip image in Site settings › General (180×180 PNG, no transparency).
+     viewport-fit=cover turns on the iPhone safe areas (notch, home bar) that Core's styles use; it replaces
+     Webflow's default viewport tag because it comes later in the head.
      Per site: set the short name (max ~12 characters, shown under the icon) and the theme color (the brand bar's background). -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">

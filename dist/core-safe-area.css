@@ -1,0 +1,29 @@
+/* Mayes Core – Safe areas v1.0.0
+ * Keeps content clear of the iPhone notch / Dynamic Island, rounded corners and home bar.
+ * Needs viewport-fit=cover (core-app-head.html); without it every inset is 0 and nothing changes.
+ * Insets are 0 on devices and orientations that have none, so these rules are safe everywhere.
+ *   bottom: home bar      – bottom nav bar, Page Shell spacing (Webflow classes), sheets, install banner
+ *   left/right: the notch in landscape – page content, header, bottom nav, sheets, install banner
+ *   top: status bar       – header and side drawers (non-zero only with a translucent status bar)
+ */
+body{padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+
+/* fixed header (Page Shell › Nav / Header slot) */
+.shell-header{padding-top:env(safe-area-inset-top,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);box-sizing:border-box}
+
+/* bottom nav: sides (the bottom inset is already on .bottom-nav_bar) */
+.bottom-nav_bar{padding-left:max(.375rem,env(safe-area-inset-left,0px));padding-right:max(.375rem,env(safe-area-inset-right,0px))}
+
+/* sheets: content clear of the sides in every presentation */
+[data-sheet-host] [data-sheet-body]{padding-left:max(1.25rem,env(safe-area-inset-left,0px));padding-right:max(1.25rem,env(safe-area-inset-right,0px))}
+[data-sheet-host] [data-sheet-footer]{padding-left:max(1.25rem,env(safe-area-inset-left,0px));padding-right:max(1.25rem,env(safe-area-inset-right,0px))}
+[data-sheet-host] [data-sheet-head]{padding-left:max(.75rem,env(safe-area-inset-left,0px));padding-right:max(.75rem,env(safe-area-inset-right,0px))}
+[data-sheet-host][data-sheet-as="bottom"] [data-sheet-head]{padding-left:max(.5rem,env(safe-area-inset-left,0px));padding-right:max(.5rem,env(safe-area-inset-right,0px))}
+/* side drawers run the full height: clear the status bar at the top */
+[data-sheet-host][data-sheet-as="left"] [data-sheet-head],
+[data-sheet-host][data-sheet-as="right"] [data-sheet-head]{padding-top:max(.5rem,env(safe-area-inset-top,0px))}
+/* center dialog: stay inside the safe area */
+[data-sheet-host][data-sheet-as="center"] [data-sheet-panel]{max-height:min(40rem,calc(100dvh - 2rem - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px)))}
+
+/* Add to Home Screen banner: sides */
+.core-install{left:max(.75rem,env(safe-area-inset-left,0px));right:max(.75rem,env(safe-area-inset-right,0px))}
