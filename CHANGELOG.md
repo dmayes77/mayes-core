@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.5.1 — 2026-11-07
+
+- **Business v1.2.1:** icon links (`data-business-href` only, like the footer social icons) get `.is-business-filled` when their Business Settings field has a URL. In Webflow, hide the link class by default and show it with an `is-business-filled` combo, so a social icon appears only once its URL is filled in, and empty icons never flash on load. Don't use the element's Visibility setting for this: Webflow leaves hidden elements out of the published page, so Core can't show them. 1 new browser check.
+
 ## v1.5.0 — 2026-11-07
 
 The first native-first release (see `docs/NATIVE_FIRST.md`). Nothing is removed, so v1.4 sites keep working.
@@ -11,10 +15,10 @@ The first native-first release (see `docs/NATIVE_FIRST.md`). Nothing is removed,
 - **Safe areas v1.1.0:** the sheet insets moved onto the panel (in `core-sheet.css`), so a designed sheet keeps its own padding.
 - **Motion v0.5.0:** with `<meta name="core-motion" content="webflow">` in the head, Core Motion leaves `data-motion` and `data-animate` to Webflow Interactions, so nothing animates twice. `data-scroll-state` still works. The master's site-wide interactions are Core / Fade, Core / Rise, Core / Scale, Core / Stagger and Core / Hero.
 - **Consent v1.2.0:** switches get `.is-on` and `.is-disabled` (essential), so their look can be a Webflow combo class. Any switch, button, row or section with its own Webflow class is marked `data-look="webflow"`, and Core's fallback look in `core-consent.css` steps aside for it. The obsolete `[data-settings-open]` cog rule is gone.
-- **Business v1.2.0:** a row designed in Webflow inside `[data-business-hours]` is cloned for every hours line and keeps its classes. Days go in `[data-business-hours-days]` or the row's first child, time in `[data-business-hours-time]` or its last child. Rows Core writes itself are marked `data-core-look`, and only those get Core's grid. Icon links (`data-business-href` only) get `.is-business-filled` when their field has a URL, so Webflow can hide them by default and show them with that combo.
+- **Business v1.2.0:** a row designed in Webflow inside `[data-business-hours]` is cloned for every hours line and keeps its classes. Days go in `[data-business-hours-days]` or the row's first child, time in `[data-business-hours-time]` or its last child. Rows Core writes itself are marked `data-core-look`, and only those get Core's grid.
 - **Install v1.1.0:** a banner designed in Webflow (`[data-install-banner]`, component Core / Install Banner) is used instead of the built one. Core fills `[data-install-title]`, `[data-install-name]` and `[data-install-icon]`, shows only the matching `[data-install-hint]`, shows the Install button only when the browser offers it, and toggles `is-visible`. Core still keeps it above the bottom nav.
 - **Sheet v1.4.1 fix:** on desktop browsers with classic scrollbars, the 15px gutter that page stability reserves can't be covered by any overlay. It showed as a light strip beside an open sheet. While a sheet is open, the root background (which is what shows there) becomes the overlay color blended over the body's background. It only applies when the body has its own background and fills the window.
-- 25 new browser checks: a designed sheet host as a bottom sheet, dialog and drawer, with its look and corners from Webflow; Core look only on the built host; safe areas; the native-motion switch; designed consent switches (`is-on`, `is-disabled`, fallback look); designed hours rows; the designed install banner; and the gutter.
+- 24 new browser checks: a designed sheet host as a bottom sheet, dialog and drawer, with its look and corners from Webflow; Core look only on the built host; safe areas; the native-motion switch; designed consent switches (`is-on`, `is-disabled`, fallback look); designed hours rows; the designed install banner; and the gutter.
 
 ## v1.4.5 — 2026-11-07
 

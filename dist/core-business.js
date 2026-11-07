@@ -1,4 +1,4 @@
-/* Mayes Core – Business v1.2.0 – one business record, shown anywhere on the page.
+/* Mayes Core – Business v1.2.1 – one business record, shown anywhere on the page.
  *
  * SOURCE – the hidden CMS layer in the Page Shell (the one Business Settings item, rendered on every page):
  *   <a data-business-field="phone">…</a>      any Business Settings field, as a native Webflow element bound in the Designer:
@@ -180,7 +180,7 @@
   window.addEventListener('load', fill);
 
   window.CoreBusiness = {
-    version: '1.2.0', get: get, fill: fill, hours: hours, groupedHours: groupedHours,
+    version: '1.2.1', get: get, fill: fill, hours: hours, groupedHours: groupedHours,
     all: function(){ cache = read(); return Object.assign({}, cache); }
   };
 })();
