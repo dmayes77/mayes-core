@@ -16,6 +16,8 @@
  *   data-business-href="field"         also set the element's href from another field
  *   data-business-empty="hide"         hide the element when the field is empty (default: keep the static fallback);
  *                                      with data-business-href alone (an icon link), hide it when that field is empty
+ *   NATIVE FIRST for icon links: hide the link's Webflow class by default and show it with an is-business-filled combo;
+ *   Core adds .is-business-filled only when the field has a URL (no flash of empty icons, no Visibility setting needed).
  *   Older markup with data-store / data-store-href / data-store-empty works the same way.
  *   Filled elements get .is-business-filled; <html> gets .business-filled.
  *
@@ -165,7 +167,10 @@
         }
       }
       if(href) el.setAttribute('href', href);
-      if(!key && hrefKey && attr(el, '-empty') === 'hide') el.hidden = !href;
+      if(!key && hrefKey){                             // icon links: is-business-filled when the field has a URL
+        el.classList.toggle('is-business-filled', !!href);
+        if(attr(el, '-empty') === 'hide') el.hidden = !href;
+      }
     });
     renderHours(hours());
     document.documentElement.classList.add('business-filled');

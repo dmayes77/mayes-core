@@ -69,6 +69,7 @@ def run():
         check("icon link gets href", pg.get_attribute("#social-fb", "href") == "https://facebook.com/test" and not pg.evaluate("document.getElementById('social-fb').hidden"))
         check("icon link keeps its icon", pg.evaluate("!!document.querySelector('#social-fb svg')"))
         check("empty icon link hidden", pg.evaluate("document.getElementById('social-x').hidden"))
+        check("icon link with a URL gets is-business-filled, empty one does not", pg.evaluate("document.getElementById('social-fb').classList.contains('is-business-filled') && !document.getElementById('social-x').classList.contains('is-business-filled')"))
         rows = pg.eval_on_selector_all("#hours [data-business-hours-line]", "els => els.map(e => [...e.children].map(c => c.textContent).join(' | '))")
         check("hours grouped", rows == ["Monday – Friday | 8 AM–5 PM", "Saturday | 9 AM–1 PM", "Sunday | Closed"], rows)
         today = pg.text_content("#today")
