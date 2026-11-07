@@ -4,12 +4,37 @@ The Launch & Own offer: a professional 3-page website, mobile-first, with 30 day
 
 ## Pages
 
-| Page | Sections (Core components) |
+Each page is the Page Shell plus section components dragged into its **Main Content** slot, in this order. (Webflow's API can't place anything in a slot, so this step is done in the Designer.)
+
+| Page | Main Content, top to bottom |
 |---|---|
-| Home | Hero · Service Choice · Why · Process · Reviews (or FAQ when the client has no reviews yet) · Final CTA |
-| Services | Service Hero · Service Category card grid · Process |
-| Contact | Contact section · native Webflow form · directions · hours |
-| Privacy, 404 | Core templates (not counted in the 3 pages) |
+| Home `/` | Section / Hero · Section / Services · Section / Why Us · Section / Process · Section / Reviews (or Section / FAQ until the client has real reviews) · Section / Final CTA |
+| Services `/services` | Section / Page Header · Section / Services · Section / Process · Section / Final CTA |
+| Contact `/contact` | Section / Page Header · Section / Contact |
+| Privacy `/privacy` | Section / Page Header · Section / Legal Text |
+| 404 (Utility page) | Section / Not Found |
+
+New pages are made by duplicating Home: that brings the Page Shell (nav, footer, bottom nav, sheets) and the hidden business data layer. Delete the two empty Sections that come with it.
+
+## Section components
+
+All in the **Sections** group, built from Core classes and tokens (`section-medium`, `padding-global`, `container-large`, `section-header`, `section-grid`, `feature-card`, …). Every heading, paragraph, button label and link is a component prop, so copy is edited per page in the right panel without opening the component. Motion comes from the `data-motion` attributes already on them (Webflow Interactions).
+
+| Component | What it holds | Wired to Core |
+|---|---|---|
+| Section / Hero | eyebrow, H1, intro, two buttons, image + alt | Get a free quote opens the Quote sheet (`data-sheet-open="quote"`); Call now dials the Business Settings phone (`data-business-href="phone-href"`) |
+| Section / Services | eyebrow, heading, intro, 3 cards (title, text, link) | — |
+| Section / Why Us | eyebrow, heading, 3 reasons | — |
+| Section / Process | eyebrow, heading, 3 numbered steps | — |
+| Section / Reviews | eyebrow, heading, 3 reviews (text, name) | Use real client reviews only |
+| Section / FAQ | eyebrow, heading, 4 questions and answers | Native `details`/`summary`: opens with no JS |
+| Section / Final CTA | heading, text, two buttons | Same buttons as the Hero |
+| Section / Page Header | eyebrow, H1, intro | — |
+| Section / Contact | phone, email, address + directions, today's status, weekly hours; native form **Contact** (Name, Phone, Email, Message) | All details fill from Business Settings and Business Hours; hours use the designed `contact-hours_row` |
+| Section / Legal Text | rich-text policy | Template only: replace with the client's reviewed policy |
+| Section / Not Found | eyebrow, H1, text, Back to home, Get a free quote | — |
+
+The top nav defaults to Home, Services and Contact (turn on **Show Link 4** for a fourth); its CTA opens the Quote sheet. The footer defaults to Pages (Home, Services, Contact) and Info (Privacy policy, Request a quote); the newsletter form is off (**Show Subscribe**).
 
 ## Mobile app layer
 
@@ -57,8 +82,9 @@ Business Settings (1 item) and Business Hours (7 items) only. Both exist in the 
 - [ ] Logos, favicon, share image, webclip (180×180 PNG, no transparency).
 - [ ] App head snippet: short name (max ~12 characters) and theme color.
 - [ ] Choose Home sections; write copy; add imagery with alt text.
-- [ ] Services page content.
-- [ ] Contact form recipient and thank-you message.
+- [ ] Services page content; Reviews (real ones) or FAQ on Home.
+- [ ] Privacy policy text from the client.
+- [ ] Contact and Quote form recipients (Site settings › Forms) and thank-you messages.
 - [ ] Bottom nav: Quote (or Collab on creator sites); check every sheet.
 - [ ] Quote form: notification email and thank-you message.
 - [ ] Footer copyright and social links in Business Settings.
