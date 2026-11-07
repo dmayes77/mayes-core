@@ -1,11 +1,11 @@
-/* Mayes Core – Install v1.0.0 – "Add to Home Screen" banner for the mobile app layer.
+/* Mayes Core – Install v1.0.1 – "Add to Home Screen" banner for the mobile app layer.
  *
  * Pairs with the head snippet dist/core-app-head.html (full-screen launch, status bar, theme color) and the
  * Webflow webclip (Site settings › General), which is the home-screen icon.
  *
  * WHEN IT SHOWS – phones and tablets only, on the visitor's 2nd page view or later, never:
  *   · when the site is already open from the home screen (standalone)
- *   · while a sheet is open, or before the visitor has answered the cookie notice (waits for "core:consent")
+ *   · while a sheet is open, including the cookie notice (shows once it closes, whether or not a choice was made)
  *   · for 30 days after the visitor closes it
  *   · when <html data-install="off">
  *
@@ -57,8 +57,9 @@
   function read(){ try{ return JSON.parse(localStorage.getItem(KEY)) || {}; }catch(e){ return {}; } }
   function write(s){ try{ localStorage.setItem(KEY, JSON.stringify(s)); }catch(e){} }
   function snoozed(s){ return s.dismissed && (Date.now() - s.dismissed) < SNOOZE; }
-  function consentPending(){
-    if(!window.CoreConsent) return false;
+  /* the cookie notice opens about a second after load; give it the first chance before showing */
+  function consentNoticeDue(){
+    if(!window.CoreConsent || !document.querySelector('[data-sheet="cookie-notice"]')) return false;
     var key = root.getAttribute('data-consent-key') || 'core-consent-v1';
     try{ return !localStorage.getItem(key); }catch(e){ return false; }
   }
@@ -155,7 +156,6 @@
   function views(){ var s = read(); s.views = (s.views || 0) + 1; write(s); return s.views; }
   function tryAuto(){
     if(root.getAttribute('data-install') === 'off' || standalone() || !mobile() || snoozed(read())) return;
-    if(consentPending()){ document.addEventListener('core:consent', function once(){ document.removeEventListener('core:consent', once); setTimeout(tryAuto, 1500); }); return; }
     if(sheetOpen()){ document.addEventListener('sheet:close', function once(){ document.removeEventListener('sheet:close', once); setTimeout(tryAuto, 800); }); return; }
     show(false);
   }
@@ -198,12 +198,14 @@
     var n = views();
     if(n < 2) return;
     var delay = parseInt(root.getAttribute('data-install-delay'), 10);
-    setTimeout(tryAuto, isNaN(delay) ? 3000 : delay);
+    if(isNaN(delay)) delay = 3000;
+    if(consentNoticeDue()) delay = Math.max(delay, 2500); /* let the cookie notice open first; tryAuto then waits for it to close */
+    setTimeout(tryAuto, delay);
   }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 
   window.CoreInstall = {
-    version: '1.0.0',
+    version: '1.0.1',
     show: function(force){ return show(force !== false); },
     hide: function(){ hide(true); },
     state: function(){ var s = read(); return {platform: platform(), standalone: standalone(), mobile: mobile(), snoozed: snoozed(s), views: s.views || 0, canPrompt: !!deferred}; }

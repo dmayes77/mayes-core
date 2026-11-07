@@ -1,4 +1,4 @@
-/* Mayes Core – Install v1.0.0 – "Add to Home Screen" banner (built by core-install.js), above the bottom nav. */
+/* Mayes Core – Install v1.0.1 – "Add to Home Screen" banner (built by core-install.js), above the bottom nav. */
 .core-install{position:fixed;left:.75rem;right:.75rem;bottom:calc(var(--core-install-offset,0px) + .75rem + env(safe-area-inset-bottom,0px));z-index:1000;display:flex;align-items:center;gap:.75rem;max-width:30rem;margin:0 auto;padding:.75rem .5rem .75rem .75rem;border:1px solid var(--_theme---border--subtle,#e5e5e5);border-radius:var(--_surface---radius--small,.5rem);background:var(--_theme---background--primary,#fff);color:var(--_theme---text--primary,#111);box-shadow:0 8px 24px rgba(17,17,17,.16);opacity:0;transform:translateY(1rem);transition:opacity .25s ease,transform .25s ease;pointer-events:none}
 html.has-bottom-nav .core-install{bottom:calc(var(--core-install-offset,0px) + .75rem)}
 .core-install.is-visible{opacity:1;transform:none;pointer-events:auto}
