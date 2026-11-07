@@ -29,7 +29,7 @@ mayes-core/
 
 | Layer | Where | Owns |
 |---|---|---|
-| Core | this repo + the Core Design System 2.0 Webflow site | tokens, Page Shell, navigation, mobile app layer (bottom nav, sheets, Site Settings), sections, cards, icons, motion, consent, business record |
+| Core | this repo + the Core Design System 2.0 Webflow site | tokens, Page Shell, navigation, mobile app layer (flush top bar with ⋯ settings, bottom nav, sheets), sections, cards, icons, motion, consent, business record |
 | Product | `base/` now; `products/` later | a sellable configuration of Core: the $500 Base site, ShopFlow (commerce), DetailFlow (detailing) |
 | Client | a Webflow site duplicated from a product | brand, copy, imagery, CMS content |
 
@@ -43,11 +43,11 @@ Head (consent snippet first, above any Google tag; then the app snippet; then th
 
     <!-- paste dist/core-consent-head.html here -->
     <!-- paste dist/core-app-head.html here (set the short name and theme color) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v1.4.4/dist/core.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v1.4.5/dist/core.css">
 
 Footer (after GSAP, if the site uses it):
 
-    <script src="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v1.4.4/dist/core.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v1.4.5/dist/core.js" defer></script>
 
 `core.js` = sheet + bottom nav + consent + business + announcement + install + motion. Each module also ships alone in `dist/`.
 
@@ -56,7 +56,7 @@ Footer (after GSAP, if the site uses it):
 | Sheet | `CoreSheet.open/close/show` | `data-sheet`, `data-sheet-open`, `data-sheet-mode`, `data-sheet-height`; optional designed host `data-sheet-host` |
 | Bottom nav | — | `data-bottom-nav`, `data-bottom-nav-tab`, `data-tab-action`, `data-bottom-nav-link` |
 | Consent | `CoreConsent.get/set/open` | `data-consent-switch`, `data-consent-action`, `data-consent` (gated scripts) |
-| Business | `CoreBusiness.get/all/hours/fill` | `data-business-field` (source), `data-business` (target), `data-business-hours`, `data-business-today` |
+| Business | `CoreBusiness.get/all/hours/fill` | `data-business-field` (source), `data-business` (target), `data-business-href`, `data-business-empty="hide"`, `data-business-hours`, `data-business-today` |
 | Announcement | `CoreAnnouncement.refresh` | `data-announcement`, `data-announcement-follow` |
 | Install (Add to Home Screen) | `CoreInstall.show/hide/state` | none required (builds its own banner); `data-install-open` trigger; `<html data-install="off">`, `data-install-name`, `data-install-delay` |
 | Motion | `CoreMotion` | `data-motion`, `data-scroll-state`, `data-animate` (older) |

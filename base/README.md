@@ -13,25 +13,37 @@ The Launch & Own offer: a professional 3-page website, mobile-first, with 30 day
 
 ## Mobile app layer
 
-Brand bar (logo, Call) · bottom nav: Home · Services (sheet) · Call or Book · Location (sheet) · More (sheet). Desktop keeps a normal header, dropdown and footer.
+Phones and tablets (991px and below) get a flush top bar and a flush bottom nav, like an app. Neither floats, and the page doesn't bounce under them. Desktop keeps a normal header and footer.
 
-In the Webflow master (built 2026-11-03):
+- **Top bar:** logo and a ⋯ button that opens the Settings sheet (cookie and privacy choices, Add to Home Screen, legal links). No dropdown on phones.
+- **Bottom nav, quick actions only:** Home · Services (sheet) · Call · Location (sheet) · Quote (sheet). On a creator or influencer site the Quote tab becomes **Collab**, which opens the same kind of sheet with a collaboration form.
+- **Desktop:** the ⋯ button is hidden; the footer's "Cookie settings" link opens the same Settings sheet.
+
+In the Webflow master:
 
 | Component | Goes in | Notes |
 |---|---|---|
-| Page Shell | page body | Slots: Nav / Header, Main Content, Footer, Overlay, Mobile Nav |
-| Navigation / Bottom Nav | Page Shell › Mobile Nav | Tabs slot takes 3–5 tabs; columns size themselves; hidden above 991px |
-| Navigation / Bottom Nav Tab | Bottom Nav › Tabs | Props: Label, Link, Action (`sheet:NAME`, `click:SELECTOR`), Sheet Mode. Slots: Icon, Badge |
-| Sheet / Content | Page Shell › Overlay | Props: Name, Title, Height, Mode. Content slot for links, text, a form |
-| Core / Site Settings | Page Shell › Overlay, once | Settings sheet (`site-settings`) + cookie notice; More tab opens it with Sheet Mode `bottom` |
+| Page Shell | page body | Slots: Nav / Header, Main Content, Footer, Mobile Nav (fixed, 991px and below), Sheets. (The old Overlay slot is no longer used.) |
+| Navigation / Glass | Page Shell › Nav / Header | Flush top bar; ⋯ button (`data-sheet-open="site-settings"`) on phones |
+| Navigation / Site Bottom Nav | Page Shell › Mobile Nav | Home, Services, Call, Location, Quote. A tab opens a sheet with `data-tab-action="sheet:NAME"` |
+| Sheet / Site Settings | Page Shell › Sheets, once | `site-settings` sheet + `cookie-notice` sheet |
+| Sheet / Services | Page Shell › Sheets | `services` sheet |
+| Sheet / Location | Page Shell › Sheets | `location` sheet: today's hours, address, Directions, Call, the week's hours |
+| Sheet / Quote | Page Shell › Sheets | `quote` sheet with a native Webflow form; rename to Collab on creator sites |
+| Footer / Standard | Page Shell › Footer | Logo, copyright and social icons fill from Business Settings; empty social links hide; "Cookie settings" link |
+| Business data layer | Home page, inside the Page Shell (see below) | Hidden. Renders the Business Settings item and the 7 Business Hours items for `core-business.js` |
 
-Site custom code loads the consent snippet, `core.css`, GSAP, and `core.js`, all pinned to `@v1.3.0`. To turn on Add to Home Screen, move them to `@v1.4.4` and add the app head snippet.
+**Sheet naming:** the component is `Sheet / Name`; the sheet's root class is the sheet's own name with the `is-hidden` combo (`settings is-hidden`, `location is-hidden`), and its inner parts use that name as a prefix (`location_hours`, `location_actions`). `data-sheet` is the lowercase name that openers use (`data-sheet-open="location"`).
 
-Add to Home Screen: the app head snippet makes the saved site open full screen, and Core shows phone visitors a banner on their second page view. The More sheet carries an "Add to Home Screen" row (`data-install-open`). Opened from the home screen there is no browser back button, so every page keeps the bottom nav.
+**Business data layer:** a hidden `shell-data` div with two Collection Lists (Business Settings, limit 1; Business Hours, limit 7). Each field is a native element bound to the CMS with `data-business-field="slug"`; each hours item is `[data-business-hours-entry]` with `data-business-hours-day / -order / -open / -close`, plus a "true" text whose visibility is bound to Closed. Webflow can't put a live Collection List inside a component created through the API, so the layer sits on the page. Copy it onto every new static page (or duplicate pages from Home) until it is moved into the Page Shell in the Designer.
+
+Site custom code loads the consent snippet, the app head snippet, `core.css` and GSAP in the head, and `core.js` before `</body>`, all pinned to the same release tag.
+
+Add to Home Screen: the app head snippet makes the saved site open full screen, and Core shows phone visitors a banner on their second page view. The Settings sheet carries an "Add to Home Screen" row (`data-install-open`). Opened from the home screen there is no browser back button, so every page keeps the bottom nav.
 
 ## CMS
 
-Business Settings (1 item) and Business Hours (7 items) only. Both exist in the master with placeholder content. Business Settings field slugs match `data-business` names in `core-business.js` (business-name, phone, email, booking-url, street-address, city, state, zip-code, directions-url, google-business-url, announcement, social URLs, and more). Business Hours: Day Order, Open, Close, Closed, Note. Services, reviews and FAQs are component props at this tier; a Services collection is added only on plans with per-service pages. GoHighLevel embeds stay dormant until the client moves to a managed plan.
+Business Settings (1 item) and Business Hours (7 items) only. Both exist in the master with placeholder content. Business Settings field slugs match `data-business` names in `core-business.js` (business-name, phone, email, booking-url, street-address, city, state, zip-code, directions-url, google-business-url, announcement, footer-copyright, and the social links facebook, instagram, tiktok, youtube, linkedin, nextdoor, x-url). Business Hours: Name (the day), Day Order, Open, Close, Closed, Note. Services, reviews and FAQs are component props at this tier; a Services collection is added only on plans with per-service pages. GoHighLevel embeds stay dormant until the client moves to a managed plan.
 
 ## Per-client checklist
 
@@ -43,7 +55,9 @@ Business Settings (1 item) and Business Hours (7 items) only. Both exist in the 
 - [ ] Choose Home sections; write copy; add imagery with alt text.
 - [ ] Services page content.
 - [ ] Contact form recipient and thank-you message.
-- [ ] Bottom nav: Call or Book; check every sheet.
+- [ ] Bottom nav: Quote (or Collab on creator sites); check every sheet.
+- [ ] Quote form: notification email and thank-you message.
+- [ ] Footer copyright and social links in Business Settings.
 - [ ] SEO title and description on each page.
 - [ ] QA at Desktop, Tablet, Mobile Landscape, Mobile Portrait, on a real phone.
 - [ ] Custom code pins `mayes-core` to a release tag.
