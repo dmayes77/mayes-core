@@ -1,6 +1,8 @@
 # Changelog
 
-## v1.4.0 — 2026-11-06
+## v1.4.1 — 2026-11-06
+
+First release with Add to Home Screen. (The `v1.4.0` tag was created before this change was merged and points at the v1.3.0 code; do not use it.)
 
 Add to Home Screen. Webflow cannot host a service worker, so a full installable web app is out of reach; this gets the parts that matter: the site opens full screen from the home screen, and visitors are shown how to put it there.
 
