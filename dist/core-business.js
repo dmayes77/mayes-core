@@ -1,4 +1,4 @@
-/* Mayes Core – Business v1.0.0 – one business record, shown anywhere on the page.
+/* Mayes Core – Business v1.1.0 – one business record, shown anywhere on the page.
  *
  * SOURCE – the hidden CMS layer in the Page Shell (the one Business Settings item, rendered on every page):
  *   <a data-business-field="phone">…</a>      any Business Settings field, as a native Webflow element bound in the Designer:
@@ -14,7 +14,8 @@
  *   <a data-business="phone">          text + tel:      ·  <a data-business="email"> text + mailto:
  *   <p data-business="tagline">        text
  *   data-business-href="field"         also set the element's href from another field
- *   data-business-empty="hide"         hide the element when the field is empty (default: keep the static fallback)
+ *   data-business-empty="hide"         hide the element when the field is empty (default: keep the static fallback);
+ *                                      with data-business-href alone (an icon link), hide it when that field is empty
  *   Older markup with data-store / data-store-href / data-store-empty works the same way.
  *   Filled elements get .is-business-filled; <html> gets .business-filled.
  *
@@ -146,6 +147,7 @@
         }
       }
       if(href) el.setAttribute('href', href);
+      if(!key && hrefKey && attr(el, '-empty') === 'hide') el.hidden = !href;
     });
     renderHours(hours());
     document.documentElement.classList.add('business-filled');
@@ -155,7 +157,7 @@
   window.addEventListener('load', fill);
 
   window.CoreBusiness = {
-    version: '1.0.0', get: get, fill: fill, hours: hours, groupedHours: groupedHours,
+    version: '1.1.0', get: get, fill: fill, hours: hours, groupedHours: groupedHours,
     all: function(){ cache = read(); return Object.assign({}, cache); }
   };
 })();

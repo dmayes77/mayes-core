@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.4.5 — 2026-11-07
+
+- **Business v1.1.0:** an icon link with only `data-business-href="field"` and `data-business-empty="hide"` (a social icon) now hides when that field is empty and shows when it has a URL. Before, `hide` only worked together with `data-business`. 3 new browser checks.
+- Docs: the Base site README, README and DECISIONS now describe the current mobile layer (flush top bar with the ⋯ Settings button, quick-action bottom nav, one component per sheet in the Sheets slot, sheet naming, the business data layer).
+
 ## v1.4.4 — 2026-11-07
 
 Safe areas: content stays clear of the iPhone notch, rounded corners and home bar.
