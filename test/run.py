@@ -268,6 +268,21 @@ def run():
         check("install: no JS errors (consent)", not errors, errors)
         ctx.close()
 
+        # cookie notice closed without a choice: still shows (v1.0.1 fix)
+        ctx, pg, errors = phone(IPHONE, "localStorage.setItem('core-install-v1', JSON.stringify({views:1}));")
+        pg.goto(base + plain); pg.wait_for_load_state("load"); pg.wait_for_timeout(3000)
+        pg.evaluate("CoreSheet.close()"); pg.wait_for_timeout(1500)
+        check("install: shows when cookie notice closed without a choice", visible(pg) and not pg.evaluate("!!localStorage.getItem('core-consent-v1')"))
+        ctx.close()
+
+        # no consent saved and no cookie notice on the page: still shows
+        ctx, pg, errors = phone(IPHONE, "localStorage.setItem('core-install-v1', JSON.stringify({views:1}));"
+            "document.addEventListener('DOMContentLoaded', () => { const n = document.querySelector('[data-sheet=\"cookie-notice\"]'); if (n) n.remove(); });")
+        pg.goto(base + plain); pg.wait_for_load_state("load"); pg.wait_for_timeout(3600)
+        check("install: shows with no cookie notice on the page", visible(pg))
+        check("install: no JS errors (no notice)", not errors, errors)
+        ctx.close()
+
         # Android with the browser's install prompt
         ctx, pg, errors = phone(ANDROID, CONSENTED + "localStorage.setItem('core-install-v1', JSON.stringify({views:1}));")
         pg.goto(base + plain); pg.wait_for_load_state("load")
