@@ -1,10 +1,16 @@
 # Changelog
 
-## v1.5.1 — 2026-11-07
+## v1.6.0 — 2026-11-07
 
-- **Business v1.2.1:** icon links (`data-business-href` only, like the footer social icons) get `.is-business-filled` when their Business Settings field has a URL. In Webflow, hide the link class by default and show it with an `is-business-filled` combo, so a social icon appears only once its URL is filled in, and empty icons never flash on load. Don't use the element's Visibility setting for this: Webflow leaves hidden elements out of the published page, so Core can't show them. 1 new browser check.
+A minor release under semver: it adds a hook and changes nothing existing. It was first prepared as v1.5.1, never tagged, and renamed because a new hook is a feature, not a fix.
+
+- **Business v1.3.0:** icon links (`data-business-href` only, like the footer social icons) get `.is-business-filled` when their Business Settings field has a URL. In Webflow, hide the link class by default and show it with an `is-business-filled` combo, so a social icon appears only once its URL is filled in, and empty icons never flash on load. Don't use the element's Visibility setting for this: Webflow leaves hidden elements out of the published page, so Core can't show them. 1 new browser check.
 
 ## v1.5.0 — 2026-11-07
+
+**Upgrade note (outside strict semver):** two v1.5.0 changes can alter how an existing site looks, which semver would call breaking. Both were shipped in a minor because only the master used the affected markup.
+- Cookie switches, buttons, rows and sections that carry their own Webflow class no longer get Core's fallback look. Give those classes the look in Webflow, as the master now does with `settings_row`, `settings_section`, `settings_switch` and `button`.
+- A sheet host designed in Webflow now gets its safe-area insets on the panel instead of on the body, footer and head padding.
 
 The first native-first release (see `docs/NATIVE_FIRST.md`). Nothing is removed, so v1.4 sites keep working.
 
