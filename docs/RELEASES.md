@@ -20,8 +20,8 @@ Never `@main`, never `@stable`, never a bare commit. A push to `main` must never
 | `v1.4.1` | Add to Home Screen banner (`core-install`) in the bundles; `core-app-head.html` snippet | — (banner never shows if the cookie notice is closed without a choice) |
 | `v1.4.2` | Fix: banner shows after the cookie notice closes, with or without a choice | — |
 | `v1.4.3` | No vertical overscroll bounce or pull-to-refresh on phones and tablets (bottom nav stays still) | — |
-| `v1.4.5` | Business v1.1.0: social icon links hide when empty; docs for the current mobile layer | latest; the $500 Base site and every new site |
 | `v1.4.4` | Safe areas: viewport-fit=cover in the app head snippet, new core-safe-area.css | superseded by v1.4.5 |
+| `v1.4.5` | Business v1.1.0: social icon links hide when empty; docs for the current mobile layer | latest; the $500 Base site and every new site |
 
 ## Cutting a release
 
