@@ -1,23 +1,26 @@
-/* Mayes Core – Consent v1.1.0 – Site Settings sheet + first-visit cookie notice (content lives in the Sheet engine's drawer). */
-[data-settings-section]{display:flex;flex-direction:column;gap:.75rem;padding:.25rem 0 1rem}
-[data-settings-section] + [data-settings-section]{border-top:1px solid var(--_theme---border--subtle,#e5e5e5);padding-top:1.25rem}
-[data-settings-section] > :is(h2,h3){margin:0}
-[data-settings-section] p{margin:0;color:var(--_theme---text--secondary,#555)}
-[data-settings-row]{display:flex;align-items:center;justify-content:space-between;gap:1rem;min-height:3.5rem;padding:.5rem 0;border-top:1px solid var(--_theme---border--subtle,#e5e5e5)}
+/* Mayes Core – Consent v1.2.0 – fallback look for the Site Settings sheet and cookie notice.
+ * NATIVE FIRST: anything carrying its own Webflow class is marked data-look="webflow" by core-consent.js and none of
+ * this applies to it. Style switches in Webflow with a switch class plus the is-on (on) and is-disabled (essential)
+ * combos, and the knob with ::after. */
+[data-settings-section]:not([data-look="webflow"]){display:flex;flex-direction:column;gap:.75rem;padding:.25rem 0 1rem}
+[data-settings-section]:not([data-look="webflow"]) + [data-settings-section]:not([data-look="webflow"]){border-top:1px solid var(--_theme---border--subtle,#e5e5e5);padding-top:1.25rem}
+[data-settings-section]:not([data-look="webflow"]) > :is(h2,h3){margin:0}
+[data-settings-section]:not([data-look="webflow"]) p{margin:0;color:var(--_theme---text--secondary,#555)}
+[data-settings-row]:not([data-look="webflow"]){display:flex;align-items:center;justify-content:space-between;gap:1rem;min-height:3.5rem;padding:.5rem 0;border-top:1px solid var(--_theme---border--subtle,#e5e5e5)}
 [data-settings-row-title]{font-weight:600}
-[data-settings-row] p{font-size:.875rem}
+[data-settings-row]:not([data-look="webflow"]) p{font-size:.875rem}
 /* switch */
-[data-consent-switch]{position:relative;flex:none;width:3rem;height:1.75rem;margin:0;padding:0;border:0;border-radius:999px;background:var(--_theme---border--primary,#ccc);cursor:pointer;transition:background-color .2s ease}
-[data-consent-switch]::after{content:"";position:absolute;top:.1875rem;left:.1875rem;width:1.375rem;height:1.375rem;border-radius:999px;background:#fff;box-shadow:0 1px 3px rgba(17,17,17,.25);transition:transform .2s ease}
-[data-consent-switch][aria-checked="true"]{background:var(--_theme---background--brand,#f60)}
-[data-consent-switch][aria-checked="true"]::after{transform:translateX(1.25rem)}
-[data-consent-switch][aria-disabled="true"]{opacity:.55;cursor:not-allowed}
-[data-consent-switch]:focus-visible{outline:2px solid var(--_theme---border--brand,#f60);outline-offset:2px}
+[data-consent-switch]{cursor:pointer}
+[data-consent-switch][aria-disabled="true"]{cursor:not-allowed}
+[data-consent-switch]:not([data-look="webflow"]){position:relative;flex:none;width:3rem;height:1.75rem;margin:0;padding:0;border:0;border-radius:999px;background:var(--_theme---border--primary,#ccc);transition:background-color .2s ease}
+[data-consent-switch]:not([data-look="webflow"])::after{content:"";position:absolute;top:.1875rem;left:.1875rem;width:1.375rem;height:1.375rem;border-radius:999px;background:#fff;box-shadow:0 1px 3px rgba(17,17,17,.25);transition:transform .2s ease}
+[data-consent-switch]:not([data-look="webflow"])[aria-checked="true"]{background:var(--_theme---background--brand,#f60)}
+[data-consent-switch]:not([data-look="webflow"])[aria-checked="true"]::after{transform:translateX(1.25rem)}
+[data-consent-switch]:not([data-look="webflow"])[aria-disabled="true"]{opacity:.55}
+[data-consent-switch]:focus-visible{outline:2px solid var(--_theme---focus--ring,#f60);outline-offset:2px}
 /* actions (8px radius per the Core shape rule) */
-[data-consent-action]{display:flex;align-items:center;justify-content:center;width:100%;min-height:3rem;padding:.75rem 1rem;border:1px solid var(--_theme---border--brand,#f60);border-radius:var(--_surface---radius--small,.5rem);background:transparent;color:var(--_theme---text--brand,#f60);font:inherit;font-weight:700;text-decoration:none;cursor:pointer}
-[data-consent-action][data-variant="primary"]{background:var(--_theme---background--brand,#f60);color:var(--_theme---text--inverse,#fff)}
-[data-consent-action][data-variant="text"]{min-height:2.75rem;border-color:transparent;color:var(--_theme---text--primary,#111);text-decoration:underline}
-/* the cog opens Settings: shown in the brand bar on phones/tablets only */
-html [data-settings-open]{display:none;align-items:center;justify-content:center;margin:0;padding:0;border:0;background:none;cursor:pointer}
-@media (max-width:991px){html.has-bottom-nav [data-settings-open]{display:flex}}
+[data-consent-action]{cursor:pointer}
+[data-consent-action]:not([data-look="webflow"]){display:flex;align-items:center;justify-content:center;width:100%;min-height:3rem;padding:.75rem 1rem;border:1px solid var(--_theme---border--brand,#f60);border-radius:var(--_surface---radius--small,.5rem);background:transparent;color:var(--_theme---text--brand,#f60);font:inherit;font-weight:700;text-decoration:none}
+[data-consent-action]:not([data-look="webflow"])[data-variant="primary"]{background:var(--_theme---background--brand,#f60);color:var(--_theme---text--inverse,#fff)}
+[data-consent-action]:not([data-look="webflow"])[data-variant="text"]{min-height:2.75rem;border-color:transparent;color:var(--_theme---text--primary,#111);text-decoration:underline}
 @media (prefers-reduced-motion:reduce){[data-consent-switch],[data-consent-switch]::after{transition:none}}

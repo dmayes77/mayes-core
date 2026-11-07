@@ -1,4 +1,4 @@
-/* Mayes Core – Business v1.1.0 – one business record, shown anywhere on the page.
+/* Mayes Core – Business v1.2.0 – one business record, shown anywhere on the page.
  *
  * SOURCE – the hidden CMS layer in the Page Shell (the one Business Settings item, rendered on every page):
  *   <a data-business-field="phone">…</a>      any Business Settings field, as a native Webflow element bound in the Designer:
@@ -23,8 +23,12 @@
  *   [data-business-hours-entry]  with children (or attributes) data-business-hours-day / -order / -open / -close /
  *                                -closed (text "true", shown by conditional visibility when Closed is set)
  *   Targets:
- *     [data-business-hours]  filled with one row per run of days that share a schedule:
- *                            <div data-business-hours-line><span>Monday – Friday</span><span>8 AM–5 PM</span></div>
+ *     [data-business-hours]  filled with one row per run of days that share a schedule.
+ *                            NATIVE FIRST: design one row in Webflow inside it ([data-business-hours-line], placeholder
+ *                            text is fine) and Core clones that row for every line, keeping its Webflow classes. The days
+ *                            go in [data-business-hours-days] (else the row's first child), the time in
+ *                            [data-business-hours-time] (else its last child). Without a designed row Core writes
+ *                            <div data-business-hours-line data-core-look><span>Monday – Friday</span><span>8 AM–5 PM</span></div>
  *     [data-business-today]  text: "Open today, 8 AM–5 PM" / "Closed today" (empty when no hours are set)
  *
  * Public API: window.CoreBusiness = { get(field), all(), hours(), groupedHours(), fill() }
@@ -104,13 +108,27 @@
     var groups = groupedHours(list);
     Array.prototype.forEach.call(document.querySelectorAll('[data-business-hours]'), function(target){
       if(!groups.length){ if(target.getAttribute('data-business-empty') === 'hide') target.hidden = true; return; }
+      if(target.__coreRow === undefined){              // the designed row, captured once before the first fill
+        var row = target.querySelector('[data-business-hours-line]:not([data-core-look])');
+        target.__coreRow = row ? row.cloneNode(true) : null;
+      }
       target.textContent = '';
       groups.forEach(function(g){
-        var line = document.createElement('div'), days = document.createElement('span'), time = document.createElement('span');
-        line.setAttribute('data-business-hours-line', '');
-        days.textContent = g.start === g.end ? g.start : g.start + ' – ' + g.end;
-        time.textContent = g.schedule;
-        line.appendChild(days); line.appendChild(time); target.appendChild(line);
+        var label = g.start === g.end ? g.start : g.start + ' – ' + g.end, line, days, time;
+        if(target.__coreRow){
+          line = target.__coreRow.cloneNode(true);
+          var kids = line.children;
+          days = line.querySelector('[data-business-hours-days]') || kids[0];
+          time = line.querySelector('[data-business-hours-time]') || kids[kids.length - 1];
+          if(days) days.textContent = label;
+          if(time && time !== days) time.textContent = g.schedule;
+        } else {
+          line = document.createElement('div'); days = document.createElement('span'); time = document.createElement('span');
+          line.setAttribute('data-business-hours-line', ''); line.setAttribute('data-core-look', '');
+          days.textContent = label; time.textContent = g.schedule;
+          line.appendChild(days); line.appendChild(time);
+        }
+        target.appendChild(line);
       });
       target.hidden = false;
     });
@@ -157,7 +175,7 @@
   window.addEventListener('load', fill);
 
   window.CoreBusiness = {
-    version: '1.1.0', get: get, fill: fill, hours: hours, groupedHours: groupedHours,
+    version: '1.2.0', get: get, fill: fill, hours: hours, groupedHours: groupedHours,
     all: function(){ cache = read(); return Object.assign({}, cache); }
   };
 })();

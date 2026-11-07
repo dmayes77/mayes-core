@@ -1,4 +1,4 @@
-/* Mayes Core – Install v1.0.1 – "Add to Home Screen" banner for the mobile app layer.
+/* Mayes Core – Install v1.1.0 – "Add to Home Screen" banner for the mobile app layer.
  *
  * Pairs with the head snippet dist/core-app-head.html (full-screen launch, status bar, theme color) and the
  * Webflow webclip (Site settings › General), which is the home-screen icon.
@@ -16,7 +16,17 @@
  *   · Instagram, TikTok, Facebook and other in-app browsers (which cannot add to the home screen)
  *     → "Open this page in your browser first"
  *
- * MARKUP – none needed: the banner is built by this script and styled by core-install.css with Core tokens.
+ * MARKUP – none needed: without one, the banner is built by this script and styled by core-install.css.
+ * NATIVE FIRST – design it in Webflow instead (component "Core / Install Banner", once, in the Page Shell root):
+ *   [data-install-banner]               the banner; hide it with its class and show it with an is-visible combo
+ *     [data-install-icon]               optional image: gets the site's webclip, removed when there is none
+ *     [data-install-title]              text set to "Add <name> to your Home Screen"
+ *     [data-install-name]               any text that should read just the site's name
+ *     [data-install-hint="ios|android|in-app|prompt|other"]  one message per case; Core shows only the matching one
+ *                                       (falls back to "other", then to the first hint)
+ *     [data-install-action="prompt"]    the Install button, shown only when the browser offers its own install prompt
+ *     [data-install-action="dismiss"]   the close button
+ *   Core only fills it, toggles is-visible, and keeps it above the bottom nav (bottom = --core-install-offset).
  * Optional:
  *   [data-install-open]         any element (e.g. an "Add to Home Screen" row in the More sheet) shows the banner on demand,
  *                               even if it was closed; hidden automatically when already on the home screen or on desktop
@@ -92,7 +102,36 @@
   }
   function esc(t){ return String(t).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
 
+  /* a banner designed in Webflow: fill it and pick its message */
+  function adopt(box){
+    var p = platform(), icon = iconUrl(), name = appName();
+    box.setAttribute('data-install-platform', p);
+    if(!box.getAttribute('role')) box.setAttribute('role', 'region');
+    box.setAttribute('aria-label', 'Add ' + name + ' to your Home Screen');
+    box.querySelectorAll('[data-install-title]').forEach(function(n){ n.textContent = 'Add ' + name + ' to your Home Screen'; });
+    box.querySelectorAll('[data-install-name]').forEach(function(n){ n.textContent = name; });
+    box.querySelectorAll('[data-install-icon]').forEach(function(img){
+      if(icon){ img.removeAttribute('srcset'); img.removeAttribute('sizes'); img.setAttribute('src', icon); img.setAttribute('alt', ''); img.hidden = false; }
+      else img.hidden = true;
+    });
+    var hints = Array.prototype.slice.call(box.querySelectorAll('[data-install-hint]'));
+    var pick = hints.filter(function(h){ return h.getAttribute('data-install-hint') === p; })[0] ||
+               hints.filter(function(h){ return h.getAttribute('data-install-hint') === 'other'; })[0] || hints[0];
+    hints.forEach(function(h){ h.hidden = h !== pick; });
+    box.querySelectorAll('[data-install-action]').forEach(function(a){
+      if(a.tagName === 'A'){ a.setAttribute('role', 'button'); a.removeAttribute('href'); a.setAttribute('tabindex', '0'); }
+      if(a.getAttribute('data-install-action') === 'prompt') a.hidden = p !== 'prompt';
+      if(a.getAttribute('data-install-action') === 'dismiss' && !a.getAttribute('aria-label') && !(a.textContent || '').trim()) a.setAttribute('aria-label', 'Close');
+    });
+    if(box.parentNode !== document.body) document.body.appendChild(box);   // above everything, out of any slot
+    box.hidden = false;
+    return box;
+  }
+  function designedBanner(){ return document.querySelector('[data-install-banner]:not(.core-install)'); }
+
   function build(){
+    var designed = designedBanner();
+    if(designed) return adopt(designed);
     var p = platform(), icon = iconUrl(), name = appName();
     var box = document.createElement('div');
     box.className = 'core-install';
@@ -138,6 +177,7 @@
     if(!el) return;
     var gone = el; el = null;
     gone.classList.remove('is-visible');
+    if(!gone.classList.contains('core-install')) return;   // a designed banner stays in the page, hidden by its class
     var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
     setTimeout(function(){ if(gone.parentNode) gone.parentNode.removeChild(gone); }, reduced ? 0 : 260);
   }
@@ -205,7 +245,7 @@
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 
   window.CoreInstall = {
-    version: '1.0.1',
+    version: '1.1.0',
     show: function(force){ return show(force !== false); },
     hide: function(){ hide(true); },
     state: function(){ var s = read(); return {platform: platform(), standalone: standalone(), mobile: mobile(), snoozed: snoozed(s), views: s.views || 0, canPrompt: !!deferred}; }

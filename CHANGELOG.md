@@ -10,7 +10,11 @@ The first native-first release (see `docs/NATIVE_FIRST.md`). Nothing is removed,
   - Corner size is `--sheet-radius`, falling back to the Radius/medium token.
 - **Safe areas v1.1.0:** the sheet insets moved onto the panel (in `core-sheet.css`), so a designed sheet keeps its own padding.
 - **Motion v0.5.0:** with `<meta name="core-motion" content="webflow">` in the head, Core Motion leaves `data-motion` and `data-animate` to Webflow Interactions, so nothing animates twice. `data-scroll-state` still works. The master's site-wide interactions are Core / Fade, Core / Rise, Core / Scale, Core / Stagger and Core / Hero.
-- 9 new browser checks: a designed host is positioned correctly as a bottom sheet, dialog and drawer, takes its look and corners from Webflow, the Core look applies only to the built host, safe areas, and the native-motion switch.
+- **Consent v1.2.0:** switches get `.is-on` and `.is-disabled` (essential), so their look can be a Webflow combo class. Any switch, button, row or section with its own Webflow class is marked `data-look="webflow"`, and Core's fallback look in `core-consent.css` steps aside for it. The obsolete `[data-settings-open]` cog rule is gone.
+- **Business v1.2.0:** a row designed in Webflow inside `[data-business-hours]` is cloned for every hours line and keeps its classes. Days go in `[data-business-hours-days]` or the row's first child, time in `[data-business-hours-time]` or its last child. Rows Core writes itself are marked `data-core-look`, and only those get Core's grid.
+- **Install v1.1.0:** a banner designed in Webflow (`[data-install-banner]`, component Core / Install Banner) is used instead of the built one. Core fills `[data-install-title]`, `[data-install-name]` and `[data-install-icon]`, shows only the matching `[data-install-hint]`, shows the Install button only when the browser offers it, and toggles `is-visible`. Core still keeps it above the bottom nav.
+- **Fix:** the sheet overlay now covers the 15px scrollbar gutter that page stability reserves on desktop.
+- 23 new browser checks: a designed sheet host as a bottom sheet, dialog and drawer, with its look and corners from Webflow; Core look only on the built host; safe areas; the native-motion switch; designed consent switches (`is-on`, `is-disabled`, fallback look); designed hours rows; the designed install banner; and the gutter.
 
 ## v1.4.5 — 2026-11-07
 
