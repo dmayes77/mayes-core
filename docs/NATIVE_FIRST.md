@@ -40,6 +40,10 @@ Checked on the master (Core Design System 2.0) on 2026-11-07:
 
 About 220 of Core's ~1,100 JS lines (bottom nav, motion, announcement) could go entirely. Most of the remaining CSS that sets a look (sheet, consent, install, hours) moves into Webflow classes.
 
+## Status
+
+- **v1.5.0 (2026-11-07):** Sheet / Host designed in Webflow, with sheet CSS split into behavior and look. Motion moved to the Webflow Interactions Core / Fade, Rise, Scale, Stagger and Hero, with the `core-motion` meta switch. Still to do for v1.5.x: the consent `is-on` hook, the hours row template and the install banner component.
+
 ## Release plan
 
 Removing `data-tab-action`, badges, `data-animate` and the bottom-nav and motion scripts can break older sites that still load Core (DetailFlow, ShopFlow), so the removals ship as **Core v2.0.0**. Those sites stay pinned to their v1 tags until they're rebuilt.

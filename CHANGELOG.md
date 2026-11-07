@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.5.0 — 2026-11-07
+
+The first native-first release (see `docs/NATIVE_FIRST.md`). Nothing is removed, so v1.4 sites keep working.
+
+- **Sheet v1.4.0, designed in Webflow.** Build the sheet frame as a Webflow component, **Sheet / Host**. It has `data-sheet="drawer" data-sheet-host` with overlay, panel, grabber (put a bar inside it), head with title and close, and body. Its look then comes from its own classes.
+  - `core-sheet.css` is split. **Behavior** (every host): showing and hiding, the position and slide for each presentation, the bottom-sheet heights, the scrolling body, the swipe zone and the safe areas. **Look** (only the host Core builds itself, now marked `data-sheet-look="core"`): colors, shadow, spacing, type, the drag bar and the close button.
+  - Position and width set on a Webflow panel class for the Designer preview are overridden, so one designed panel works as a bottom sheet, a dialog and a drawer.
+  - Corner size is `--sheet-radius`, falling back to the Radius/medium token.
+- **Safe areas v1.1.0:** the sheet insets moved onto the panel (in `core-sheet.css`), so a designed sheet keeps its own padding.
+- **Motion v0.5.0:** with `<meta name="core-motion" content="webflow">` in the head, Core Motion leaves `data-motion` and `data-animate` to Webflow Interactions, so nothing animates twice. `data-scroll-state` still works. The master's site-wide interactions are Core / Fade, Core / Rise, Core / Scale, Core / Stagger and Core / Hero.
+- 9 new browser checks: a designed host is positioned correctly as a bottom sheet, dialog and drawer, takes its look and corners from Webflow, the Core look applies only to the built host, safe areas, and the native-motion switch.
+
 ## v1.4.5 — 2026-11-07
 
 - **Business v1.1.0:** an icon link with only `data-business-href="field"` and `data-business-empty="hide"` (a social icon) now hides when that field is empty and shows when it has a URL. Before, `hide` only worked together with `data-business`. 3 new browser checks.

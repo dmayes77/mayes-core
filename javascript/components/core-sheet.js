@@ -1,4 +1,4 @@
-/* Mayes Core – Sheet v1.3.0
+/* Mayes Core – Sheet v1.4.0
  * One shared sheet for the whole site: bottom sheet, centered dialog, or left/right drawer.
  *
  * CONTENT BLOCKS – anything the site shows in a sheet is a hidden block somewhere on the page:
@@ -15,6 +15,8 @@
  *   ([data-sheet-host] containing [data-sheet-panel]; optional [data-sheet-overlay], [data-sheet-grabber],
  *   [data-sheet-head] with [data-sheet-title] and [data-sheet-close], [data-sheet-body]) it adopts that one
  *   instead, so the sheet's look can be designed in Webflow. It is moved to the end of <body>.
+ *   Only the host Core builds carries data-sheet-look="core" (Core's default look); an adopted host is styled by its
+ *   Webflow classes. Keep data-sheet="drawer" on a Webflow-built host so it stays hidden until it opens.
  *
  * OPEN  any [data-sheet-open="name"], or CoreSheet.open(nameOrBlock, {returnFocus, mode, height, width, title})
  *       CoreSheet.show({title, html|node, mode, height, width, view}) for content built in JS
@@ -87,7 +89,7 @@
     if(authored && authored.querySelector('[data-sheet-panel]')) adopt(authored);
     else {
       host = document.createElement('div');
-      host.setAttribute('data-sheet', 'drawer'); host.setAttribute('data-sheet-host', '');
+      host.setAttribute('data-sheet', 'drawer'); host.setAttribute('data-sheet-host', ''); host.setAttribute('data-sheet-look', 'core');
       host.innerHTML = '<div data-sheet-overlay data-sheet-close></div>' +
         '<div data-sheet-panel role="dialog" aria-modal="true" tabindex="-1">' +
           '<div data-sheet-grabber aria-hidden="true"></div>' +
@@ -350,7 +352,7 @@
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', build); else build();
 
   window.CoreSheet = {
-    version: '1.3.0',
+    version: '1.4.0',
     open: open, show: show, close: close,
     top: function(){ return host && host.classList.contains('is-open') && !finishClose ? host : null; },
     current: function(){ return current && !finishClose ? current.block : null; },
