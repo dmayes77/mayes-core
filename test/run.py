@@ -221,6 +221,18 @@ def run():
         check("before/after: no JS errors", not errors, errors)
         ctx.close()
 
+        # ---------- page stability: no vertical bounce on phones ----------
+        ctx = browser.new_context(viewport={"width": 390, "height": 844}, is_mobile=True, has_touch=True)
+        pg = ctx.new_page(); pg.goto(base + plain); pg.wait_for_load_state("load")
+        check("stability: no vertical overscroll on phones",
+              pg.evaluate("getComputedStyle(document.documentElement).overscrollBehaviorY") == "none"
+              and pg.evaluate("getComputedStyle(document.body).overscrollBehaviorY") == "none")
+        ctx.close()
+        ctx = browser.new_context(viewport={"width": 1280, "height": 900})
+        pg = ctx.new_page(); pg.goto(base + plain); pg.wait_for_load_state("load")
+        check("stability: desktop scrolling unchanged", pg.evaluate("getComputedStyle(document.documentElement).overscrollBehaviorY") == "auto")
+        ctx.close()
+
         # ---------- Add to Home Screen ----------
         IPHONE = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1"
         ANDROID = "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36"

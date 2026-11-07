@@ -1,9 +1,12 @@
 /* Mayes Core – core.css – built from: css/core-page-stability.css css/core-sheet.css css/core-bottom-nav.css css/core-consent.css css/core-business.css css/core-announcement.css css/core-install.css */
 
-/* Mayes Core – Page stability v1.1.0
+/* Mayes Core – Page stability v1.2.0
  * Reserve scrollbar space so vertical scroll locking does not shift layout,
  * and suppress root-level horizontal overscroll when the document itself
  * has no horizontal overflow. Horizontal component scrollers remain unaffected.
+ * Phones and tablets (where the bottom nav shows): no vertical overscroll bounce
+ * or pull-to-refresh on the page, so the pinned bottom nav stays still like an app.
+ * Scrollable areas inside the page (sheets, carousels) keep their own behavior.
  */
 html{
   scrollbar-gutter:stable;
@@ -11,6 +14,9 @@ html{
 }
 body{
   overscroll-behavior-x:none;
+}
+@media (max-width:991px){
+  html,body{overscroll-behavior-y:none}
 }
 
 /* Mayes Core – Sheet v1.3.0

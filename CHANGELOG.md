@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.4.3 — 2026-11-07
+
+**Page stability v1.2.0:** on phones and tablets (991px and below, where the bottom nav shows) the page no longer bounces past its top and bottom or triggers pull-to-refresh, so the pinned bottom nav stays still while scrolling. Sheets and carousels keep their own scrolling. Desktop is unchanged. 2 new browser checks.
+
 ## v1.4.2 — 2026-11-07
 
 **Fix:** `core-install.js` v1.0.1. The Add to Home Screen banner waited for a saved cookie choice, so visitors who closed or ignored the cookie notice never saw it. It now waits only while the cookie notice (or any sheet) is open, and shows once it closes, with or without a choice. 3 new browser checks.
