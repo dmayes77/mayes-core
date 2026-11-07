@@ -27,7 +27,8 @@ In the Webflow master:
 | Navigation / Glass | Page Shell › Nav / Header | Flush top bar; ⋯ button (`data-sheet-open="site-settings"`) on phones |
 | Navigation / Site Bottom Nav | Page Shell › Mobile Nav | Home, Services, Call, Location, Quote. A tab opens a sheet with `data-tab-action="sheet:NAME"` |
 | Sheet / Host | Page Shell root (not a slot), once | The frame every sheet opens in; its look is the `sheet-host_*` classes. Preview it by adding the `is-open` combo to `sheet-host` |
-| Sheet / Site Settings | Page Shell › Sheets, once | `site-settings` sheet + `cookie-notice` sheet |
+| Core / Install Banner | Page Shell root, once | Add to Home Screen banner; its look is the `install-banner_*` classes. Preview it by adding the `is-visible` combo |
+| Sheet / Site Settings | Page Shell › Sheets, once | `site-settings` sheet + `cookie-notice` sheet. Switches use `settings_switch` with the `is-on` and `is-disabled` combos; buttons use `button` and `button is-secondary` |
 | Sheet / Services | Page Shell › Sheets | `services` sheet |
 | Sheet / Location | Page Shell › Sheets | `location` sheet: today's hours, address, Directions, Call, the week's hours |
 | Sheet / Quote | Page Shell › Sheets | `quote` sheet with a native Webflow form; rename to Collab on creator sites |

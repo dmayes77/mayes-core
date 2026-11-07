@@ -443,7 +443,7 @@
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
 
-/* Mayes Core – Consent v1.1.0 – cookie consent + the Site Settings sheet.
+/* Mayes Core – Consent v1.2.0 – cookie consent + the Site Settings sheet.
    Uses the Sheet engine (window.CoreSheet). Pairs with the head snippet (Consent Mode v2 defaults),
    which must run BEFORE the Google tag. Categories: essential (always on), analytics, marketing.
 
@@ -454,7 +454,10 @@
      [data-consent-action="accept-all|necessary|save|customize"]
    Opening: any [data-sheet-open="site-settings"] (the brand-bar cog) or CoreConsent.open().
    Deferred third-party scripts: <script type="text/plain" data-consent="analytics|marketing" src|inline> run once consent is given.
-   Events: "core:consent" on document (detail = {analytics, marketing}). */
+   Events: "core:consent" on document (detail = {analytics, marketing}).
+   NATIVE FIRST: switches get .is-on when on and .is-disabled when locked (essential), so their look can be a Webflow
+   combo class. A switch, button, row or section that carries its own Webflow class is marked data-look="webflow" and
+   Core's fallback look (core-consent.css) steps aside for it. */
 (function(){
   if(window.CoreConsent) return;
   var KEY = document.documentElement.getAttribute('data-consent-key') || 'core-consent-v1', CATS = ['analytics','marketing'];
@@ -484,7 +487,8 @@
       var c = sw.getAttribute('data-consent-switch'), on = c === 'essential' ? true : !!s[c];
       sw.setAttribute('role', 'switch'); if(sw.tagName === 'BUTTON') sw.type = 'button'; else if(!sw.hasAttribute('tabindex')) sw.setAttribute('tabindex', '0');
       sw.setAttribute('aria-checked', on ? 'true' : 'false');
-      if(c === 'essential') sw.setAttribute('aria-disabled', 'true');
+      sw.classList.toggle('is-on', on);
+      if(c === 'essential'){ sw.setAttribute('aria-disabled', 'true'); sw.classList.add('is-disabled'); }
     });
   }
   function fromSwitches(){
@@ -506,7 +510,8 @@
     if(sw){
       e.preventDefault();
       if(sw.getAttribute('aria-disabled') === 'true') return;
-      sw.setAttribute('aria-checked', sw.getAttribute('aria-checked') === 'true' ? 'false' : 'true');
+      var nowOn = sw.getAttribute('aria-checked') !== 'true';
+      sw.setAttribute('aria-checked', nowOn ? 'true' : 'false'); sw.classList.toggle('is-on', nowOn);
       return;
     }
     var b = e.target.closest('[data-consent-action]');
@@ -519,6 +524,13 @@
     else if(a === 'customize'){ if(sheet()) sheet().close(null, {instant: true, noFocus: true}); setTimeout(open, 30); }
   });
   document.addEventListener('sheet:open', function(){ sync(); });
+  /* elements styled with their own Webflow class keep that look; Core's fallback look is only for unstyled ones */
+  function designed(el){ return (el.getAttribute('class') || '').split(/\s+/).some(function(c){ return c && !/^(w-|is-)/.test(c); }); }
+  function markLooks(){
+    document.querySelectorAll('[data-consent-switch],[data-consent-action],[data-settings-row],[data-settings-section]').forEach(function(el){
+      if(designed(el)) el.setAttribute('data-look', 'webflow');
+    });
+  }
   /* Webflow renders these as div/link elements: make them real controls for keyboard and screen readers */
   function prepActions(){
     document.querySelectorAll('[data-consent-action]').forEach(function(b){
@@ -532,7 +544,7 @@
 
   function init(){
     var s = read();
-    prepActions(); sync(s);
+    markLooks(); prepActions(); sync(s);
     if(s) apply(s);
     else if(document.querySelector('[data-sheet="cookie-notice"]')){
       setTimeout(function(){ if(!read() && sheet() && !sheet().top()) sheet().open('cookie-notice'); }, 1200);
@@ -540,10 +552,10 @@
   }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 
-  window.CoreConsent = { version: '1.1.0', key: KEY, get: read, set: set, open: open };
+  window.CoreConsent = { version: '1.2.0', key: KEY, get: read, set: set, open: open };
 })();
 
-/* Mayes Core – Business v1.1.0 – one business record, shown anywhere on the page.
+/* Mayes Core – Business v1.2.0 – one business record, shown anywhere on the page.
  *
  * SOURCE – the hidden CMS layer in the Page Shell (the one Business Settings item, rendered on every page):
  *   <a data-business-field="phone">…</a>      any Business Settings field, as a native Webflow element bound in the Designer:
@@ -568,8 +580,12 @@
  *   [data-business-hours-entry]  with children (or attributes) data-business-hours-day / -order / -open / -close /
  *                                -closed (text "true", shown by conditional visibility when Closed is set)
  *   Targets:
- *     [data-business-hours]  filled with one row per run of days that share a schedule:
- *                            <div data-business-hours-line><span>Monday – Friday</span><span>8 AM–5 PM</span></div>
+ *     [data-business-hours]  filled with one row per run of days that share a schedule.
+ *                            NATIVE FIRST: design one row in Webflow inside it ([data-business-hours-line], placeholder
+ *                            text is fine) and Core clones that row for every line, keeping its Webflow classes. The days
+ *                            go in [data-business-hours-days] (else the row's first child), the time in
+ *                            [data-business-hours-time] (else its last child). Without a designed row Core writes
+ *                            <div data-business-hours-line data-core-look><span>Monday – Friday</span><span>8 AM–5 PM</span></div>
  *     [data-business-today]  text: "Open today, 8 AM–5 PM" / "Closed today" (empty when no hours are set)
  *
  * Public API: window.CoreBusiness = { get(field), all(), hours(), groupedHours(), fill() }
@@ -649,13 +665,27 @@
     var groups = groupedHours(list);
     Array.prototype.forEach.call(document.querySelectorAll('[data-business-hours]'), function(target){
       if(!groups.length){ if(target.getAttribute('data-business-empty') === 'hide') target.hidden = true; return; }
+      if(target.__coreRow === undefined){              // the designed row, captured once before the first fill
+        var row = target.querySelector('[data-business-hours-line]:not([data-core-look])');
+        target.__coreRow = row ? row.cloneNode(true) : null;
+      }
       target.textContent = '';
       groups.forEach(function(g){
-        var line = document.createElement('div'), days = document.createElement('span'), time = document.createElement('span');
-        line.setAttribute('data-business-hours-line', '');
-        days.textContent = g.start === g.end ? g.start : g.start + ' – ' + g.end;
-        time.textContent = g.schedule;
-        line.appendChild(days); line.appendChild(time); target.appendChild(line);
+        var label = g.start === g.end ? g.start : g.start + ' – ' + g.end, line, days, time;
+        if(target.__coreRow){
+          line = target.__coreRow.cloneNode(true);
+          var kids = line.children;
+          days = line.querySelector('[data-business-hours-days]') || kids[0];
+          time = line.querySelector('[data-business-hours-time]') || kids[kids.length - 1];
+          if(days) days.textContent = label;
+          if(time && time !== days) time.textContent = g.schedule;
+        } else {
+          line = document.createElement('div'); days = document.createElement('span'); time = document.createElement('span');
+          line.setAttribute('data-business-hours-line', ''); line.setAttribute('data-core-look', '');
+          days.textContent = label; time.textContent = g.schedule;
+          line.appendChild(days); line.appendChild(time);
+        }
+        target.appendChild(line);
       });
       target.hidden = false;
     });
@@ -702,7 +732,7 @@
   window.addEventListener('load', fill);
 
   window.CoreBusiness = {
-    version: '1.1.0', get: get, fill: fill, hours: hours, groupedHours: groupedHours,
+    version: '1.2.0', get: get, fill: fill, hours: hours, groupedHours: groupedHours,
     all: function(){ cache = read(); return Object.assign({}, cache); }
   };
 })();
@@ -748,7 +778,7 @@
   window.CoreAnnouncement = { version: '1.0.0', refresh: measure };
 })();
 
-/* Mayes Core – Install v1.0.1 – "Add to Home Screen" banner for the mobile app layer.
+/* Mayes Core – Install v1.1.0 – "Add to Home Screen" banner for the mobile app layer.
  *
  * Pairs with the head snippet dist/core-app-head.html (full-screen launch, status bar, theme color) and the
  * Webflow webclip (Site settings › General), which is the home-screen icon.
@@ -766,7 +796,17 @@
  *   · Instagram, TikTok, Facebook and other in-app browsers (which cannot add to the home screen)
  *     → "Open this page in your browser first"
  *
- * MARKUP – none needed: the banner is built by this script and styled by core-install.css with Core tokens.
+ * MARKUP – none needed: without one, the banner is built by this script and styled by core-install.css.
+ * NATIVE FIRST – design it in Webflow instead (component "Core / Install Banner", once, in the Page Shell root):
+ *   [data-install-banner]               the banner; hide it with its class and show it with an is-visible combo
+ *     [data-install-icon]               optional image: gets the site's webclip, removed when there is none
+ *     [data-install-title]              text set to "Add <name> to your Home Screen"
+ *     [data-install-name]               any text that should read just the site's name
+ *     [data-install-hint="ios|android|in-app|prompt|other"]  one message per case; Core shows only the matching one
+ *                                       (falls back to "other", then to the first hint)
+ *     [data-install-action="prompt"]    the Install button, shown only when the browser offers its own install prompt
+ *     [data-install-action="dismiss"]   the close button
+ *   Core only fills it, toggles is-visible, and keeps it above the bottom nav (bottom = --core-install-offset).
  * Optional:
  *   [data-install-open]         any element (e.g. an "Add to Home Screen" row in the More sheet) shows the banner on demand,
  *                               even if it was closed; hidden automatically when already on the home screen or on desktop
@@ -842,7 +882,36 @@
   }
   function esc(t){ return String(t).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
 
+  /* a banner designed in Webflow: fill it and pick its message */
+  function adopt(box){
+    var p = platform(), icon = iconUrl(), name = appName();
+    box.setAttribute('data-install-platform', p);
+    if(!box.getAttribute('role')) box.setAttribute('role', 'region');
+    box.setAttribute('aria-label', 'Add ' + name + ' to your Home Screen');
+    box.querySelectorAll('[data-install-title]').forEach(function(n){ n.textContent = 'Add ' + name + ' to your Home Screen'; });
+    box.querySelectorAll('[data-install-name]').forEach(function(n){ n.textContent = name; });
+    box.querySelectorAll('[data-install-icon]').forEach(function(img){
+      if(icon){ img.removeAttribute('srcset'); img.removeAttribute('sizes'); img.setAttribute('src', icon); img.setAttribute('alt', ''); img.hidden = false; }
+      else img.hidden = true;
+    });
+    var hints = Array.prototype.slice.call(box.querySelectorAll('[data-install-hint]'));
+    var pick = hints.filter(function(h){ return h.getAttribute('data-install-hint') === p; })[0] ||
+               hints.filter(function(h){ return h.getAttribute('data-install-hint') === 'other'; })[0] || hints[0];
+    hints.forEach(function(h){ h.hidden = h !== pick; });
+    box.querySelectorAll('[data-install-action]').forEach(function(a){
+      if(a.tagName === 'A'){ a.setAttribute('role', 'button'); a.removeAttribute('href'); a.setAttribute('tabindex', '0'); }
+      if(a.getAttribute('data-install-action') === 'prompt') a.hidden = p !== 'prompt';
+      if(a.getAttribute('data-install-action') === 'dismiss' && !a.getAttribute('aria-label') && !(a.textContent || '').trim()) a.setAttribute('aria-label', 'Close');
+    });
+    if(box.parentNode !== document.body) document.body.appendChild(box);   // above everything, out of any slot
+    box.hidden = false;
+    return box;
+  }
+  function designedBanner(){ return document.querySelector('[data-install-banner]:not(.core-install)'); }
+
   function build(){
+    var designed = designedBanner();
+    if(designed) return adopt(designed);
     var p = platform(), icon = iconUrl(), name = appName();
     var box = document.createElement('div');
     box.className = 'core-install';
@@ -888,6 +957,7 @@
     if(!el) return;
     var gone = el; el = null;
     gone.classList.remove('is-visible');
+    if(!gone.classList.contains('core-install')) return;   // a designed banner stays in the page, hidden by its class
     var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
     setTimeout(function(){ if(gone.parentNode) gone.parentNode.removeChild(gone); }, reduced ? 0 : 260);
   }
@@ -955,7 +1025,7 @@
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 
   window.CoreInstall = {
-    version: '1.0.1',
+    version: '1.1.0',
     show: function(force){ return show(force !== false); },
     hide: function(){ hide(true); },
     state: function(){ var s = read(); return {platform: platform(), standalone: standalone(), mobile: mobile(), snoozed: snoozed(s), views: s.views || 0, canPrompt: !!deferred}; }

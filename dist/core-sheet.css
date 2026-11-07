@@ -13,7 +13,9 @@
  */
 
 /* ---------- behavior ---------- */
+/* the host spans the full viewport, including the scrollbar gutter page stability reserves on desktop */
 [data-sheet]{position:fixed;inset:0;z-index:1002;display:none}
+[data-sheet][data-sheet-host]{right:auto;width:100vw}
 [data-sheet-content]{display:none}
 [data-sheet-host] [hidden]{display:none!important}
 [data-sheet].is-open{display:block}

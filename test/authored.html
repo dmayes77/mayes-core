@@ -9,7 +9,13 @@
 .sheet_component{display:none;position:fixed;inset:0;z-index:1002}
 .sheet_backdrop{position:absolute;inset:0;background-color:rgba(17,17,17,.45)}
 .sheet_panel{position:absolute;left:0;right:0;bottom:0;max-width:36rem;margin-left:auto;margin-right:auto;display:flex;flex-direction:column;overflow:hidden;border-top-left-radius:1rem;border-top-right-radius:1rem;background-color:rgb(250,250,250);box-shadow:0 -8px 32px rgba(17,17,17,.16)}
-.sheet_body{padding:0 1.25rem 1.25rem}</style>
+.sheet_body{padding:0 1.25rem 1.25rem}
+/* designed consent switch, hours row and install banner, as Webflow would publish them */
+.settings_switch{display:inline-block;width:40px;height:24px;background:rgb(10,20,30)}
+.settings_switch.is-on{background:rgb(0,128,0)}
+.location_hours-row{display:flex;justify-content:space-between;color:rgb(1,2,3)}
+.install-banner{display:none;position:fixed;left:8px;right:8px;background:rgb(4,5,6)}
+.install-banner.is-visible{display:flex}</style>
 </head>
 <body>
   <!-- Webflow Page Shell › Overlay slot: a designed host (Overlay / Sheet Native), nested as Webflow nests it -->
@@ -29,7 +35,34 @@
   <main>
     <button data-sheet-open="location" id="open-location">Location</button>
   </main>
-  <div data-sheet="location" data-sheet-title="Location" class="is-hidden"><p id="loc-text">100 Market St</p><a href="#map">Map</a></div>
+  <div data-sheet="location" data-sheet-title="Location" class="is-hidden"><p id="loc-text">100 Market St</p><a href="#map">Map</a>
+    <div id="hours" data-business-hours>
+      <div class="location_hours-row" data-business-hours-line><p class="location_text">Monday</p><p class="location_text">9–5</p></div>
+      <div class="location_hours-row" data-business-hours-line><p class="location_text">Tuesday</p><p class="location_text">9–5</p></div>
+    </div>
+  </div>
+  <div data-sheet="site-settings" data-sheet-title="Settings" class="is-hidden">
+    <div data-settings-row class="settings_row"><span>Analytics</span><a href="#" id="sw-designed" class="settings_switch" data-consent-switch="analytics" aria-label="Analytics"></a></div>
+    <div data-settings-row><span>Marketing</span><a href="#" id="sw-plain" data-consent-switch="marketing" aria-label="Marketing"></a></div>
+    <div data-settings-row><span>Essential</span><a href="#" id="sw-essential" class="settings_switch" data-consent-switch="essential" aria-label="Essential"></a></div>
+  </div>
+  <div hidden aria-hidden="true">
+    <div data-business-hours-entry><span data-business-hours-day>Monday</span><span data-business-hours-open>8 AM</span><span data-business-hours-close>5 PM</span></div>
+    <div data-business-hours-entry><span data-business-hours-day>Tuesday</span><span data-business-hours-open>8 AM</span><span data-business-hours-close>5 PM</span></div>
+    <div data-business-hours-entry><span data-business-hours-day>Sunday</span><span data-business-hours-closed>true</span></div>
+    <span data-business-field="business-name">Test Plumbing Co.</span>
+  </div>
+  <div class="page-shell_root">
+    <div class="install-banner" data-install-banner id="designed-banner">
+      <img data-install-icon src="placeholder.svg" alt="">
+      <p class="install-banner_title" data-install-title>Add this site to your Home Screen</p><span data-install-name>name</span>
+      <p data-install-hint="ios">Tap Share, then Add to Home Screen.</p>
+      <p data-install-hint="android">Tap the menu, then Install.</p>
+      <p data-install-hint="other" id="hint-other">Use your browser menu.</p>
+      <a href="#" class="install-banner_button" data-install-action="prompt" id="banner-install">Install</a>
+      <a href="#" class="install-banner_close" data-install-action="dismiss" id="banner-close"></a>
+    </div>
+  </div>
   <script src="../dist/core.js" defer></script>
 </body>
 </html>

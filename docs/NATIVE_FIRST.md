@@ -42,7 +42,7 @@ About 220 of Core's ~1,100 JS lines (bottom nav, motion, announcement) could go 
 
 ## Status
 
-- **v1.5.0 (2026-11-07):** Sheet / Host designed in Webflow, with sheet CSS split into behavior and look. Motion moved to the Webflow Interactions Core / Fade, Rise, Scale, Stagger and Hero, with the `core-motion` meta switch. Still to do for v1.5.x: the consent `is-on` hook, the hours row template and the install banner component.
+- **v1.5.0 (2026-11-07):** Sheet / Host designed in Webflow, with sheet CSS split into behavior and look. Motion moved to the Webflow Interactions Core / Fade, Rise, Scale, Stagger and Hero, with the `core-motion` meta switch. Also in v1.5.0: the consent `is-on` and `is-disabled` hooks with `data-look="webflow"`, the hours row template, the Core / Install Banner component, and the sheet overlay covering the scrollbar gutter. Next is v2.0.0 (removals).
 
 ## Release plan
 
