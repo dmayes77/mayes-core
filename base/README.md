@@ -25,7 +25,7 @@ In the Webflow master (built 2026-11-03):
 | Sheet / Content | Page Shell › Overlay | Props: Name, Title, Height, Mode. Content slot for links, text, a form |
 | Core / Site Settings | Page Shell › Overlay, once | Settings sheet (`site-settings`) + cookie notice; More tab opens it with Sheet Mode `bottom` |
 
-Site custom code loads the consent snippet, `core.css`, GSAP, and `core.js`, all pinned to `@v1.3.0`. To turn on Add to Home Screen, move them to `@v1.4.2` and add the app head snippet.
+Site custom code loads the consent snippet, `core.css`, GSAP, and `core.js`, all pinned to `@v1.3.0`. To turn on Add to Home Screen, move them to `@v1.4.3` and add the app head snippet.
 
 Add to Home Screen: the app head snippet makes the saved site open full screen, and Core shows phone visitors a banner on their second page view. The More sheet carries an "Add to Home Screen" row (`data-install-open`). Opened from the home screen there is no browser back button, so every page keeps the bottom nav.
 

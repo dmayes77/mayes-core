@@ -18,7 +18,8 @@ Never `@main`, never `@stable`, never a bare commit. A push to `main` must never
 | `v1.3.0` | sheet v1.3 (GSAP motion, iPhone-safe scroll lock, Webflow-authored host, per-open mode), optional Before and After | — |
 | `v1.4.0` | **do not use**: tagged by mistake on the v1.3.0 commit, same code as `v1.3.0` | — |
 | `v1.4.1` | Add to Home Screen banner (`core-install`) in the bundles; `core-app-head.html` snippet | — (banner never shows if the cookie notice is closed without a choice) |
-| `v1.4.2` | Fix: banner shows after the cookie notice closes, with or without a choice | latest; the $500 Base site and every new site |
+| `v1.4.2` | Fix: banner shows after the cookie notice closes, with or without a choice | — |
+| `v1.4.3` | No vertical overscroll bounce or pull-to-refresh on phones and tablets (bottom nav stays still) | latest; the $500 Base site and every new site |
 
 ## Cutting a release
 
