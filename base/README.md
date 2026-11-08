@@ -48,16 +48,16 @@ In the Webflow master:
 
 | Component | Goes in | Notes |
 |---|---|---|
-| Page Shell | page body | Slots: Nav / Header, Main Content, Footer, Mobile Nav (fixed, 991px and below), Sheets. (The old Overlay slot is no longer used.) |
-| Navigation / Glass | Page Shell › Nav / Header | Flush top bar; ⋯ button (`data-sheet-open="site-settings"`) on phones |
-| Navigation / Site Bottom Nav | Page Shell › Mobile Nav | Home, Services, Book, Location, Quote. Each tab is a link (`bottom-nav_hit`) with its icon and label inside; a sheet tab carries `data-sheet-open="NAME"`. The active tab is the link's **Current** state in Webflow |
-| Sheet / Host | Page Shell root (not a slot), once | The frame every sheet opens in; its look is the `sheet-host_*` classes. Preview it by adding the `is-open` combo to `sheet-host` |
+| Page Shell | page body | One slot: **Main Content**. Everything else is built in and identical on every page: the top nav (`shell-header`), footer (`shell-footer`), bottom nav (`shell-mobile-nav`, 991px and below), the sheets (`shell-sheets`), Sheet / Host and Core / Install Banner. Change any of them once in its component |
+| Navigation / Glass | inside the Page Shell (`shell-header`) | Flush top bar: logo, links, and a Get a quote button (`data-sheet-open="quote"`, text from the CTA Text prop, hidden with Show CTA); ⋯ button (`data-sheet-open="site-settings"`) on phones |
+| Navigation / Site Bottom Nav | inside the Page Shell (`shell-mobile-nav`) | Home, Services, Book, Location, Quote. Each tab is a link (`bottom-nav_hit`) with its icon and label inside; a sheet tab carries `data-sheet-open="NAME"`. The active tab is the link's **Current** state in Webflow |
+| Sheet / Host | Page Shell root, once | The frame every sheet opens in; its look is the `sheet-host_*` classes. Preview it by adding the `is-open` combo to `sheet-host` |
 | Core / Install Banner | Page Shell root, once | Add to Home Screen banner; its look is the `install-banner_*` classes. Preview it by adding the `is-visible` combo |
 | Sheet / Site Settings | inside the Page Shell (`shell-sheets` div), once | `site-settings` sheet + `cookie-notice` sheet. Switches use `settings_switch` with the `is-on` and `is-disabled` combos; buttons use `button` and `button is-secondary` |
 | Sheet / Services | inside the Page Shell (`shell-sheets` div) | `services` sheet |
 | Sheet / Location | inside the Page Shell (`shell-sheets` div) | `location` sheet: today's hours, address, Directions, Call, the week's hours |
 | Sheet / Quote | inside the Page Shell (`shell-sheets` div) | `quote` sheet with a native Webflow form; rename to Collab on creator sites |
-| Footer / Standard | Page Shell › Footer | Logo, copyright and social icons fill from Business Settings; empty social links hide; "Cookie settings" link |
+| Footer / Standard | inside the Page Shell (`shell-footer`) | Logo, copyright and social icons fill from Business Settings; empty social links hide; "Cookie settings" link |
 | Business data layer | Home page, inside the Page Shell (see below) | Hidden. Renders the Business Settings item and the 7 Business Hours items for `core-business.js` |
 
 **Sheet naming:** the component is `Sheet / Name`; the sheet's root class is the sheet's own name with the `is-hidden` combo (`settings is-hidden`, `location is-hidden`), and its inner parts use that name as a prefix (`location_hours`, `location_actions`). `data-sheet` is the lowercase name that openers use (`data-sheet-open="location"`).
