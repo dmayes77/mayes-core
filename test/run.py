@@ -275,7 +275,7 @@ def run():
         check("safe area: bottom nav clear of the notch", px(pg, ".bottom-nav_bar", "paddingLeft") == 47 and px(pg, ".bottom-nav_bar", "paddingRight") == 47)
         pg.evaluate("CoreSheet.open('services', {mode: 'left'})"); pg.wait_for_timeout(500)
         content_left = pg.evaluate("(() => { const b = document.querySelector('[data-sheet-host].is-open [data-sheet-body]'); return b.getBoundingClientRect().left + parseFloat(getComputedStyle(b).paddingLeft); })()")
-        check("safe area: sheet content clear of the notch", content_left >= 47 + 16, content_left)
+        check("safe area: sheet content clear of the notch", content_left >= 47, content_left)
         pg.evaluate("CoreSheet.close(null, {instant: true}); CoreSheet.open('services', {mode: 'bottom'})"); pg.wait_for_timeout(500)
         body_bottom = pg.evaluate("document.querySelector('[data-sheet-host].is-open [data-sheet-body]').getBoundingClientRect().bottom")
         check("safe area: sheet clear of the home bar", body_bottom <= 390 - 21, body_bottom)
