@@ -70,6 +70,8 @@ Site custom code loads the consent snippet, the app head snippet, `core.css` and
 
 **Styling is native (Core v2):** every look and layout is a Webflow class. Core only adds `is-*` combo classes, and the master's classes style them: the sheet panel's `is-bottom` / `is-center` / `is-left` / `is-right` + `is-visible` and the heights, the overlay's `is-visible`, the grabber's `is-bottom`, the switches' `is-on` / `is-disabled`, the banner's `is-visible`, the icon links' `is-business-filled`. Safe areas (`env(safe-area-inset-*)`) sit on Body, `shell-header`, `bottom-nav_bar`, the sheet panel and `install-banner`. To restyle any of it, edit those classes and combos.
 
+**Sheet bodies:** a sheet whose content has its own `data-sheet-body` (e.g. `quote_body`, `settings_body`) replaces Sheet / Host's body when it opens, so `sheet-host_body`'s padding and scrolling don't apply to it. That body's class carries its own padding (the `layout-column` combo) and the scroll recipe: flex 1 1 auto, min-height 0, overflow-y auto, overscroll-behavior contain, scrollbar-width none.
+
 Add to Home Screen: the app head snippet makes the saved site open full screen, and Core shows phone visitors a banner on their second page view. The Settings sheet carries an "Add to Home Screen" row (`data-install-open`). Opened from the home screen there is no browser back button, so every page keeps the bottom nav.
 
 ## CMS
