@@ -53,10 +53,10 @@ In the Webflow master:
 | Navigation / Site Bottom Nav | Page Shell › Mobile Nav | Home, Services, Book, Location, Quote. Each tab is a link (`bottom-nav_hit`) with its icon and label inside; a sheet tab carries `data-sheet-open="NAME"`. The active tab is the link's **Current** state in Webflow |
 | Sheet / Host | Page Shell root (not a slot), once | The frame every sheet opens in; its look is the `sheet-host_*` classes. Preview it by adding the `is-open` combo to `sheet-host` |
 | Core / Install Banner | Page Shell root, once | Add to Home Screen banner; its look is the `install-banner_*` classes. Preview it by adding the `is-visible` combo |
-| Sheet / Site Settings | Page Shell › Sheets, once | `site-settings` sheet + `cookie-notice` sheet. Switches use `settings_switch` with the `is-on` and `is-disabled` combos; buttons use `button` and `button is-secondary` |
-| Sheet / Services | Page Shell › Sheets | `services` sheet |
-| Sheet / Location | Page Shell › Sheets | `location` sheet: today's hours, address, Directions, Call, the week's hours |
-| Sheet / Quote | Page Shell › Sheets | `quote` sheet with a native Webflow form; rename to Collab on creator sites |
+| Sheet / Site Settings | inside the Page Shell (`shell-sheets` div), once | `site-settings` sheet + `cookie-notice` sheet. Switches use `settings_switch` with the `is-on` and `is-disabled` combos; buttons use `button` and `button is-secondary` |
+| Sheet / Services | inside the Page Shell (`shell-sheets` div) | `services` sheet |
+| Sheet / Location | inside the Page Shell (`shell-sheets` div) | `location` sheet: today's hours, address, Directions, Call, the week's hours |
+| Sheet / Quote | inside the Page Shell (`shell-sheets` div) | `quote` sheet with a native Webflow form; rename to Collab on creator sites |
 | Footer / Standard | Page Shell › Footer | Logo, copyright and social icons fill from Business Settings; empty social links hide; "Cookie settings" link |
 | Business data layer | Home page, inside the Page Shell (see below) | Hidden. Renders the Business Settings item and the 7 Business Hours items for `core-business.js` |
 
