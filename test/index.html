@@ -11,20 +11,11 @@
 <script>window.__gtagCalls = []; window.dataLayer = { push: function(a){ window.__gtagCalls.push(Array.prototype.slice.call(a)); } };</script>
 <!--CONSENT_HEAD-->
 <link rel="stylesheet" href="../dist/core.css">
-<style>
-  body { margin: 0; font-family: system-ui, sans-serif; }
-  .navbar-compact { position: fixed; left: 0; right: 0; height: 56px; background: #fff; border-bottom: 1px solid #ddd; }
-  .navbar-compact.is-scrolled { box-shadow: 0 2px 8px rgba(0,0,0,.2); }
-  main { padding: 120px 16px 1600px; }
-  [data-bottom-nav] { height: 64px; }
-  .bottom-nav_bar { position: fixed; left: 0; right: 0; bottom: 0; display: flex; background: #fff; border-top: 1px solid #ddd; }
-  .bottom-nav_tab { flex: 1; text-align: center; position: relative; }
-  .bottom-nav_tab a { display: block; padding: 12px 0; }
-  [hidden], .is-hidden { display: none; }
-</style>
+<link rel="stylesheet" href="webflow.css">
 </head>
 <body>
-  <div class="shell-header" id="shell-header" style="position:fixed;top:0;left:0;width:100%;z-index:100"><div style="height:40px">Header</div></div>
+  <div class="announcement-bar" data-announcement id="bar">Announcement</div>
+  <div class="shell-header" id="shell-header"><div style="height:40px">Header</div></div>
   <!-- Page Shell: hidden business record (Business Settings + Business Hours) -->
   <div class="is-hidden" aria-hidden="true">
     <span data-business-field="business-name">Test Plumbing Co.</span>
@@ -48,20 +39,22 @@
     <div data-business-hours-entry><span data-business-hours-day>Sunday</span><span data-business-hours-order>7</span><span data-business-hours-closed>true</span><span class="w-condition-invisible" data-business-hours-open>never shown</span></div>
   </div>
 
-  <div data-announcement id="bar" style="height:40px;background:#f60">Announcement</div>
-  <header class="navbar-compact" data-scroll-state id="nav">
+  <header id="nav">
     <img data-business="logo" id="logo" alt="" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-test="fallback">
     <a data-business="phone" id="phone" href="#">(000) 000-0000</a>
   </header>
 
   <main>
-    <h1 data-motion="rise" id="rise">Heading</h1>
-    <div data-motion="stagger" id="stagger"><p data-motion-item>One</p><p data-motion-item>Two</p></div>
+    <h1 id="rise">Heading</h1>
     <a data-business="email" id="email" href="#">email</a>
     <p data-business="address" id="address"></p>
     <a data-business="directions-url" id="directions" href="#">Directions</a>
     <p data-business="tagline" data-business-empty="hide" id="tagline">fallback tagline</p>
-    <div data-business-hours id="hours"></div>
+    <div data-business-hours id="hours" class="contact-hours"></div>
+    <div data-business-hours id="hours-designed" class="location_hours">
+      <div class="location_hours-row" data-business-hours-line><p class="location_text">Monday – Friday</p><p class="location_text">9–5</p></div>
+      <div class="location_hours-row" data-business-hours-line><p class="location_text">Sunday</p><p class="location_text">Closed</p></div>
+    </div>
     <a id="social-fb" data-business-href="facebook" data-business-empty="hide" href="#"><svg></svg></a>
     <a id="social-x" data-business-href="x-url" data-business-empty="hide" href="#"><svg></svg></a>
     <p data-business-today id="today"></p>
@@ -79,8 +72,9 @@
   </div>
   <div data-sheet="site-settings" data-sheet-title="Settings" class="is-hidden">
     <div data-settings-section="privacy">
-      <div data-settings-row><span data-settings-row-title>Analytics</span><button data-consent-switch="analytics" id="sw-analytics"></button></div>
-      <div data-settings-row><span data-settings-row-title>Marketing</span><button data-consent-switch="marketing" id="sw-marketing"></button></div>
+      <div data-settings-row><span data-settings-row-title>Essential</span><a href="#" class="settings_switch" data-consent-switch="essential" id="sw-essential" aria-label="Essential"></a></div>
+      <div data-settings-row><span data-settings-row-title>Analytics</span><a href="#" class="settings_switch" data-consent-switch="analytics" id="sw-analytics" aria-label="Analytics"></a></div>
+      <div data-settings-row><span data-settings-row-title>Marketing</span><a href="#" class="settings_switch" data-consent-switch="marketing" id="sw-marketing" aria-label="Marketing"></a></div>
       <button data-consent-action="save" id="save">Save</button>
     </div>
     <div data-settings-section="app">
@@ -93,15 +87,37 @@
     <button data-consent-action="necessary" id="necessary">Necessary only</button>
   </div>
 
-  <!-- Mobile Nav slot -->
-  <div data-bottom-nav>
+  <!-- Mobile Nav slot: tabs are links; sheet tabs carry data-sheet-open (no bottom-nav script) -->
+  <div class="bottom-nav" data-bottom-nav>
     <nav class="bottom-nav_bar">
-      <div class="bottom-nav_tab" data-bottom-nav-tab data-tab-action="" id="tab-home"><a data-bottom-nav-link href="/test/index.html" aria-label="Home">Home</a></div>
-      <div class="bottom-nav_tab" data-bottom-nav-tab data-tab-action="sheet:services" id="tab-services"><a data-bottom-nav-link href="/services" aria-label="Services">Services</a></div>
-      <div class="bottom-nav_tab" data-bottom-nav-tab data-tab-action="sheet:location" id="tab-location"><a data-bottom-nav-link href="/contact" aria-label="Location">Location</a></div>
-      <div class="bottom-nav_tab" data-bottom-nav-tab data-tab-action="click:#open-services" id="tab-click"><a data-bottom-nav-link href="/services" aria-label="Book">Book</a><span class="bottom-nav_badge" id="badge">0</span></div>
-      <div class="bottom-nav_tab" data-bottom-nav-tab data-tab-action="sheet:site-settings" data-tab-sheet-mode="bottom" id="tab-more"><a data-bottom-nav-link href="#" aria-label="More">More</a></div>
+      <div class="bottom-nav_tab"><a class="bottom-nav_hit w--current" aria-current="page" href="/test/_plain.html" id="tab-home">Home</a></div>
+      <div class="bottom-nav_tab"><a class="bottom-nav_hit" href="/services" data-sheet-open="services" id="tab-services">Services</a></div>
+      <div class="bottom-nav_tab"><a class="bottom-nav_hit" href="#location" data-sheet-open="location" id="tab-location">Location</a></div>
+      <div class="bottom-nav_tab"><a class="bottom-nav_hit" href="#more" data-sheet-open="site-settings" data-sheet-open-mode="bottom" id="tab-more">More</a></div>
     </nav>
+  </div>
+
+  <!-- Page Shell root: Sheet / Host and Core / Install Banner, designed in Webflow -->
+  <div class="sheet-host" data-sheet="drawer" data-sheet-host aria-hidden="true">
+    <div class="sheet-host_overlay" data-sheet-overlay></div>
+    <div class="sheet-host_panel" data-sheet-panel>
+      <div class="sheet-host_grabber" data-sheet-grabber><div class="sheet-host_bar"></div></div>
+      <div class="sheet-host_head" data-sheet-head>
+        <h2 class="sheet-host_title" data-sheet-title>Title</h2>
+        <a href="#" class="sheet-host_close" data-sheet-close role="button" aria-label="Close" id="host-close">×</a>
+      </div>
+      <div class="sheet-host_body" data-sheet-body><p>Slot placeholder</p></div>
+    </div>
+  </div>
+  <div class="install-banner" data-install-banner id="banner">
+    <img data-install-icon src="placeholder.svg" alt="">
+    <div><p data-install-title>Add this site to your Home Screen</p><span data-install-name>name</span>
+      <p data-install-hint="ios" id="hint-ios">Tap Share, then Add to Home Screen.</p>
+      <p data-install-hint="android" id="hint-android">Tap the menu, then Install.</p>
+      <p data-install-hint="in-app" id="hint-in-app">Open this page in your browser first.</p>
+      <p data-install-hint="other" id="hint-other">Use your browser menu.</p></div>
+    <a href="#" data-install-action="prompt" id="banner-install">Install</a>
+    <a href="#" data-install-action="dismiss" id="banner-close">×</a>
   </div>
 
   <!--GSAP-->

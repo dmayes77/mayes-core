@@ -1,5 +1,46 @@
 # Changelog
 
+## v2.0.0 — 2026-11-07
+
+**Breaking.** Core ships no look and no layout: Webflow owns all of it, and Core only adds `is-*` combo classes that Webflow styles. Sites on v1 (DetailFlow, ShopFlow) stay pinned to their v1 tag until they're rebuilt on the master's components.
+
+**What changed:**
+- **`core.css` is now `core-base.css` only.** These are the rules Webflow's style panel can't express:
+  - `[hidden]{display:none!important}`
+  - the `<html>` scrollbar gutter and overscroll rules
+  - the sheet scroll lock
+  - `-webkit-tap-highlight-color`
+  - reduced motion
+- **Sheet v2.0.0:**
+  - The Sheet / Host component is required. Core no longer builds a host, and logs one console warning when there's none.
+  - Combos Webflow styles:
+    - host: `is-open`, `is-visible`
+    - overlay: `is-visible`, `is-gsap`
+    - panel: `is-bottom | is-center | is-left | is-right`, `is-visible`, `is-compact | is-medium | is-tall | is-full` (bottom only), `is-gsap`
+    - grabber and head: the presentation combo
+  - `data-sheet-as` is still set on the host.
+- **Install v2.0.0:**
+  - The Core / Install Banner component is required. Core no longer builds a banner.
+  - `--core-install-offset` is set only while a bottom nav is showing and removed otherwise. Position the banner with `bottom: calc(var(--core-install-offset, env(safe-area-inset-bottom, 0px)) + .75rem)`.
+  - `html.is-standalone` is gone. Install triggers get the `hidden` attribute instead.
+- **Consent v2.0.0:** no `data-look` marking and no fallback look. Style the switches, rows and buttons with Webflow classes; `is-on` and `is-disabled` stay.
+- **Business v2.0.0:** no hours CSS. Design a row in Webflow, or style the plain rows Core writes.
+- **Announcement v2.0.0:** no CSS. Give the fixed header's class `top: var(--core-announcement-offset, 0px)`.
+
+**Removed:**
+- `core-bottom-nav.js` and `.css`. Tabs are links; sheet tabs use `data-sheet-open`; the active tab is Webflow's Current state. `data-tab-action`, badges and `html.has-bottom-nav` are gone.
+- `core-motion.js`. Motion is Webflow Interactions; `data-scroll-state` and `data-animate` are gone.
+- `core-sheet.css`, `core-consent.css`, `core-business.css`, `core-install.css`, `core-announcement.css`, `core-safe-area.css`, `core-page-stability.css`.
+
+**Master:** the matching Webflow classes and combos are built:
+- Sheet / Host presentations, heights and safe areas
+- `install-banner` position
+- safe areas on Body, `shell-header` and `bottom-nav_bar`
+- `location_hours` rows and `announcement-bar`
+- bottom nav tabs rebuilt as links
+
+**Tests:** 130 browser checks against a copy of the master's classes (`test/webflow.css`), including a check that `core.css` styles no Webflow class.
+
 ## v1.7.0 — 2026-11-07
 
 A minor release: a new feature that existing sites get without any change.

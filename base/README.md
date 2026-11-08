@@ -50,7 +50,7 @@ In the Webflow master:
 |---|---|---|
 | Page Shell | page body | Slots: Nav / Header, Main Content, Footer, Mobile Nav (fixed, 991px and below), Sheets. (The old Overlay slot is no longer used.) |
 | Navigation / Glass | Page Shell › Nav / Header | Flush top bar; ⋯ button (`data-sheet-open="site-settings"`) on phones |
-| Navigation / Site Bottom Nav | Page Shell › Mobile Nav | Home, Services, Call, Location, Quote. A tab opens a sheet with `data-tab-action="sheet:NAME"` |
+| Navigation / Site Bottom Nav | Page Shell › Mobile Nav | Home, Services, Book, Location, Quote. Each tab is a link (`bottom-nav_hit`) with its icon and label inside; a sheet tab carries `data-sheet-open="NAME"`. The active tab is the link's **Current** state in Webflow |
 | Sheet / Host | Page Shell root (not a slot), once | The frame every sheet opens in; its look is the `sheet-host_*` classes. Preview it by adding the `is-open` combo to `sheet-host` |
 | Core / Install Banner | Page Shell root, once | Add to Home Screen banner; its look is the `install-banner_*` classes. Preview it by adding the `is-visible` combo |
 | Sheet / Site Settings | Page Shell › Sheets, once | `site-settings` sheet + `cookie-notice` sheet. Switches use `settings_switch` with the `is-on` and `is-disabled` combos; buttons use `button` and `button is-secondary` |
@@ -64,9 +64,11 @@ In the Webflow master:
 
 **Business data layer:** a hidden `shell-data` div with two Collection Lists (Business Settings, limit 1; Business Hours, limit 7). Each field is a native element bound to the CMS with `data-business-field="slug"`; each hours item is `[data-business-hours-entry]` with `data-business-hours-day / -order / -open / -close`, plus a "true" text whose visibility is bound to Closed. Webflow can't put a live Collection List inside a component created through the API, so the layer sits on the page. Copy it onto every new static page (or duplicate pages from Home) until it is moved into the Page Shell in the Designer.
 
-**Motion:** the site-wide Webflow Interactions Core / Fade, Rise, Scale, Stagger (each direct child in turn) and Hero (on load) animate any element with `data-motion="fade|rise|scale|stagger|hero"`. The head carries `<meta name="core-motion" content="webflow">` so Core Motion stays out of the way. Edit the motion in the Interactions panel.
+**Motion:** the site-wide Webflow Interactions Core / Fade, Rise, Scale, Stagger (each direct child in turn) and Hero (on load) animate any element with `data-motion="fade|rise|scale|stagger|hero"`. Edit the motion in the Interactions panel. (Core v2 has no motion script; the `core-motion` meta in the head is harmless and can go.)
 
 Site custom code loads the consent snippet, the app head snippet, `core.css` and GSAP in the head, and `core.js` before `</body>`, all pinned to the same release tag.
+
+**Styling is native (Core v2):** every look and layout is a Webflow class. Core only adds `is-*` combo classes, and the master's classes style them: the sheet panel's `is-bottom` / `is-center` / `is-left` / `is-right` + `is-visible` and the heights, the overlay's `is-visible`, the grabber's `is-bottom`, the switches' `is-on` / `is-disabled`, the banner's `is-visible`, the icon links' `is-business-filled`. Safe areas (`env(safe-area-inset-*)`) sit on Body, `shell-header`, `bottom-nav_bar`, the sheet panel and `install-banner`. To restyle any of it, edit those classes and combos.
 
 Add to Home Screen: the app head snippet makes the saved site open full screen, and Core shows phone visitors a banner on their second page view. The Settings sheet carries an "Add to Home Screen" row (`data-install-open`). Opened from the home screen there is no browser back button, so every page keeps the bottom nav.
 

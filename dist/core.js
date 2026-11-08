@@ -1,6 +1,6 @@
-/* Mayes Core – core.js – built from: javascript/components/core-sheet.js javascript/components/core-bottom-nav.js javascript/privacy/core-consent.js javascript/utilities/core-business.js javascript/utilities/core-announcement.js javascript/components/core-install.js javascript/motion/core-motion.js */
+/* Mayes Core – core.js – built from: javascript/components/core-sheet.js javascript/privacy/core-consent.js javascript/utilities/core-business.js javascript/utilities/core-announcement.js javascript/components/core-install.js */
 
-/* Mayes Core – Sheet v1.4.1
+/* Mayes Core – Sheet v2.0.0
  * One shared sheet for the whole site: bottom sheet, centered dialog, or left/right drawer.
  *
  * CONTENT BLOCKS – anything the site shows in a sheet is a hidden block somewhere on the page:
@@ -13,12 +13,19 @@
  *   While open, the parts move into the host and go back on close, so CMS bindings travel with them.
  *   The block's data-* attributes are mirrored onto the host, plus data-sheet-view="name".
  *
- * THE HOST – the engine builds one host ([data-sheet-host]). If the page already has a Webflow-authored host
- *   ([data-sheet-host] containing [data-sheet-panel]; optional [data-sheet-overlay], [data-sheet-grabber],
- *   [data-sheet-head] with [data-sheet-title] and [data-sheet-close], [data-sheet-body]) it adopts that one
- *   instead, so the sheet's look can be designed in Webflow. It is moved to the end of <body>.
- *   Only the host Core builds carries data-sheet-look="core" (Core's default look); an adopted host is styled by its
- *   Webflow classes. Keep data-sheet="drawer" on a Webflow-built host so it stays hidden until it opens.
+ * THE HOST – designed in Webflow (component Sheet / Host), once per page:
+ *   [data-sheet-host]  with [data-sheet-panel]; optional [data-sheet-overlay], [data-sheet-grabber],
+ *   [data-sheet-head] with [data-sheet-title] and [data-sheet-close], [data-sheet-body]. Missing parts are added
+ *   (unstyled). It is moved to the end of <body>. Without a host on the page, sheets do not open.
+ *
+ * STYLING – NATIVE: Core sets combo classes and Webflow styles them. Core ships no sheet CSS.
+ *   host     .is-open while open (display it), .is-visible while shown
+ *   overlay  .is-visible (fade in)
+ *   panel    .is-bottom | .is-center | .is-left | .is-right (the presentation in use: position, size, corners, the
+ *            closed transform) + .is-visible (the open transform); on bottom sheets also .is-compact | .is-medium |
+ *            .is-tall | .is-full; .is-gsap while GSAP animates it (turn transitions off)
+ *   grabber, head   the same presentation combo (show the grabber only on .is-bottom)
+ *   --sheet-width is set on the host when a block asks for a width.
  *
  * OPEN  any [data-sheet-open="name"], or CoreSheet.open(nameOrBlock, {returnFocus, mode, height, width, title})
  *       CoreSheet.show({title, html|node, mode, height, width, view}) for content built in JS
@@ -29,7 +36,7 @@
  *   bottom | center | left | right   the same presentation at every width
  * HEIGHTS (bottom sheets): data-sheet-height = compact | medium | tall | full (default: fits content, max 88%)
  * WIDTH  data-sheet-width="34rem" (or --sheet-width)
- * The host carries data-sheet-as="bottom|center|left|right" – the presentation in use – for styling.
+ * The host also carries data-sheet-as="bottom|center|left|right" (read it with CoreSheet.presentation()).
  * EVENTS "sheet:open" / "sheet:close" on the block and the host.
  *
  * Handles focus trap and return, inert background, scroll lock that also holds on iPhone, swipe-to-close,
@@ -86,24 +93,28 @@
     defBody.innerHTML = '';
   }
   function build(){
-    if(host) return;
+    if(host) return true;
     var authored = document.querySelector('[data-sheet-host]');
-    if(authored && authored.querySelector('[data-sheet-panel]')) adopt(authored);
-    else {
-      host = document.createElement('div');
-      host.setAttribute('data-sheet', 'drawer'); host.setAttribute('data-sheet-host', ''); host.setAttribute('data-sheet-look', 'core');
-      host.innerHTML = '<div data-sheet-overlay data-sheet-close></div>' +
-        '<div data-sheet-panel role="dialog" aria-modal="true" tabindex="-1">' +
-          '<div data-sheet-grabber aria-hidden="true"></div>' +
-          '<div data-sheet-head data-sheet-default><div data-sheet-title id="sheet-host-title"></div><div data-sheet-close>' + xButton() + '</div></div>' +
-          '<div data-sheet-body data-sheet-default></div>' +
-        '</div>';
-      overlay = host.children[0]; panel = host.children[1];
-      grab = panel.children[0]; defHead = panel.children[1]; defTitle = defHead.querySelector('[data-sheet-title]'); defBody = panel.children[2];
-      document.body.appendChild(host);
+    if(!authored || !authored.querySelector('[data-sheet-panel]')){
+      if(!build.warned && window.console) console.warn('Core Sheet: no [data-sheet-host] with [data-sheet-panel] on this page (add the Sheet / Host component).');
+      build.warned = true;
+      return false;
     }
+    adopt(authored);
     baseClass = host.className;
     panel.addEventListener('pointerdown', dragStart);
+    return true;
+  }
+
+  /* combo classes Webflow styles (Core ships no sheet CSS) */
+  var AS = ['is-bottom', 'is-center', 'is-left', 'is-right'], HEIGHTS = ['compact', 'medium', 'tall', 'full'];
+  function parts(){ return [panel, grab, defHead].filter(Boolean); }
+  function setVisible(on){ [host, overlay, panel].forEach(function(e){ e.classList.toggle('is-visible', on); }); }
+  function setGsap(on){ [host, overlay, panel].forEach(function(e){ e.classList.toggle('is-gsap', on); }); }
+  function clearCombos(){
+    parts().forEach(function(e){ e.classList.remove.apply(e.classList, AS); });
+    HEIGHTS.forEach(function(h){ panel.classList.remove('is-' + h); });
+    setVisible(false); setGsap(false);
   }
 
   /* which presentation the current mode resolves to at this width */
@@ -114,6 +125,9 @@
     else if(m === 'drawer') as = MQ_PHONE.matches ? 'bottom' : 'right';
     else as = (m === 'bottom' || m === 'center' || m === 'left' || m === 'right') ? m : 'center';
     host.setAttribute('data-sheet-as', as);
+    parts().forEach(function(e){ e.classList.remove.apply(e.classList, AS); e.classList.add('is-' + as); });
+    var h = host.getAttribute('data-sheet-height');
+    HEIGHTS.forEach(function(n){ panel.classList.toggle('is-' + n, as === 'bottom' && h === n); });
     return as;
   }
   function onResize(){ if(host && host.classList.contains('is-open')) present(); }
@@ -177,7 +191,7 @@
     if(!window.gsap || !panel) return;
     window.gsap.killTweensOf([panel, overlay]);
     window.gsap.set([panel, overlay], {clearProps: 'transform,opacity,visibility'});
-    host.classList.remove('is-gsap');
+    setGsap(false);
   }
 
   /* move a node into the host and remember where it came from */
@@ -236,6 +250,7 @@
     current.moved.reverse().forEach(function(p){ var n = p[0], m = p[1]; if(m.parentNode){ m.parentNode.insertBefore(n, m); m.parentNode.removeChild(m); } });
     current.attrs.forEach(function(a){ host.removeAttribute(a); });
     host.className = baseClass;                        // drop state classes a feature added (e.g. is-invalid)
+    clearCombos();
     host.removeAttribute('data-sheet-height');
     defHead.hidden = false; defBody.hidden = false; defBody.innerHTML = '';
     current = null;
@@ -249,7 +264,7 @@
 
   function open(target, opts){
     opts = opts || {};
-    build();
+    if(!build()) return null;
     var block = typeof target === 'string' ? byName(target) : target;
     if(block && block.closest && block.closest('[data-sheet-host]')) block = current && current.block;   // already inside the host
     if(!block && !opts.html && !opts.node) return null;
@@ -263,15 +278,15 @@
     setInert(true);
     if(motionOk()){
       var g = window.gsap, f = frames(as);
-      host.classList.add('is-gsap', 'is-open', 'is-visible');
+      host.classList.add('is-open'); setGsap(true); setVisible(true);
       g.killTweensOf([panel, overlay]);
       g.fromTo(panel, f[0], Object.assign({}, f[1], {duration: OPEN_S, ease: 'power3.out', overwrite: true,
-        onComplete: function(){ g.set(panel, {clearProps: 'transform,opacity,visibility'}); host.classList.remove('is-gsap'); }}));
+        onComplete: function(){ g.set(panel, {clearProps: 'transform,opacity,visibility'}); setGsap(false); }}));
       g.fromTo(overlay, {opacity: 0}, {opacity: 1, duration: OPEN_S, ease: 'power1.out', overwrite: true,
         onComplete: function(){ g.set(overlay, {clearProps: 'opacity'}); }});
     } else {
       host.classList.add('is-open');
-      requestAnimationFrame(function(){ requestAnimationFrame(function(){ if(host.classList.contains('is-open')) host.classList.add('is-visible'); }); });
+      requestAnimationFrame(function(){ requestAnimationFrame(function(){ if(host.classList.contains('is-open') && !finishClose) setVisible(true); }); });
     }
     setTimeout(function(){
       var f = panel.querySelector('[data-sheet-autofocus]');
@@ -296,14 +311,14 @@
     if(opts.instant){ flushClose(); }
     else if(animate){
       var g = window.gsap;
-      host.classList.add('is-gsap');
+      setGsap(true);
       g.killTweensOf([panel, overlay]);
       g.to(panel, Object.assign({}, frames(as)[0], {duration: CLOSE_S, ease: 'power2.in', overwrite: true,
         onComplete: function(){ g.set(panel, {clearProps: 'transform,opacity,visibility'}); if(finishClose){ var f = finishClose; finishClose = null; f(); } }}));
       g.to(overlay, {opacity: 0, duration: CLOSE_S, ease: 'power1.out', overwrite: true,
         onComplete: function(){ g.set(overlay, {clearProps: 'opacity'}); }});
     } else {
-      host.classList.remove('is-visible');
+      setVisible(false);
       closeTimer = setTimeout(flushClose, ANIM);
     }
     if(!opts.noFocus && r && r.focus && document.contains(r)) r.focus({preventScroll:true});
@@ -372,96 +387,16 @@
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', build); else build();
 
   window.CoreSheet = {
-    version: '1.4.1',
+    version: '2.0.0',
     open: open, show: show, close: close,
     top: function(){ return host && host.classList.contains('is-open') && !finishClose ? host : null; },
     current: function(){ return current && !finishClose ? current.block : null; },
-    host: function(){ build(); return host; },
+    host: function(){ build(); return host || null; },
     presentation: function(){ return host ? host.getAttribute('data-sheet-as') : null; }
   };
 })();
 
-/* Mayes Core – Bottom Nav v1.2.0 – behavior for Navigation / Bottom Nav + Navigation / Bottom Nav Tab.
-   Works with the Sheet engine (window.CoreSheet). Optional GSAP tap feedback when GSAP is loaded.
-
-   Markup contract (built by the Webflow components):
-     [data-bottom-nav]                       outer spacer (reserves height so content is never covered)
-       nav.bottom-nav_bar
-         [data-bottom-nav-tab][data-tab-action="…"]   one per tab (Action prop)
-           a[data-bottom-nav-link]                     full-tab hit area (Link prop = no-JS fallback)
-           .bottom-nav_badge                           optional, in the Badge slot
-
-   Tab actions (Action prop):
-     ""                    normal link (active when the current page matches)
-     "sheet:NAME"          opens the sheet [data-sheet="NAME"]; add data-tab-sheet-mode="bottom" on the tab to force a presentation
-     "click:SELECTOR"      clicks an existing control, e.g. click:[data-booking-open]
-   Badges whose text is empty or 0 get .is-empty (hidden); the tab's accessible name includes the count. */
-(function(){
-  if(window.__coreBottomNav) return; window.__coreBottomNav = true;
-  var TAB = '[data-bottom-nav-tab]', LINK = '[data-bottom-nav-link]';
-  function sheetApi(){ return window.CoreSheet || null; }
-  function motionOk(){ return !!window.gsap && !window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
-  function animateTab(tab){
-    if(!tab || !motionOk()) return;
-    var icon = tab.querySelector('.bottom-nav_icon');
-    if(icon) window.gsap.fromTo(icon, {scale:0.88}, {scale:1, duration:0.22, ease:'power2.out', clearProps:'transform'});
-  }
-  function norm(p){ p = (p || '/').replace(/\/+$/, ''); return p || '/'; }
-
-  document.addEventListener('click', function(e){
-    var link = e.target.closest && e.target.closest(LINK);
-    if(!link) return;
-    var tab = link.closest(TAB), action = tab && (tab.getAttribute('data-tab-action') || '').trim();
-    animateTab(tab);
-    if(!action) return;                                   // plain link: let it navigate
-    var i = action.indexOf(':'), kind = action.slice(0, i), arg = action.slice(i + 1).trim();
-    if(kind === 'sheet' && sheetApi()){
-      e.preventDefault(); sheetApi().open(arg, {returnFocus: link, mode: tab.getAttribute('data-tab-sheet-mode') || undefined});
-    } else if(kind === 'click'){
-      var target = null; try{ target = document.querySelector(arg); }catch(err){}
-      if(target){ e.preventDefault(); target.click(); }     // missing target: fall back to the link
-    }
-  });
-
-  function markActive(){
-    var here = norm(location.pathname);
-    document.querySelectorAll(TAB).forEach(function(tab){
-      var link = tab.querySelector(LINK), action = (tab.getAttribute('data-tab-action') || '').trim(), on = false;
-      if(link && !action){
-        var a = document.createElement('a'); a.href = link.getAttribute('href') || '/';
-        if(a.origin === location.origin){ var p = norm(a.pathname); on = p === '/' ? here === '/' : (here === p || here.indexOf(p + '/') === 0); }
-      }
-      tab.classList.toggle('is-active', on);
-      if(link){ if(on) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current'); }
-      if(link && action.indexOf('sheet:') === 0) link.setAttribute('aria-haspopup', 'dialog');
-    });
-  }
-
-  function syncBadges(){
-    document.querySelectorAll(TAB).forEach(function(tab){
-      var b = tab.querySelector('.bottom-nav_badge'), link = tab.querySelector(LINK);
-      if(!b || !link) return;
-      var n = (b.textContent || '').trim(), empty = n === '' || n === '0';
-      if(b.classList.contains('is-empty') !== empty) b.classList.toggle('is-empty', empty);
-      var base = link.getAttribute('data-label') || link.getAttribute('aria-label') || '';
-      if(!link.hasAttribute('data-label')) link.setAttribute('data-label', base);
-      var name = empty ? base : base + ', ' + n + (n === '1' ? ' item' : ' items');
-      if(link.getAttribute('aria-label') !== name) link.setAttribute('aria-label', name);
-    });
-  }
-
-  function init(){
-    markActive(); syncBadges();
-    var t = 0, mo = new MutationObserver(function(){ clearTimeout(t); t = setTimeout(syncBadges, 30); });
-    document.querySelectorAll('[data-bottom-nav] .bottom-nav_badge').forEach(function(b){
-      mo.observe(b, {childList:true, characterData:true, subtree:true});
-    });
-    document.documentElement.classList.toggle('has-bottom-nav', !!document.querySelector('[data-bottom-nav]'));
-  }
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
-})();
-
-/* Mayes Core – Consent v1.2.0 – cookie consent + the Site Settings sheet.
+/* Mayes Core – Consent v2.0.0 – cookie consent + the Site Settings sheet.
    Uses the Sheet engine (window.CoreSheet). Pairs with the head snippet (Consent Mode v2 defaults),
    which must run BEFORE the Google tag. Categories: essential (always on), analytics, marketing.
 
@@ -473,9 +408,8 @@
    Opening: any [data-sheet-open="site-settings"] (the brand-bar cog) or CoreConsent.open().
    Deferred third-party scripts: <script type="text/plain" data-consent="analytics|marketing" src|inline> run once consent is given.
    Events: "core:consent" on document (detail = {analytics, marketing}).
-   NATIVE FIRST: switches get .is-on when on and .is-disabled when locked (essential), so their look can be a Webflow
-   combo class. A switch, button, row or section that carries its own Webflow class is marked data-look="webflow" and
-   Core's fallback look (core-consent.css) steps aside for it. */
+   NATIVE: Core ships no consent CSS. Style the switches, rows and buttons with Webflow classes; switches get .is-on
+   when on and .is-disabled when locked (essential), so on/off and locked are Webflow combo classes. */
 (function(){
   if(window.CoreConsent) return;
   var KEY = document.documentElement.getAttribute('data-consent-key') || 'core-consent-v1', CATS = ['analytics','marketing'];
@@ -542,13 +476,6 @@
     else if(a === 'customize'){ if(sheet()) sheet().close(null, {instant: true, noFocus: true}); setTimeout(open, 30); }
   });
   document.addEventListener('sheet:open', function(){ sync(); });
-  /* elements styled with their own Webflow class keep that look; Core's fallback look is only for unstyled ones */
-  function designed(el){ return (el.getAttribute('class') || '').split(/\s+/).some(function(c){ return c && !/^(w-|is-)/.test(c); }); }
-  function markLooks(){
-    document.querySelectorAll('[data-consent-switch],[data-consent-action],[data-settings-row],[data-settings-section]').forEach(function(el){
-      if(designed(el)) el.setAttribute('data-look', 'webflow');
-    });
-  }
   /* Webflow renders these as div/link elements: make them real controls for keyboard and screen readers */
   function prepActions(){
     document.querySelectorAll('[data-consent-action]').forEach(function(b){
@@ -562,7 +489,7 @@
 
   function init(){
     var s = read();
-    markLooks(); prepActions(); sync(s);
+    prepActions(); sync(s);
     if(s) apply(s);
     else if(document.querySelector('[data-sheet="cookie-notice"]')){
       setTimeout(function(){ if(!read() && sheet() && !sheet().top()) sheet().open('cookie-notice'); }, 1200);
@@ -570,10 +497,10 @@
   }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 
-  window.CoreConsent = { version: '1.2.0', key: KEY, get: read, set: set, open: open };
+  window.CoreConsent = { version: '2.0.0', key: KEY, get: read, set: set, open: open };
 })();
 
-/* Mayes Core – Business v1.4.0 – one business record, shown anywhere on the page.
+/* Mayes Core – Business v2.0.0 – one business record, shown anywhere on the page.
  *
  * SOURCE – the hidden CMS layer in the Page Shell (the one Business Settings item, rendered on every page):
  *   <a data-business-field="phone">…</a>      any Business Settings field, as a native Webflow element bound in the Designer:
@@ -606,6 +533,7 @@
  *                            go in [data-business-hours-days] (else the row's first child), the time in
  *                            [data-business-hours-time] (else its last child). Without a designed row Core writes
  *                            <div data-business-hours-line data-core-look><span>Monday – Friday</span><span>8 AM–5 PM</span></div>
+ *                            (unstyled: Core ships no CSS; style [data-business-hours] and the row with Webflow classes)
  *     [data-business-today]  text: "Open today, 8 AM–5 PM" / "Closed today" (empty when no hours are set)
  *
  * SCHEMA – Core writes the page's structured data from the same record, so it always matches what the site shows:
@@ -848,17 +776,18 @@
   window.addEventListener('load', fill);
 
   window.CoreBusiness = {
-    version: '1.4.0', get: get, fill: fill, hours: hours, groupedHours: groupedHours, schema: function(){ cache = read(); return schema(); },
+    version: '2.0.0', get: get, fill: fill, hours: hours, groupedHours: groupedHours, schema: function(){ cache = read(); return schema(); },
     all: function(){ cache = read(); return Object.assign({}, cache); }
   };
 })();
 
-/* Mayes Core – Announcement bar v1.0.0 – keeps a fixed header stacked under an announcement bar.
+/* Mayes Core – Announcement bar v2.0.0 – keeps a fixed header stacked under an announcement bar.
  *
  * Markup: the bar carries [data-announcement] (its CMS list wrapper is measured when it has one).
  * Sets --core-announcement-offset on <html> = how much of the bar is still on screen (bar height − scroll, never below 0).
- * css/core-announcement.css applies it as `top` on [data-announcement-follow] and .navbar-compact, so a fixed header
- * sits right under the bar, scrolls up with it, then pins at top:0. No bar = offset 0, nothing changes.
+ * NATIVE: Core ships no CSS for it. In Webflow, give the fixed header's class top: var(--core-announcement-offset, 0px),
+ * so it sits right under the bar, scrolls up with it, then pins at top 0; give the bar's class position: relative and a
+ * z-index above the header. No bar = offset 0, nothing changes.
  * Public API: window.CoreAnnouncement = { refresh() }
  */
 (function(){
@@ -891,10 +820,10 @@
   }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 
-  window.CoreAnnouncement = { version: '1.0.0', refresh: measure };
+  window.CoreAnnouncement = { version: '2.0.0', refresh: measure };
 })();
 
-/* Mayes Core – Install v1.1.0 – "Add to Home Screen" banner for the mobile app layer.
+/* Mayes Core – Install v2.0.0 – "Add to Home Screen" banner for the mobile app layer.
  *
  * Pairs with the head snippet dist/core-app-head.html (full-screen launch, status bar, theme color) and the
  * Webflow webclip (Site settings › General), which is the home-screen icon.
@@ -912,8 +841,8 @@
  *   · Instagram, TikTok, Facebook and other in-app browsers (which cannot add to the home screen)
  *     → "Open this page in your browser first"
  *
- * MARKUP – none needed: without one, the banner is built by this script and styled by core-install.css.
- * NATIVE FIRST – design it in Webflow instead (component "Core / Install Banner", once, in the Page Shell root):
+ * MARKUP – designed in Webflow (component "Core / Install Banner", once, in the Page Shell root). Core ships no
+ * banner CSS and builds no banner: without one on the page, nothing shows.
  *   [data-install-banner]               the banner; hide it with its class and show it with an is-visible combo
  *     [data-install-icon]               optional image: gets the site's webclip, removed when there is none
  *     [data-install-title]              text set to "Add <name> to your Home Screen"
@@ -922,10 +851,13 @@
  *                                       (falls back to "other", then to the first hint)
  *     [data-install-action="prompt"]    the Install button, shown only when the browser offers its own install prompt
  *     [data-install-action="dismiss"]   the close button
- *   Core only fills it, toggles is-visible, and keeps it above the bottom nav (bottom = --core-install-offset).
+ *   Core only fills it and toggles is-visible. Position it in Webflow with
+ *     bottom: calc(var(--core-install-offset, env(safe-area-inset-bottom, 0px)) + 0.75rem)
+ *   Core sets --core-install-offset to the bottom nav's height while the nav is showing, and removes it otherwise.
  * Optional:
  *   [data-install-open]         any element (e.g. an "Add to Home Screen" row in the More sheet) shows the banner on demand,
- *                               even if it was closed; hidden automatically when already on the home screen or on desktop
+ *                               even if it was closed; hidden automatically (hidden attribute) when already on the home
+ *                               screen or on desktop
  *   <html data-install-name="…"> the name in the banner (default: Business Settings name, then the
  *                               apple-mobile-web-app-title meta, then the page title)
  *   <html data-install-delay="4000"> ms to wait after load before showing (default 3000)
@@ -984,20 +916,6 @@
     var l = document.querySelector('link[rel="apple-touch-icon"], link[rel="apple-touch-icon-precomposed"]');
     return l ? l.getAttribute('href') : '';
   }
-  var SVG = {
-    share: '<svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/></svg>',
-    dots: '<svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>',
-    close: '<svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>'
-  };
-  function message(p){
-    if(p === 'prompt') return 'Install it for one-tap access, like an app.';
-    if(p === 'ios') return 'Tap <span class="core-install_glyph">' + SVG.share + '<span class="core-install_sr">Share</span></span> then <b>Add to Home Screen</b>.';
-    if(p === 'android') return 'Tap <span class="core-install_glyph">' + SVG.dots + '<span class="core-install_sr">the menu</span></span> then <b>Install</b> or <b>Add to Home screen</b>.';
-    if(p === 'in-app') return 'Open this page in your browser first, then add it to your Home Screen.';
-    return 'Use your browser menu to add it to your Home Screen.';
-  }
-  function esc(t){ return String(t).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
-
   /* a banner designed in Webflow: fill it and pick its message */
   function adopt(box){
     var p = platform(), icon = iconUrl(), name = appName();
@@ -1023,28 +941,9 @@
     box.hidden = false;
     return box;
   }
-  function designedBanner(){ return document.querySelector('[data-install-banner]:not(.core-install)'); }
-
   function build(){
-    var designed = designedBanner();
-    if(designed) return adopt(designed);
-    var p = platform(), icon = iconUrl(), name = appName();
-    var box = document.createElement('div');
-    box.className = 'core-install';
-    box.setAttribute('data-install-banner', '');
-    box.setAttribute('data-install-platform', p);
-    box.setAttribute('role', 'region');
-    box.setAttribute('aria-label', 'Add ' + name + ' to your Home Screen');
-    box.innerHTML =
-      (icon ? '<img class="core-install_icon" src="' + esc(icon) + '" alt="" width="44" height="44">' : '') +
-      '<div class="core-install_text"><p class="core-install_title">Add ' + esc(name) + ' to your Home Screen</p>' +
-      '<p class="core-install_hint">' + message(p) + '</p></div>' +
-      (p === 'prompt' ? '<button type="button" class="core-install_action" data-install-action="prompt">Install</button>' : '') +
-      '<button type="button" class="core-install_close" data-install-action="dismiss" aria-label="Close">' + SVG.close + '</button>';
-    var img = box.querySelector('.core-install_icon');
-    if(img) img.addEventListener('error', function(){ if(img.parentNode) img.parentNode.removeChild(img); });
-    document.body.appendChild(box);
-    return box;
+    var designed = document.querySelector('[data-install-banner]');
+    return designed ? adopt(designed) : null;
   }
 
   /* ---------- placement: above the bottom nav ---------- */
@@ -1054,7 +953,8 @@
       var r = bar.getBoundingClientRect();
       if(r.height && getComputedStyle(bar).display !== 'none') off = Math.max(0, Math.round(window.innerHeight - r.top));
     }
-    root.style.setProperty('--core-install-offset', off + 'px');
+    if(off) root.style.setProperty('--core-install-offset', off + 'px');
+    else root.style.removeProperty('--core-install-offset');   // the class falls back to the home-bar inset
   }
 
   /* ---------- show / hide ---------- */
@@ -1064,6 +964,7 @@
     if(el && el.isConnected){ el.classList.add('is-visible'); return true; }
     placeOffset();
     el = build();
+    if(!el) return false;
     requestAnimationFrame(function(){ requestAnimationFrame(function(){ if(el) el.classList.add('is-visible'); }); });
     emit('shown');
     return true;
@@ -1072,10 +973,7 @@
     if(remember){ var s = read(); s.dismissed = Date.now(); write(s); }
     if(!el) return;
     var gone = el; el = null;
-    gone.classList.remove('is-visible');
-    if(!gone.classList.contains('core-install')) return;   // a designed banner stays in the page, hidden by its class
-    var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-    setTimeout(function(){ if(gone.parentNode) gone.parentNode.removeChild(gone); }, reduced ? 0 : 260);
+    gone.classList.remove('is-visible');                // the banner stays in the page, hidden by its class
   }
   function prompt(){
     if(!deferred){ hide(true); return; }
@@ -1100,7 +998,7 @@
   function prepTriggers(){
     var hideThem = standalone() || !mobile();
     document.querySelectorAll('[data-install-open]').forEach(function(t){
-      if(hideThem){ t.hidden = true; t.style.display = 'none'; return; }
+      if(hideThem){ t.hidden = true; return; }
       if(t.tagName !== 'BUTTON' && t.tagName !== 'A'){ t.setAttribute('role', 'button'); if(!t.hasAttribute('tabindex')) t.setAttribute('tabindex', '0'); }
       if(t.tagName === 'A'){ t.setAttribute('role', 'button'); t.removeAttribute('href'); t.setAttribute('tabindex', '0'); }
     });
@@ -1130,7 +1028,6 @@
 
   function init(){
     prepTriggers();
-    if(standalone()) root.classList.add('is-standalone');
     var n = views();
     if(n < 2) return;
     var delay = parseInt(root.getAttribute('data-install-delay'), 10);
@@ -1141,118 +1038,9 @@
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 
   window.CoreInstall = {
-    version: '1.1.0',
+    version: '2.0.0',
     show: function(force){ return show(force !== false); },
     hide: function(){ hide(true); },
     state: function(){ var s = read(); return {platform: platform(), standalone: standalone(), mobile: mobile(), snoozed: snoozed(s), views: s.views || 0, canPrompt: !!deferred}; }
   };
-})();
-
-/* Mayes Core – Motion v0.5.0 – attribute-driven motion and scroll state.
- *
- * NATIVE FIRST: on sites where Webflow Interactions animate the data-motion attributes (the master's
- * "Core / Fade", "Core / Rise", … interactions), add this to the head so Core stays out of the way:
- *   <meta name="core-motion" content="webflow">
- * Core then skips data-motion and data-animate (Webflow animates them) and keeps only data-scroll-state.
- *
- * Scroll state (no GSAP needed):
- *   data-scroll-state                  toggles a class once the page scrolls past a threshold
- *   data-scroll-threshold="64"         px (default 64)
- *   data-scroll-class="is-scrolled"    class to toggle (default is-scrolled)
- *   data-scroll-duration="500"         ms, written to transition-duration
- *
- * Motion vocabulary (Core 2.0 Implementation Addendum §5; needs GSAP, ScrollTrigger for scroll reveals):
- *   data-motion="fade"     fades in when scrolled into view
- *   data-motion="rise"     fades in and rises (alias: "reveal")
- *   data-motion="scale"    fades in from 96%
- *   data-motion="stagger"  reveals [data-motion-item] children (or direct children) one after another
- *   data-motion="hero"     like stagger, but plays on page load (no scroll trigger)
- *   data-motion-delay="0.1"  seconds · data-motion-duration="0.6" seconds
- *
- * Older vocabulary, still supported:
- *   data-animate="fade|fade-up|fade-down|fade-left|fade-right|scale"  with data-duration / data-delay
- *   data-scroll="parallax"  with data-speed="-10"  (needs ScrollTrigger)
- *
- * Content is never hidden by CSS: without GSAP, or when the visitor prefers reduced motion,
- * everything simply stays visible and nothing moves.
- */
-(function(){
-  if(window.CoreMotion) return;
-
-  function num(v, d){ var n = parseFloat(v); return isNaN(n) ? d : n; }
-
-  function scrollStates(){
-    document.querySelectorAll('[data-scroll-state]').forEach(function(el){
-      var y = num(el.getAttribute('data-scroll-threshold'), 64);
-      var cls = el.getAttribute('data-scroll-class') || 'is-scrolled';
-      el.style.transitionDuration = num(el.getAttribute('data-scroll-duration'), 500) + 'ms';
-      var state;
-      function update(){ var on = window.scrollY > y; if(on !== state){ state = on; el.classList.toggle(cls, on); } }
-      window.addEventListener('scroll', update, {passive: true});
-      update();
-    });
-  }
-
-  function items(group){
-    var marked = group.querySelectorAll('[data-motion-item]');
-    return marked.length ? Array.prototype.slice.call(marked) : Array.prototype.slice.call(group.children);
-  }
-
-  function motion(gsap, ST){
-    var FROM = {
-      fade:  {autoAlpha: 0},
-      rise:  {autoAlpha: 0, y: 24},
-      reveal:{autoAlpha: 0, y: 24},
-      scale: {autoAlpha: 0, scale: 0.96}
-    };
-    var CLEAR = 'opacity,visibility,transform';
-    document.querySelectorAll('[data-motion]').forEach(function(el){
-      var kind = el.getAttribute('data-motion');
-      var delay = num(el.getAttribute('data-motion-delay'), 0);
-      if(kind === 'hero' || kind === 'stagger'){
-        var list = items(el); if(!list.length) return;
-        var vars = {autoAlpha: 1, y: 0, duration: num(el.getAttribute('data-motion-duration'), kind === 'hero' ? 0.85 : 0.65),
-                    delay: delay, stagger: kind === 'hero' ? 0.12 : 0.1, ease: 'power2.out', clearProps: CLEAR};
-        if(kind === 'stagger'){ if(!ST) return; vars.scrollTrigger = {trigger: el, start: 'top 88%', once: true}; }
-        gsap.fromTo(list, {autoAlpha: 0, y: kind === 'hero' ? 28 : 20}, vars);
-        return;
-      }
-      var from = FROM[kind]; if(!from || !ST) return;
-      gsap.fromTo(el, from, {autoAlpha: 1, y: 0, scale: 1, duration: num(el.getAttribute('data-motion-duration'), 0.7),
-        delay: delay, ease: 'power2.out', clearProps: CLEAR, scrollTrigger: {trigger: el, start: 'top 88%', once: true}});
-    });
-  }
-
-  function legacy(gsap, ST){
-    document.querySelectorAll('[data-animate]').forEach(function(el){
-      var a = el.getAttribute('data-animate');
-      var o = {opacity: 0, duration: num(el.getAttribute('data-duration'), 0.8), delay: num(el.getAttribute('data-delay'), 0), ease: 'power2.out'};
-      if(a === 'fade-up') o.y = 32;
-      if(a === 'fade-down') o.y = -32;
-      if(a === 'fade-left') o.x = 32;
-      if(a === 'fade-right') o.x = -32;
-      if(a === 'scale') o.scale = 0.96;
-      if(ST) o.scrollTrigger = {trigger: el, start: 'top 85%', once: true};
-      gsap.from(el, o);
-    });
-    if(ST) document.querySelectorAll('[data-scroll="parallax"]').forEach(function(el){
-      gsap.to(el, {yPercent: num(el.getAttribute('data-speed'), -10), ease: 'none',
-        scrollTrigger: {trigger: el, start: 'top bottom', end: 'bottom top', scrub: true}});
-    });
-  }
-
-  function native(){ var m = document.querySelector('meta[name="core-motion"]'); return !!m && /^webflow$/i.test(m.getAttribute('content') || ''); }
-
-  function init(){
-    scrollStates();
-    if(native()) return;
-    var gsap = window.gsap, ST = window.ScrollTrigger;
-    if(!gsap || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    if(ST) gsap.registerPlugin(ST);
-    motion(gsap, ST);
-    legacy(gsap, ST);
-  }
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
-
-  window.CoreMotion = { version: '0.5.0', native: native };
 })();
