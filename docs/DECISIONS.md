@@ -18,6 +18,7 @@
 | 2026-11-07 | Each sheet is its own component (`Sheet / Name`) placed in the Page Shell's Sheets slot; root class `name is-hidden` | Replaces Sheet / Content in the Overlay slot |
 | 2026-11-08 | The sheets live in a fixed `shell-sheets` div inside the Page Shell, not a slot | Every page gets the same sheets with nothing to place per page; edit a sheet once in its component |
 | 2026-11-08 | The top nav, footer and bottom nav are built into the Page Shell too; Main Content is its only slot. The Glass nav's actions slot is replaced by a fixed Get a quote button (CTA Text / Show CTA props, `data-sheet-open="quote"`) | Same chrome on every page with nothing to place or forget; the actions slot had been left empty, so desktop showed no CTA |
+| 2026-11-08 | The bottom nav's Services tab goes to the Services page; Location and Quote stay sheets | David's call: Services is a full page, Location and Quote are quick actions. Sheet / Services stays in the Page Shell for any button that wants it |
 | 2026-11-07 | The phone number is not shown as text where a Call button exists | |
 | 2026-11-07 | The business data layer stays on the page, not in a component | Webflow rejects live Collection Lists in API-made components |
 | 2026-11-07 | Native first: if Webflow can do it natively, Core doesn't do it in JS; JS toggles `is-*` combos and Webflow styles them | See NATIVE_FIRST.md; removals ship as v2.0.0 |
