@@ -1,5 +1,13 @@
 # Changelog
 
+## v2.0.1 — 2026-11-08
+
+Patch: every image Core fills now has alt text.
+- **Business v2.0.1:** a `[data-business]` image with no alt gets the business name as its alt, even when no logo is set and the placeholder stays.
+- **Install v2.0.1:** the banner icon's alt is "<site name> icon" (was empty).
+- **Consent v2.0.1:** header comment no longer mentions the old Overlay slot.
+- Test fixture comments no longer mention slots. 132 browser checks.
+
 ## v2.0.0 — 2026-11-07
 
 **Breaking.** Core ships no look and no layout: Webflow owns all of it, and Core only adds `is-*` combo classes that Webflow styles. Sites on v1 (DetailFlow, ShopFlow) stay pinned to their v1 tag until they're rebuilt on the master's components.

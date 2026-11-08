@@ -1,8 +1,8 @@
-/* Mayes Core – Consent v2.0.0 – cookie consent + the Site Settings sheet.
+/* Mayes Core – Consent v2.0.1 – cookie consent + the Site Settings sheet.
    Uses the Sheet engine (window.CoreSheet). Pairs with the head snippet (Consent Mode v2 defaults),
    which must run BEFORE the Google tag. Categories: essential (always on), analytics, marketing.
 
-   Markup (Webflow component "Core / Site Settings", placed in the Page Shell Overlay slot):
+   Markup (Webflow component "Sheet / Site Settings", built into the Page Shell in shell-sheets):
      [data-sheet="site-settings"]  the settings sheet (cog opens it). Sections: [data-settings-section] (privacy now, appearance later)
        [data-consent-switch="analytics|marketing|essential"]   role="switch" buttons
      [data-sheet="cookie-notice"]  first-visit notice

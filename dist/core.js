@@ -396,11 +396,11 @@
   };
 })();
 
-/* Mayes Core – Consent v2.0.0 – cookie consent + the Site Settings sheet.
+/* Mayes Core – Consent v2.0.1 – cookie consent + the Site Settings sheet.
    Uses the Sheet engine (window.CoreSheet). Pairs with the head snippet (Consent Mode v2 defaults),
    which must run BEFORE the Google tag. Categories: essential (always on), analytics, marketing.
 
-   Markup (Webflow component "Core / Site Settings", placed in the Page Shell Overlay slot):
+   Markup (Webflow component "Sheet / Site Settings", built into the Page Shell in shell-sheets):
      [data-sheet="site-settings"]  the settings sheet (cog opens it). Sections: [data-settings-section] (privacy now, appearance later)
        [data-consent-switch="analytics|marketing|essential"]   role="switch" buttons
      [data-sheet="cookie-notice"]  first-visit notice
@@ -500,7 +500,7 @@
   window.CoreConsent = { version: '2.0.0', key: KEY, get: read, set: set, open: open };
 })();
 
-/* Mayes Core – Business v2.0.0 – one business record, shown anywhere on the page.
+/* Mayes Core – Business v2.0.1 – one business record, shown anywhere on the page.
  *
  * SOURCE – the hidden CMS layer in the Page Shell (the one Business Settings item, rendered on every page):
  *   <a data-business-field="phone">…</a>      any Business Settings field, as a native Webflow element bound in the Designer:
@@ -511,7 +511,7 @@
  *             "directions-url" (falls back to a Google Maps search of the address).
  *
  * TARGETS – put data-business="field" on any element, in any component:
- *   <img data-business="logo">         src (+ alt from business-name when the image has none)
+ *   <img data-business="logo">         src; alt = business-name whenever the image has none (even with no logo set)
  *   <a data-business="facebook-url">   href (fields ending in -url)
  *   <a data-business="phone">          text + tel:      ·  <a data-business="email"> text + mailto:
  *   <p data-business="tagline">        text
@@ -746,11 +746,11 @@
       var key = attr(el, ''), v = key ? get(key) : '';
       var hrefKey = attr(el, '-href'), href = hrefKey ? get(hrefKey) : '';
       if(key){
+        if(el.tagName === 'IMG' && !el.getAttribute('alt')) el.setAttribute('alt', get('business-name'));
         if(!v){
           if(attr(el, '-empty') === 'hide') el.hidden = true;
         } else if(el.tagName === 'IMG'){
           if(el.getAttribute('src') !== v){ el.removeAttribute('srcset'); el.removeAttribute('sizes'); el.setAttribute('src', v); }
-          if(!el.getAttribute('alt')) el.setAttribute('alt', get('business-name'));
           el.hidden = false; el.classList.add('is-business-filled');
         } else if(el.tagName === 'A' && /-url$/.test(key)){
           el.setAttribute('href', v); el.hidden = false; el.classList.add('is-business-filled');
@@ -823,7 +823,7 @@
   window.CoreAnnouncement = { version: '2.0.0', refresh: measure };
 })();
 
-/* Mayes Core – Install v2.0.0 – "Add to Home Screen" banner for the mobile app layer.
+/* Mayes Core – Install v2.0.1 – "Add to Home Screen" banner for the mobile app layer.
  *
  * Pairs with the head snippet dist/core-app-head.html (full-screen launch, status bar, theme color) and the
  * Webflow webclip (Site settings › General), which is the home-screen icon.
@@ -844,7 +844,7 @@
  * MARKUP – designed in Webflow (component "Core / Install Banner", once, in the Page Shell root). Core ships no
  * banner CSS and builds no banner: without one on the page, nothing shows.
  *   [data-install-banner]               the banner; hide it with its class and show it with an is-visible combo
- *     [data-install-icon]               optional image: gets the site's webclip, removed when there is none
+ *     [data-install-icon]               optional image: gets the site's webclip and alt "<site name> icon", hidden when there is none
  *     [data-install-title]              text set to "Add <name> to your Home Screen"
  *     [data-install-name]               any text that should read just the site's name
  *     [data-install-hint="ios|android|in-app|prompt|other"]  one message per case; Core shows only the matching one
@@ -925,7 +925,7 @@
     box.querySelectorAll('[data-install-title]').forEach(function(n){ n.textContent = 'Add ' + name + ' to your Home Screen'; });
     box.querySelectorAll('[data-install-name]').forEach(function(n){ n.textContent = name; });
     box.querySelectorAll('[data-install-icon]').forEach(function(img){
-      if(icon){ img.removeAttribute('srcset'); img.removeAttribute('sizes'); img.setAttribute('src', icon); img.setAttribute('alt', ''); img.hidden = false; }
+      if(icon){ img.removeAttribute('srcset'); img.removeAttribute('sizes'); img.setAttribute('src', icon); img.setAttribute('alt', name + ' icon'); img.hidden = false; }
       else img.hidden = true;
     });
     var hints = Array.prototype.slice.call(box.querySelectorAll('[data-install-hint]'));
