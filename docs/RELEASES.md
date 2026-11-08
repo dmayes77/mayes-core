@@ -23,7 +23,8 @@ Never `@main`, never `@stable`, never a bare commit. A push to `main` must never
 | `v1.4.4` | Safe areas: viewport-fit=cover in the app head snippet, new core-safe-area.css | superseded by v1.4.5 |
 | `v1.4.5` | Business v1.1.0: social icon links hide when empty; docs for the current mobile layer | superseded by v1.5.0 |
 | `v1.5.0` | Native first: sheets designed in Webflow (Sheet / Host), Webflow Interactions for motion (`core-motion` meta), designed consent switches, hours rows and install banner | superseded by v1.6.0 |
-| `v1.6.0` | Social icon links get `is-business-filled` when their URL is set (show them with a Webflow combo) | latest; the $500 Base site and every new site |
+| `v1.6.0` | Social icon links get `is-business-filled` when their URL is set (show them with a Webflow combo) | superseded by v1.7.0 |
+| `v1.7.0` | Core writes the LocalBusiness / WebSite / WebPage JSON-LD from Business Settings and Business Hours | latest; the $500 Base site and every new site |
 
 ## Cutting a release
 

@@ -1,5 +1,18 @@
 # Changelog
 
+## v1.7.0 — 2026-11-07
+
+A minor release: a new feature that existing sites get without any change.
+
+- **Business v1.4.0, structured data from Business Settings.** Core writes one `<script type="application/ld+json" id="core-schema">` in the head with a `@graph` of:
+  - **LocalBusiness** (`#business`): name, legal name, description, URL, phone (E.164), email, logo and image, address, service area, opening hours from Business Hours (grouped, 24-hour, closed days left out), map link, and `sameAs` with only the social and Google Business links that are filled in.
+  - **WebSite** (`#website`) and a **WebPage** for the current URL, named from the H1 (or title), with the meta description.
+  - It always matches what the site shows, so nothing is retyped per client.
+- Set a more specific schema.org type with `<meta name="core-schema-type" content="Plumber">` in the site head, or with a `schema-type` field in the data layer. Turn the feature off with `<meta name="core-schema" content="off">`.
+- `CoreBusiness.schema()` returns the object.
+- **Upgrade note:** on a site that also has hand-written page JSON-LD, clear it in Page settings, or the business is described twice.
+- 8 new browser checks.
+
 ## v1.6.0 — 2026-11-07
 
 A minor release under semver: it adds a hook and changes nothing existing. It was first prepared as v1.5.1, never tagged, and renamed because a new hook is a feature, not a fix.

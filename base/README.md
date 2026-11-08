@@ -88,7 +88,8 @@ Business Settings (1 item) and Business Hours (7 items) only. Both exist in the 
 - [ ] Bottom nav: Quote (or Collab on creator sites); check every sheet.
 - [ ] Quote form: notification email and thank-you message.
 - [ ] Footer copyright and social links in Business Settings.
-- [ ] SEO title and description on each page.
+- [ ] SEO title and description on each page. Leave Page settings › Schema markup empty: Core writes the JSON-LD from Business Settings.
+- [ ] Site head: `<meta name="core-schema-type" content="…">` with the schema.org type for the trade (Plumber, HVACBusiness, HairSalon, AutoRepair…). Check it with Google's Rich Results Test.
 - [ ] QA at Desktop, Tablet, Mobile Landscape, Mobile Portrait, on a real phone.
 - [ ] Custom code pins `mayes-core` to a release tag.
 - [ ] Connect domain, publish, start the 30-day support window.

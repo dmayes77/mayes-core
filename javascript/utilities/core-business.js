@@ -1,4 +1,4 @@
-/* Mayes Core – Business v1.3.0 – one business record, shown anywhere on the page.
+/* Mayes Core – Business v1.4.0 – one business record, shown anywhere on the page.
  *
  * SOURCE – the hidden CMS layer in the Page Shell (the one Business Settings item, rendered on every page):
  *   <a data-business-field="phone">…</a>      any Business Settings field, as a native Webflow element bound in the Designer:
@@ -33,7 +33,18 @@
  *                            <div data-business-hours-line data-core-look><span>Monday – Friday</span><span>8 AM–5 PM</span></div>
  *     [data-business-today]  text: "Open today, 8 AM–5 PM" / "Closed today" (empty when no hours are set)
  *
- * Public API: window.CoreBusiness = { get(field), all(), hours(), groupedHours(), fill() }
+ * SCHEMA – Core writes the page's structured data from the same record, so it always matches what the site shows:
+ *   <script type="application/ld+json" id="core-schema"> in <head>, one @graph with
+ *     LocalBusiness (#business): name, legalName, description, url, telephone, email, logo/image, address,
+ *                  areaServed, openingHoursSpecification (from Business Hours), hasMap, sameAs (only filled
+ *                  social and Google Business links)
+ *     WebSite (#website) and WebPage (this URL, name from the H1 or title, description from the meta description)
+ *   The business type defaults to LocalBusiness. Set a more specific schema.org type (Plumber, HairSalon,
+ *   HVACBusiness, AutoRepair, …) with <meta name="core-schema-type" content="Plumber"> in the site head, or bind a
+ *   data-business-field="schema-type" in the data layer. Turn it off with <meta name="core-schema" content="off">.
+ *   Leave Webflow's page-level JSON-LD empty on Core sites, or the business is described twice.
+ *
+ * Public API: window.CoreBusiness = { get(field), all(), hours(), groupedHours(), fill(), schema() }
  */
 (function(){
   if(window.CoreBusiness) return;
@@ -142,6 +153,87 @@
     });
   }
 
+
+  /* ---------- schema ---------- */
+  function meta(name){ var m = document.querySelector('meta[name="' + name + '"]'); return m ? clean(m.getAttribute('content')) : ''; }
+  function abs(u){ try { return u ? new URL(u, location.href).href : ''; } catch(e){ return ''; } }
+  function e164(phone){
+    var d = (phone || '').replace(/[^\d+]/g, '');
+    if(!d) return '';
+    if(d.charAt(0) === '+') return d;
+    if(d.length === 10) return '+1' + d;
+    if(d.length === 11 && d.charAt(0) === '1') return '+' + d;
+    return d;
+  }
+  function time24(t){                                  // "8:00 AM", "8 AM", "5:30pm", "17:00" → "HH:MM"
+    var m = clean(t).toLowerCase().match(/^(\d{1,2})(?::(\d{2}))?\s*(a|p)?\.?m?\.?$/);
+    if(!m) return '';
+    var h = Number(m[1]), min = m[2] || '00';
+    if(m[3] === 'p' && h < 12) h += 12;
+    if(m[3] === 'a' && h === 12) h = 0;
+    return h > 23 ? '' : (h < 10 ? '0' : '') + h + ':' + min;
+  }
+  function openingHours(list){
+    var specs = [];
+    list.forEach(function(e){
+      if(e.closed) return;
+      var o = time24(e.open), c = time24(e.close);
+      if(!o || !c) return;
+      var day = e.day.charAt(0).toUpperCase() + e.day.slice(1).toLowerCase();
+      var prev = specs[specs.length - 1];
+      if(prev && prev.opens === o && prev.closes === c) prev.dayOfWeek.push(day);
+      else specs.push({'@type': 'OpeningHoursSpecification', dayOfWeek: [day], opens: o, closes: c});
+    });
+    return specs;
+  }
+  function schema(){
+    var d = cache || read(), name = d['business-name'];
+    if(!name) return null;
+    var site = location.origin + '/', page = location.href.split('#')[0];
+    var business = {
+      '@type': d['schema-type'] || meta('core-schema-type') || 'LocalBusiness',
+      '@id': site + '#business', name: name, url: site
+    };
+    function put(k, v){ if(v && (!Array.isArray(v) || v.length)) business[k] = v; }
+    put('legalName', d['legal-business-name'] !== name ? d['legal-business-name'] : '');
+    put('description', d['short-description'] || d.tagline);
+    put('telephone', e164(d.phone));
+    put('email', d.email);
+    put('logo', abs(d.logo)); put('image', abs(d['default-social-share-image'] || d.logo));
+    if(d['street-address'] || d.city){
+      var a = {'@type': 'PostalAddress'};
+      var street = [d['street-address'], d['address-line-2']].filter(Boolean).join(', ');
+      if(street) a.streetAddress = street;
+      if(d.city) a.addressLocality = d.city;
+      if(d.state) a.addressRegion = d.state;
+      if(d['zip-code']) a.postalCode = d['zip-code'];
+      if(d.country) a.addressCountry = d.country;
+      business.address = a;
+    }
+    put('areaServed', d['service-area']);
+    put('hasMap', abs(d['directions-url']));
+    put('openingHoursSpecification', openingHours(hours()));
+    put('sameAs', ['google-business-url','facebook-url','instagram-url','youtube-url','tiktok-url','linkedin-url','nextdoor-url','x-url']
+      .map(function(k){ return abs(d[k]); }).filter(Boolean));
+    var h1 = document.querySelector('h1');
+    var webpage = {'@type': 'WebPage', '@id': page + '#webpage', url: page,
+      name: clean(h1 && h1.textContent) || document.title, isPartOf: {'@id': site + '#website'}, about: {'@id': site + '#business'}};
+    var desc = meta('description'); if(desc) webpage.description = desc;
+    return {'@context': 'https://schema.org', '@graph': [
+      business,
+      {'@type': 'WebSite', '@id': site + '#website', url: site, name: name, publisher: {'@id': site + '#business'}},
+      webpage
+    ]};
+  }
+  function writeSchema(){
+    if(meta('core-schema') === 'off') return;
+    var data = schema(), el = document.getElementById('core-schema');
+    if(!data){ if(el) el.parentNode.removeChild(el); return; }
+    if(!el){ el = document.createElement('script'); el.type = 'application/ld+json'; el.id = 'core-schema'; document.head.appendChild(el); }
+    var json = JSON.stringify(data);
+    if(el.textContent !== json) el.textContent = json;
+  }
+
   /* ---------- fill ---------- */
   function attr(el, name){ return el.getAttribute('data-business' + name) || el.getAttribute('data-store' + name); }
   function fill(){
@@ -173,6 +265,7 @@
       }
     });
     renderHours(hours());
+    writeSchema();
     document.documentElement.classList.add('business-filled');
   }
 
@@ -180,7 +273,7 @@
   window.addEventListener('load', fill);
 
   window.CoreBusiness = {
-    version: '1.3.0', get: get, fill: fill, hours: hours, groupedHours: groupedHours,
+    version: '1.4.0', get: get, fill: fill, hours: hours, groupedHours: groupedHours, schema: function(){ cache = read(); return schema(); },
     all: function(){ cache = read(); return Object.assign({}, cache); }
   };
 })();
