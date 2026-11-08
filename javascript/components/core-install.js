@@ -1,4 +1,4 @@
-/* Mayes Core – Install v2.0.0 – "Add to Home Screen" banner for the mobile app layer.
+/* Mayes Core – Install v2.0.1 – "Add to Home Screen" banner for the mobile app layer.
  *
  * Pairs with the head snippet dist/core-app-head.html (full-screen launch, status bar, theme color) and the
  * Webflow webclip (Site settings › General), which is the home-screen icon.
@@ -19,7 +19,7 @@
  * MARKUP – designed in Webflow (component "Core / Install Banner", once, in the Page Shell root). Core ships no
  * banner CSS and builds no banner: without one on the page, nothing shows.
  *   [data-install-banner]               the banner; hide it with its class and show it with an is-visible combo
- *     [data-install-icon]               optional image: gets the site's webclip, removed when there is none
+ *     [data-install-icon]               optional image: gets the site's webclip and alt "<site name> icon", hidden when there is none
  *     [data-install-title]              text set to "Add <name> to your Home Screen"
  *     [data-install-name]               any text that should read just the site's name
  *     [data-install-hint="ios|android|in-app|prompt|other"]  one message per case; Core shows only the matching one
@@ -100,7 +100,7 @@
     box.querySelectorAll('[data-install-title]').forEach(function(n){ n.textContent = 'Add ' + name + ' to your Home Screen'; });
     box.querySelectorAll('[data-install-name]').forEach(function(n){ n.textContent = name; });
     box.querySelectorAll('[data-install-icon]').forEach(function(img){
-      if(icon){ img.removeAttribute('srcset'); img.removeAttribute('sizes'); img.setAttribute('src', icon); img.setAttribute('alt', ''); img.hidden = false; }
+      if(icon){ img.removeAttribute('srcset'); img.removeAttribute('sizes'); img.setAttribute('src', icon); img.setAttribute('alt', name + ' icon'); img.hidden = false; }
       else img.hidden = true;
     });
     var hints = Array.prototype.slice.call(box.querySelectorAll('[data-install-hint]'));

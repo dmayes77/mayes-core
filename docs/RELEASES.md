@@ -4,7 +4,7 @@
 
 Webflow sites load files from this repo through jsDelivr **by release tag only**:
 
-    https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v2.0.0/dist/core.js
+    https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v2.0.1/dist/core.js
 
 Never `@main`, never `@stable`, never a bare commit. A push to `main` must never change a live site.
 
@@ -25,7 +25,8 @@ Never `@main`, never `@stable`, never a bare commit. A push to `main` must never
 | `v1.5.0` | Native first: sheets designed in Webflow (Sheet / Host), Webflow Interactions for motion (`core-motion` meta), designed consent switches, hours rows and install banner | superseded by v1.6.0 |
 | `v1.6.0` | Social icon links get `is-business-filled` when their URL is set (show them with a Webflow combo) | superseded by v1.7.0 |
 | `v1.7.0` | Core writes the LocalBusiness / WebSite / WebPage JSON-LD from Business Settings and Business Hours | superseded by v2.0.0 |
-| `v2.0.0` | Native CSS: Core ships no look or layout; the sheet engine sets `is-*` combos that Webflow styles; bottom-nav and motion scripts, the built sheet host and install banner, and every module stylesheet removed. **Breaking.** | latest; the $500 Base site and every new site. v1 sites stay on v1 tags |
+| `v2.0.0` | Native CSS: Core ships no look or layout; the sheet engine sets `is-*` combos that Webflow styles; bottom-nav and motion scripts, the built sheet host and install banner, and every module stylesheet removed. **Breaking.** | superseded by v2.0.1 |
+| `v2.0.1` | Alt text on every image Core fills (logo with no logo set, install icon); stale slot comments fixed | latest; the $500 Base site and every new site. v1 sites stay on v1 tags |
 
 ## Cutting a release
 

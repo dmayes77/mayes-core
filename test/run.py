@@ -70,6 +70,7 @@ def run():
         check("address computed", pg.text_content("#address") == "100 Market St, Chattanooga TN 37402", pg.text_content("#address"))
         check("directions fallback", (pg.get_attribute("#directions", "href") or "").startswith("https://www.google.com/maps/search/"))
         check("empty logo keeps fallback", pg.get_attribute("#logo", "src").startswith("data:image/gif"))
+        check("empty logo still gets alt text", pg.get_attribute("#logo", "alt") == pg.evaluate("CoreBusiness.get('business-name')"), pg.get_attribute("#logo", "alt"))
         check("empty field hidden on request", pg.evaluate("document.getElementById('tagline').hidden"))
         check("icon link gets href", pg.get_attribute("#social-fb", "href") == "https://facebook.com/test" and not pg.evaluate("document.getElementById('social-fb').hidden"))
         check("empty icon link hidden", pg.evaluate("document.getElementById('social-x').hidden"))
@@ -99,7 +100,7 @@ def run():
         P = "document.querySelector('[data-sheet-panel]')"
         cls = lambda sel: pg.evaluate(f"{sel}.className")
         check("host adopted, moved to <body>, aria-hidden removed", pg.evaluate(f"document.querySelectorAll('[data-sheet-host]').length === 1 && {H}.parentNode === document.body && !{H}.hasAttribute('aria-hidden')"))
-        check("host placeholder cleared", "Slot placeholder" not in pg.text_content("[data-sheet-host]"))
+        check("host placeholder cleared", "Host body placeholder" not in pg.text_content("[data-sheet-host]"))
         check("host closed: hidden by its class", pg.evaluate(f"getComputedStyle({H}).display") == "none")
 
         # cookie notice appears ~1.2s after first visit
@@ -316,6 +317,7 @@ def run():
         check("install: iOS hint only, no Install button", shown_hint(pg) == "hint-ios" and pg.evaluate("document.getElementById('banner-install').hidden"), shown_hint(pg))
         check("install: business name used", pg.text_content("[data-install-title]") == "Add Test Plumbing Co. to your Home Screen" and pg.text_content("[data-install-name]") == "Test Plumbing Co.")
         check("install: webclip icon set", pg.evaluate("document.querySelector('[data-install-icon]').getAttribute('src').startsWith('data:image/png')"))
+        check("install: icon has alt text", pg.get_attribute("[data-install-icon]", "alt") == "Test Plumbing Co. icon", pg.get_attribute("[data-install-icon]", "alt"))
         check("install: sits above bottom nav", pg.evaluate(f"{BANNER}.getBoundingClientRect().bottom <= document.querySelector('.bottom-nav_bar').getBoundingClientRect().top"),
               pg.evaluate(f"[{BANNER}.getBoundingClientRect().bottom, document.querySelector('.bottom-nav_bar').getBoundingClientRect().top]"))
         check("install: does not take focus", pg.evaluate(f"!{BANNER}.contains(document.activeElement)"))

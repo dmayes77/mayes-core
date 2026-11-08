@@ -1,4 +1,4 @@
-/* Mayes Core – Business v2.0.0 – one business record, shown anywhere on the page.
+/* Mayes Core – Business v2.0.1 – one business record, shown anywhere on the page.
  *
  * SOURCE – the hidden CMS layer in the Page Shell (the one Business Settings item, rendered on every page):
  *   <a data-business-field="phone">…</a>      any Business Settings field, as a native Webflow element bound in the Designer:
@@ -9,7 +9,7 @@
  *             "directions-url" (falls back to a Google Maps search of the address).
  *
  * TARGETS – put data-business="field" on any element, in any component:
- *   <img data-business="logo">         src (+ alt from business-name when the image has none)
+ *   <img data-business="logo">         src; alt = business-name whenever the image has none (even with no logo set)
  *   <a data-business="facebook-url">   href (fields ending in -url)
  *   <a data-business="phone">          text + tel:      ·  <a data-business="email"> text + mailto:
  *   <p data-business="tagline">        text
@@ -244,11 +244,11 @@
       var key = attr(el, ''), v = key ? get(key) : '';
       var hrefKey = attr(el, '-href'), href = hrefKey ? get(hrefKey) : '';
       if(key){
+        if(el.tagName === 'IMG' && !el.getAttribute('alt')) el.setAttribute('alt', get('business-name'));
         if(!v){
           if(attr(el, '-empty') === 'hide') el.hidden = true;
         } else if(el.tagName === 'IMG'){
           if(el.getAttribute('src') !== v){ el.removeAttribute('srcset'); el.removeAttribute('sizes'); el.setAttribute('src', v); }
-          if(!el.getAttribute('alt')) el.setAttribute('alt', get('business-name'));
           el.hidden = false; el.classList.add('is-business-filled');
         } else if(el.tagName === 'A' && /-url$/.test(key)){
           el.setAttribute('href', v); el.hidden = false; el.classList.add('is-business-filled');
