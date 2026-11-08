@@ -70,7 +70,9 @@ Site custom code loads the consent snippet, the app head snippet, `core.css` and
 
 **Styling is native (Core v2):** every look and layout is a Webflow class. Core only adds `is-*` combo classes, and the master's classes style them: the sheet panel's `is-bottom` / `is-center` / `is-left` / `is-right` + `is-visible` and the heights, the overlay's `is-visible`, the grabber's `is-bottom`, the switches' `is-on` / `is-disabled`, the banner's `is-visible`, the icon links' `is-business-filled`. Safe areas (`env(safe-area-inset-*)`) sit on Body, `shell-header`, `bottom-nav_bar`, the sheet panel and `install-banner`. To restyle any of it, edit those classes and combos.
 
-**Sheet bodies:** a sheet whose content has its own `data-sheet-body` (e.g. `quote_body`, `settings_body`) replaces Sheet / Host's body when it opens, so `sheet-host_body`'s padding and scrolling don't apply to it. That body's own class (`quote_body`, `settings_body`…) carries its padding and the scroll recipe: flex 1 1 auto, min-height 0, overflow-y auto, overscroll-behavior contain, scrollbar-width none.
+**Sheet padding is global:** `sheet-host_panel` carries the side padding for every sheet: `max(var(--_core-2-0---page--global-padding), env(safe-area-inset-left/right))`, the same Global padding token as `padding-global` (16px on phones, 40px on desktop), never less than the notch. Sheet contents add no side padding of their own.
+
+**Sheet bodies:** a sheet whose content has its own `data-sheet-body` (e.g. `quote_body`, `settings_body`) replaces Sheet / Host's body when it opens. That body's class carries the scroll recipe: flex 1 1 auto, min-height 0, overflow-y auto, overscroll-behavior contain, scrollbar-width none.
 
 **Utility classes stay pure:** `layout-column` (and `layout-row`) only lay things out: flex direction, wrap, gap. Padding, color and size go on the element's own class, never in a combo on a layout utility.
 
