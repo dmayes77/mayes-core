@@ -13,6 +13,7 @@ mayes-core/
 │   ├── RELEASES.md       tagging and pinning rules; how Webflow loads this repo
 │   ├── DECISIONS.md      decisions log
 │   ├── AUDIT_2026-10-31.md  state of every site and repo when this became the main repo
+│   ├── AUDIT_2026-11-08.md  gaps and improvements after Core v2 and the slot-free Page Shell
 │   └── spec/             Core Design System 2.0 framework + Implementation Addendum
 ├── base/                 the $500 Base site kit (pages, mobile app layer, CMS, client checklist)
 ├── products/             where ShopFlow and DetailFlow will live once re-based on Core v2
