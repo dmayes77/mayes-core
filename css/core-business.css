@@ -1,4 +1,0 @@
-/* Mayes Core – Business v1.2.0 – look for hours rows Core writes itself (a row designed in Webflow keeps its own classes). */
-[data-business-hours]{display:grid;gap:.3rem}
-[data-business-hours-line][data-core-look]{display:grid;grid-template-columns:minmax(7rem,1fr) auto;gap:1rem}
-[data-business-hours-line][data-core-look] > :last-child{text-align:right}

@@ -35,7 +35,7 @@ Checked on the master (Core Design System 2.0) on 2026-11-07:
 | **Business** (`core-business.js` 163, `core-business.css` 4) | **Keep** | Components in the Page Shell have no CMS context, and Webflow can't bind there. It also can't build the full address or tel: links, group days into "Monday – Friday", or know what today is. One change: hours rows get cloned from a row designed in Webflow (`[data-business-hours-template]`) instead of generated spans, so the row look is Webflow's and `core-business.css` goes. Wherever an element *is* inside a CMS context (the data layer, CMS pages), bind natively instead of using `data-business`. |
 | **Install** (`core-install.js` 213, `core-install.css` 17) | **Keep the logic; move the markup to Webflow** | Webflow can't detect iPhone vs Android vs in-app browsers, home-screen mode, or remember a 30-day snooze. The banner itself becomes a Webflow component, **Core / Install Banner**, with one text block per message (iPhone, Android, Install button, in-app browser). JS shows the right one and toggles `is-visible`. It keeps building the banner itself when the component isn't on the page. |
 | **Before and After** (`core-before-after.js` 56) | **Keep** | Webflow can't turn a range input's value into the split position. It's already a Webflow component with an optional script. |
-| **Safe areas, page stability** (CSS only) | **Keep for now; test moving them** | These hold `env(safe-area-inset-*)`, `overscroll-behavior` and `scrollbar-gutter`. Webflow's style panel accepts custom CSS properties, so test whether it takes `env()` values on the header, bottom nav and sheet classes. If it does, those rules move into the classes and the file shrinks to global `html`/`body` rules. |
+| **Safe areas, page stability** (CSS only) | **Moved in v2.0.0** (tested: the style panel accepts `env()`, `max()`, `dvh`, `var()`; only the `<html>` rules stay) | These hold `env(safe-area-inset-*)`, `overscroll-behavior` and `scrollbar-gutter`. Webflow's style panel accepts custom CSS properties, so test whether it takes `env()` values on the header, bottom nav and sheet classes. If it does, those rules move into the classes and the file shrinks to global `html`/`body` rules. |
 | **App head, consent head** (snippets) | **Keep** | Head tags and the Consent Mode default must be custom code. |
 
 About 220 of Core's ~1,100 JS lines (bottom nav, motion, announcement) could go entirely. Most of the remaining CSS that sets a look (sheet, consent, install, hours) moves into Webflow classes.
@@ -43,6 +43,12 @@ About 220 of Core's ~1,100 JS lines (bottom nav, motion, announcement) could go 
 ## Status
 
 - **v1.5.0 (2026-11-07):** Sheet / Host designed in Webflow, with sheet CSS split into behavior and look. Motion moved to the Webflow Interactions Core / Fade, Rise, Scale, Stagger and Hero, with the `core-motion` meta switch. Also in v1.5.0: the consent `is-on` and `is-disabled` hooks with `data-look="webflow"`, the hours row template, the Core / Install Banner component, and the sheet overlay covering the scrollbar gutter. Next is v2.0.0 (removals).
+- **v2.0.0 (2026-11-07):** done. Core ships no look or layout.
+  - `core.css` is `core-base.css` only: the `[hidden]` guard, the `<html>` scroll rules and sheet scroll lock, tap highlight, and reduced motion.
+  - The sheet engine puts `is-*` combos on the host, overlay, panel, grabber and head, because Webflow can't style a child from a parent's state.
+  - Removed: `core-bottom-nav.*`, `core-motion.js`, the host and banner Core used to build, the consent `data-look` marking, and the sheet, consent, business, install, announcement, safe-area and page-stability stylesheets.
+  - The master's bottom nav tabs are links (icon and label inside) with `data-sheet-open`. Their active look is Webflow's Current state, set in the Designer.
+  - Not tried: a sticky header in place of the announcement script, which stays.
 
 ## Release plan
 

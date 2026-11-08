@@ -1,4 +1,4 @@
-/* Mayes Core – Consent v1.2.0 – cookie consent + the Site Settings sheet.
+/* Mayes Core – Consent v2.0.0 – cookie consent + the Site Settings sheet.
    Uses the Sheet engine (window.CoreSheet). Pairs with the head snippet (Consent Mode v2 defaults),
    which must run BEFORE the Google tag. Categories: essential (always on), analytics, marketing.
 
@@ -10,9 +10,8 @@
    Opening: any [data-sheet-open="site-settings"] (the brand-bar cog) or CoreConsent.open().
    Deferred third-party scripts: <script type="text/plain" data-consent="analytics|marketing" src|inline> run once consent is given.
    Events: "core:consent" on document (detail = {analytics, marketing}).
-   NATIVE FIRST: switches get .is-on when on and .is-disabled when locked (essential), so their look can be a Webflow
-   combo class. A switch, button, row or section that carries its own Webflow class is marked data-look="webflow" and
-   Core's fallback look (core-consent.css) steps aside for it. */
+   NATIVE: Core ships no consent CSS. Style the switches, rows and buttons with Webflow classes; switches get .is-on
+   when on and .is-disabled when locked (essential), so on/off and locked are Webflow combo classes. */
 (function(){
   if(window.CoreConsent) return;
   var KEY = document.documentElement.getAttribute('data-consent-key') || 'core-consent-v1', CATS = ['analytics','marketing'];
@@ -79,13 +78,6 @@
     else if(a === 'customize'){ if(sheet()) sheet().close(null, {instant: true, noFocus: true}); setTimeout(open, 30); }
   });
   document.addEventListener('sheet:open', function(){ sync(); });
-  /* elements styled with their own Webflow class keep that look; Core's fallback look is only for unstyled ones */
-  function designed(el){ return (el.getAttribute('class') || '').split(/\s+/).some(function(c){ return c && !/^(w-|is-)/.test(c); }); }
-  function markLooks(){
-    document.querySelectorAll('[data-consent-switch],[data-consent-action],[data-settings-row],[data-settings-section]').forEach(function(el){
-      if(designed(el)) el.setAttribute('data-look', 'webflow');
-    });
-  }
   /* Webflow renders these as div/link elements: make them real controls for keyboard and screen readers */
   function prepActions(){
     document.querySelectorAll('[data-consent-action]').forEach(function(b){
@@ -99,7 +91,7 @@
 
   function init(){
     var s = read();
-    markLooks(); prepActions(); sync(s);
+    prepActions(); sync(s);
     if(s) apply(s);
     else if(document.querySelector('[data-sheet="cookie-notice"]')){
       setTimeout(function(){ if(!read() && sheet() && !sheet().top()) sheet().open('cookie-notice'); }, 1200);
@@ -107,5 +99,5 @@
   }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 
-  window.CoreConsent = { version: '1.2.0', key: KEY, get: read, set: set, open: open };
+  window.CoreConsent = { version: '2.0.0', key: KEY, get: read, set: set, open: open };
 })();

@@ -1,187 +1,20 @@
-/* Mayes Core – core.css – built from: css/core-page-stability.css css/core-sheet.css css/core-bottom-nav.css css/core-consent.css css/core-business.css css/core-announcement.css css/core-install.css css/core-safe-area.css */
+/* Mayes Core – core.css – built from: css/core-base.css */
 
-/* Mayes Core – Page stability v1.2.0
- * Reserve scrollbar space so vertical scroll locking does not shift layout,
- * and suppress root-level horizontal overscroll when the document itself
- * has no horizontal overflow. Horizontal component scrollers remain unaffected.
- * Phones and tablets (where the bottom nav shows): no vertical overscroll bounce
- * or pull-to-refresh on the page, so the pinned bottom nav stays still like an app.
- * Scrollable areas inside the page (sheets, carousels) keep their own behavior.
- */
-html{
-  scrollbar-gutter:stable;
-  overscroll-behavior-x:none;
-}
-body{
-  overscroll-behavior-x:none;
-}
-@media (max-width:991px){
-  html,body{overscroll-behavior-y:none}
-}
-
-/* Mayes Core – Sheet v1.4.1
- * Styles for the Core Sheet engine. Keyed off data-sheet-as = bottom | center | left | right.
+/* Mayes Core – Base v2.0.0
+ * The only CSS Core ships: rules Webflow's style panel cannot express. Everything else (sheet presentations, bottom nav,
+ * consent switches, hours rows, install banner, safe areas, announcement offset) is Webflow classes and is-* combos.
  *
- * BEHAVIOR (every host): showing and hiding, where the panel sits and how it slides in each presentation,
- *   the bottom-sheet heights, the scrolling body, the swipe zone and the safe areas (on the panel, so
- *   content keeps its own padding). The corner shape follows the presentation; its size is --sheet-radius,
- *   else the Radius/medium token. Position and width set on a Webflow panel class (for the Designer preview)
- *   are overridden here, so one designed panel works as a bottom sheet, a dialog and a drawer.
- * LOOK (only the host Core builds itself, marked data-sheet-look="core"): colors, shadow, spacing, type,
- *   the drag bar and the close button. A host designed in Webflow (Sheet / Host component) gets its look
- *   from its own Webflow classes instead, so nothing here fights them.
- * While GSAP animates a sheet the host carries .is-gsap and the CSS transitions step aside.
+ * - [hidden] wins over a Webflow class's display (Core hides parts with the hidden attribute)
+ * - <html> cannot be styled in Webflow: the reserved scrollbar gutter, no sideways bounce, no pull-to-refresh bounce on
+ *   phones, and the scroll lock while a sheet is open
+ * - -webkit-tap-highlight-color is rejected by Webflow
+ * - "reduce motion" media queries are not available in Webflow
  */
-
-/* ---------- behavior ---------- */
-[data-sheet]{position:fixed;inset:0;z-index:1002;display:none}
-[data-sheet-content]{display:none}
-[data-sheet-host] [hidden]{display:none!important}
-[data-sheet].is-open{display:block}
+[hidden]{display:none!important}
+html{scrollbar-gutter:stable;overscroll-behavior-x:none}
+@media (max-width:991px){html,body{overscroll-behavior-y:none}}
 html.sheet-lock,html.sheet-lock body{overflow:hidden}
-
-[data-sheet-host] [data-sheet-overlay]{position:absolute;inset:0;opacity:0;transition:opacity .2s ease}
-[data-sheet-host].is-visible [data-sheet-overlay]{opacity:1}
-[data-sheet-host] [data-sheet-panel]{position:absolute;display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box;outline:none;max-width:none;margin:0;
-  padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
-[data-sheet-host] [data-sheet-head]{position:relative;display:flex;align-items:center;flex:none}
-[data-sheet-host] [data-sheet-head][data-sheet-default] [data-sheet-title]:empty{display:none}
-[data-sheet-host] [data-sheet-head] [data-sheet-close]{display:inline-flex;margin-left:auto}
-[data-sheet-host] [data-sheet-body]{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none}
-[data-sheet-host] [data-sheet-body]::-webkit-scrollbar{display:none;width:0;height:0}
-[data-sheet-host] [data-sheet-footer]{display:flex;flex-direction:column;flex:none}
-[data-sheet-host] [data-sheet-footer]:empty{display:none}
-[data-sheet-host] [data-sheet-grabber]{display:none}
-
-/* center – dialog */
-[data-sheet-host][data-sheet-as="center"] [data-sheet-panel]{left:50%;top:50%;right:auto;bottom:auto;width:min(var(--sheet-width,30rem),calc(100% - 2rem));max-height:min(40rem,calc(100vh - 2rem));max-height:min(40rem,calc(100dvh - 2rem - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px)));border-radius:var(--sheet-radius,var(--_surface---radius--medium,1rem));transform:translate(-50%,-46%);opacity:0;transition:transform .22s ease,opacity .22s ease}
-[data-sheet-host][data-sheet-as="center"].is-visible [data-sheet-panel]{transform:translate(-50%,-50%);opacity:1}
-
-/* bottom – sheet (clear of the home bar) */
-[data-sheet-host][data-sheet-as="bottom"] [data-sheet-panel]{left:0;right:0;bottom:0;top:auto;width:min(36rem,100%);margin:0 auto;max-height:88vh;max-height:88dvh;padding-bottom:env(safe-area-inset-bottom,0px);border-radius:var(--sheet-radius,var(--_surface---radius--medium,1rem)) var(--sheet-radius,var(--_surface---radius--medium,1rem)) 0 0;transform:translateY(100%);transition:transform .26s cubic-bezier(.2,.8,.2,1)}
-[data-sheet-host][data-sheet-as="bottom"].is-visible [data-sheet-panel]{transform:translateY(0)}
-/* drag zone: a 5rem × 1.5rem grab area at the top (style the visible bar inside it), plus the head */
-[data-sheet-host][data-sheet-as="bottom"] [data-sheet-grabber]{display:flex;justify-content:center;position:absolute;left:50%;top:0;z-index:2;width:5rem;height:1.5rem;margin-left:-2.5rem;cursor:grab;touch-action:none}
-[data-sheet-host][data-sheet-as="bottom"] [data-sheet-head]{touch-action:none}
-/* heights */
-[data-sheet-host][data-sheet-as="bottom"][data-sheet-height="compact"] [data-sheet-panel]{max-height:45vh;max-height:45dvh}
-[data-sheet-host][data-sheet-as="bottom"][data-sheet-height="medium"] [data-sheet-panel]{max-height:70vh;max-height:70dvh}
-[data-sheet-host][data-sheet-as="bottom"][data-sheet-height="tall"] [data-sheet-panel]{height:88vh;height:88dvh;max-height:none}
-[data-sheet-host][data-sheet-as="bottom"][data-sheet-height="full"] [data-sheet-panel]{height:calc(100vh - 1.5rem);height:calc(100dvh - max(1.5rem, env(safe-area-inset-top,0px)));max-height:none}
-@media (max-width:767px){[data-sheet-host][data-sheet-as="bottom"] [data-sheet-panel]{width:100%}}
-
-/* left / right – drawers (full height: clear the status bar and the home bar) */
-[data-sheet-host][data-sheet-as="left"] [data-sheet-panel],
-[data-sheet-host][data-sheet-as="right"] [data-sheet-panel]{top:0;bottom:0;height:100%;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);transition:transform .26s cubic-bezier(.2,.8,.2,1)}
-[data-sheet-host][data-sheet-as="left"] [data-sheet-panel]{left:0;right:auto;width:min(var(--sheet-width,22rem),88%);border-radius:0 var(--sheet-radius,var(--_surface---radius--medium,1rem)) var(--sheet-radius,var(--_surface---radius--medium,1rem)) 0;transform:translateX(-100%)}
-[data-sheet-host][data-sheet-as="right"] [data-sheet-panel]{right:0;left:auto;width:min(var(--sheet-width,28rem),100%);border-radius:var(--sheet-radius,var(--_surface---radius--medium,1rem)) 0 0 var(--sheet-radius,var(--_surface---radius--medium,1rem));transform:translateX(100%)}
-[data-sheet-host][data-sheet-as="left"].is-visible [data-sheet-panel],
-[data-sheet-host][data-sheet-as="right"].is-visible [data-sheet-panel]{transform:translateX(0)}
-
-[data-sheet-host].is-gsap [data-sheet-panel],[data-sheet-host].is-gsap [data-sheet-overlay]{transition:none!important}
-@media (prefers-reduced-motion:reduce){[data-sheet-host] [data-sheet-panel],[data-sheet-host] [data-sheet-overlay]{transition:none!important}}
-
-/* ---------- look: only the host Core builds itself ---------- */
-[data-sheet-look="core"] [data-sheet-overlay]{background:rgba(17,17,17,.45)}
-[data-sheet-look="core"] [data-sheet-panel]{background:var(--_theme---background--primary,#fff);color:var(--_theme---text--primary,#111);box-shadow:0 24px 60px rgba(17,17,17,.25);font-size:.9375rem;line-height:1.4}
-[data-sheet-look="core"][data-sheet-as="bottom"] [data-sheet-panel]{box-shadow:0 -8px 32px rgba(17,17,17,.16)}
-[data-sheet-look="core"] [data-sheet-head]{justify-content:flex-end;gap:.75rem;min-height:3rem;padding:.5rem .75rem 0}
-[data-sheet-look="core"][data-sheet-as="bottom"] [data-sheet-head]{min-height:2.75rem;padding:1rem .5rem 0}
-[data-sheet-look="core"] [data-sheet-head][data-sheet-default] [data-sheet-title]{margin:0 auto 0 .5rem;font-size:1.125rem;font-weight:700;line-height:1.3}
-[data-sheet-look="core"] [data-sheet-body]{padding:0 1.25rem 1.25rem}
-[data-sheet-look="core"] [data-sheet-footer]{gap:.625rem;padding:1rem 1.25rem 1.25rem;border-top:1px solid var(--_theme---border--subtle,#e5e5e5);background:var(--_theme---background--primary,#fff)}
-[data-sheet-look="core"] [data-sheet-grabber]::before{content:"";margin-top:.5rem;width:2.5rem;height:.3rem;border-radius:999px;background:var(--_theme---border--primary,#ccc)}
-/* close button: 44×44 touch target (Apple HIG) */
-[data-sheet-x]{display:inline-flex;align-items:center;justify-content:center;width:2.75rem;height:2.75rem;margin:0;padding:0;border:0;border-radius:999px;background:var(--_theme---background--secondary,#f5f3ee);color:var(--_theme---text--primary,#111);cursor:pointer}
-[data-sheet-x]:focus-visible{outline:2px solid var(--_theme---focus--ring,#f60);outline-offset:2px}
-
-/* Mayes Core – Bottom Nav v1.2.0 – runtime states for Navigation / Bottom Nav (base styles live on the Webflow bottom-nav_* classes). */
-.bottom-nav_tab{-webkit-tap-highlight-color:transparent;transition:color .15s ease}
-.bottom-nav_tab.is-active{color:var(--_theme---text--brand,#f60)}
-.bottom-nav_tab.is-active .bottom-nav_label{font-weight:700}
-.bottom-nav_indicator{transition:opacity .15s ease}
-.bottom-nav_tab.is-active .bottom-nav_indicator{opacity:1}
-.bottom-nav_badge.is-empty{display:none!important}
-.bottom-nav_tab:active .bottom-nav_icon{transform:scale(.92)}
-.bottom-nav_icon{transition:transform .12s ease}
-@media (prefers-reduced-motion:reduce){.bottom-nav_tab,.bottom-nav_indicator,.bottom-nav_icon{transition:none}}
-
-/* Mayes Core – Consent v1.2.0 – fallback look for the Site Settings sheet and cookie notice.
- * NATIVE FIRST: anything carrying its own Webflow class is marked data-look="webflow" by core-consent.js and none of
- * this applies to it. Style switches in Webflow with a switch class plus the is-on (on) and is-disabled (essential)
- * combos, and the knob with ::after. */
-[data-settings-section]:not([data-look="webflow"]){display:flex;flex-direction:column;gap:.75rem;padding:.25rem 0 1rem}
-[data-settings-section]:not([data-look="webflow"]) + [data-settings-section]:not([data-look="webflow"]){border-top:1px solid var(--_theme---border--subtle,#e5e5e5);padding-top:1.25rem}
-[data-settings-section]:not([data-look="webflow"]) > :is(h2,h3){margin:0}
-[data-settings-section]:not([data-look="webflow"]) p{margin:0;color:var(--_theme---text--secondary,#555)}
-[data-settings-row]:not([data-look="webflow"]){display:flex;align-items:center;justify-content:space-between;gap:1rem;min-height:3.5rem;padding:.5rem 0;border-top:1px solid var(--_theme---border--subtle,#e5e5e5)}
-[data-settings-row-title]{font-weight:600}
-[data-settings-row]:not([data-look="webflow"]) p{font-size:.875rem}
-/* switch */
-[data-consent-switch]{cursor:pointer}
-[data-consent-switch][aria-disabled="true"]{cursor:not-allowed}
-[data-consent-switch]:not([data-look="webflow"]){position:relative;flex:none;width:3rem;height:1.75rem;margin:0;padding:0;border:0;border-radius:999px;background:var(--_theme---border--primary,#ccc);transition:background-color .2s ease}
-[data-consent-switch]:not([data-look="webflow"])::after{content:"";position:absolute;top:.1875rem;left:.1875rem;width:1.375rem;height:1.375rem;border-radius:999px;background:#fff;box-shadow:0 1px 3px rgba(17,17,17,.25);transition:transform .2s ease}
-[data-consent-switch]:not([data-look="webflow"])[aria-checked="true"]{background:var(--_theme---background--brand,#f60)}
-[data-consent-switch]:not([data-look="webflow"])[aria-checked="true"]::after{transform:translateX(1.25rem)}
-[data-consent-switch]:not([data-look="webflow"])[aria-disabled="true"]{opacity:.55}
-[data-consent-switch]:focus-visible{outline:2px solid var(--_theme---focus--ring,#f60);outline-offset:2px}
-/* actions (8px radius per the Core shape rule) */
-[data-consent-action]{cursor:pointer}
-[data-consent-action]:not([data-look="webflow"]){display:flex;align-items:center;justify-content:center;width:100%;min-height:3rem;padding:.75rem 1rem;border:1px solid var(--_theme---border--brand,#f60);border-radius:var(--_surface---radius--small,.5rem);background:transparent;color:var(--_theme---text--brand,#f60);font:inherit;font-weight:700;text-decoration:none}
-[data-consent-action]:not([data-look="webflow"])[data-variant="primary"]{background:var(--_theme---background--brand,#f60);color:var(--_theme---text--inverse,#fff)}
-[data-consent-action]:not([data-look="webflow"])[data-variant="text"]{min-height:2.75rem;border-color:transparent;color:var(--_theme---text--primary,#111);text-decoration:underline}
-@media (prefers-reduced-motion:reduce){[data-consent-switch],[data-consent-switch]::after{transition:none}}
-
-/* Mayes Core – Business v1.2.0 – look for hours rows Core writes itself (a row designed in Webflow keeps its own classes). */
-[data-business-hours]{display:grid;gap:.3rem}
-[data-business-hours-line][data-core-look]{display:grid;grid-template-columns:minmax(7rem,1fr) auto;gap:1rem}
-[data-business-hours-line][data-core-look] > :last-child{text-align:right}
-
-/* Mayes Core – Announcement bar v1.0.0 – a fixed header follows the bar (offset set by core-announcement.js). */
-[data-announcement-follow],.navbar-compact{top:var(--core-announcement-offset,0px)}
-[data-announcement]{position:relative;z-index:1001}
-
-/* Mayes Core – Install v1.1.0 – "Add to Home Screen" banner, above the bottom nav.
- * .core-install = the banner Core builds when the page has none. A banner designed in Webflow ([data-install-banner],
- * component "Core / Install Banner") keeps its own look; Core only sets how far it sits above the bottom nav. */
-html [data-install-banner]:not(.core-install){bottom:calc(var(--core-install-offset,0px) + .75rem + env(safe-area-inset-bottom,0px))}
-html.has-bottom-nav [data-install-banner]:not(.core-install){bottom:calc(var(--core-install-offset,0px) + .75rem)}
-[data-install-banner] [hidden]{display:none!important}
-.core-install{position:fixed;left:.75rem;right:.75rem;bottom:calc(var(--core-install-offset,0px) + .75rem + env(safe-area-inset-bottom,0px));z-index:1000;display:flex;align-items:center;gap:.75rem;max-width:30rem;margin:0 auto;padding:.75rem .5rem .75rem .75rem;border:1px solid var(--_theme---border--subtle,#e5e5e5);border-radius:var(--_surface---radius--small,.5rem);background:var(--_theme---background--primary,#fff);color:var(--_theme---text--primary,#111);box-shadow:0 8px 24px rgba(17,17,17,.16);opacity:0;transform:translateY(1rem);transition:opacity .25s ease,transform .25s ease;pointer-events:none}
-html.has-bottom-nav .core-install{bottom:calc(var(--core-install-offset,0px) + .75rem)}
-.core-install.is-visible{opacity:1;transform:none;pointer-events:auto}
-.core-install_icon{flex:none;width:2.75rem;height:2.75rem;border-radius:.625rem;object-fit:cover}
-.core-install_text{flex:1;min-width:0;display:flex;flex-direction:column;gap:.125rem}
-.core-install_title{margin:0;font-weight:700;font-size:.9375rem;line-height:1.3}
-.core-install_hint{margin:0;font-size:.875rem;line-height:1.4;color:var(--_theme---text--secondary,#555)}
-.core-install_hint b{color:var(--_theme---text--primary,#111)}
-.core-install_glyph{display:inline-flex;vertical-align:-.2em;color:var(--_theme---text--brand,#f60)}
-.core-install_sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.core-install_action{flex:none;min-height:2.75rem;padding:0 1rem;border:0;border-radius:var(--_surface---radius--small,.5rem);background:var(--_theme---background--brand,#f60);color:var(--_theme---text--inverse,#fff);font:inherit;font-weight:700;cursor:pointer}
-.core-install_close{flex:none;display:flex;align-items:center;justify-content:center;width:2.75rem;height:2.75rem;margin:0;padding:0;border:0;background:none;color:var(--_theme---text--secondary,#555);cursor:pointer}
-.core-install_action:focus-visible,.core-install_close:focus-visible{outline:2px solid var(--_theme---focus--ring,var(--_theme---border--brand,#f60));outline-offset:2px}
-/* already opened from the home screen: hide "Add to Home Screen" triggers */
-html.is-standalone [data-install-open]{display:none!important}
-@media (prefers-reduced-motion:reduce){.core-install{transition:none;transform:none}}
-
-/* Mayes Core – Safe areas v1.1.0
- * Keeps content clear of the iPhone notch / Dynamic Island, rounded corners and home bar.
- * Needs viewport-fit=cover (core-app-head.html); without it every inset is 0 and nothing changes.
- * Insets are 0 on devices and orientations that have none, so these rules are safe everywhere.
- *   bottom: home bar      – bottom nav bar, Page Shell spacing (Webflow classes), sheets, install banner
- *   left/right: the notch in landscape – page content, header, bottom nav, sheets, install banner
- *   top: status bar       – header and side drawers (non-zero only with a translucent status bar)
- */
-body{padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
-
-/* fixed header (Page Shell › Nav / Header slot) */
-.shell-header{padding-top:env(safe-area-inset-top,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);box-sizing:border-box}
-
-/* bottom nav: sides (the bottom inset is already on .bottom-nav_bar) */
-.bottom-nav_bar{padding-left:max(.375rem,env(safe-area-inset-left,0px));padding-right:max(.375rem,env(safe-area-inset-right,0px))}
-
-/* sheets: the insets live on the panel in core-sheet.css (v1.4.0), so a sheet designed in Webflow keeps its own padding */
-
-/* Add to Home Screen banner: sides */
-.core-install{left:max(.75rem,env(safe-area-inset-left,0px));right:max(.75rem,env(safe-area-inset-right,0px))}
+[data-bottom-nav] a,[data-sheet-host] a,[data-install-banner] a{-webkit-tap-highlight-color:transparent}
+@media (prefers-reduced-motion:reduce){
+  [data-sheet-host],[data-sheet-host] *,[data-install-banner],[data-bottom-nav] *{transition:none!important}
+}

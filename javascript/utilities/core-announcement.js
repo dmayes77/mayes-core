@@ -1,9 +1,10 @@
-/* Mayes Core – Announcement bar v1.0.0 – keeps a fixed header stacked under an announcement bar.
+/* Mayes Core – Announcement bar v2.0.0 – keeps a fixed header stacked under an announcement bar.
  *
  * Markup: the bar carries [data-announcement] (its CMS list wrapper is measured when it has one).
  * Sets --core-announcement-offset on <html> = how much of the bar is still on screen (bar height − scroll, never below 0).
- * css/core-announcement.css applies it as `top` on [data-announcement-follow] and .navbar-compact, so a fixed header
- * sits right under the bar, scrolls up with it, then pins at top:0. No bar = offset 0, nothing changes.
+ * NATIVE: Core ships no CSS for it. In Webflow, give the fixed header's class top: var(--core-announcement-offset, 0px),
+ * so it sits right under the bar, scrolls up with it, then pins at top 0; give the bar's class position: relative and a
+ * z-index above the header. No bar = offset 0, nothing changes.
  * Public API: window.CoreAnnouncement = { refresh() }
  */
 (function(){
@@ -36,5 +37,5 @@
   }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 
-  window.CoreAnnouncement = { version: '1.0.0', refresh: measure };
+  window.CoreAnnouncement = { version: '2.0.0', refresh: measure };
 })();

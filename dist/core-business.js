@@ -1,4 +1,4 @@
-/* Mayes Core – Business v1.4.0 – one business record, shown anywhere on the page.
+/* Mayes Core – Business v2.0.0 – one business record, shown anywhere on the page.
  *
  * SOURCE – the hidden CMS layer in the Page Shell (the one Business Settings item, rendered on every page):
  *   <a data-business-field="phone">…</a>      any Business Settings field, as a native Webflow element bound in the Designer:
@@ -31,6 +31,7 @@
  *                            go in [data-business-hours-days] (else the row's first child), the time in
  *                            [data-business-hours-time] (else its last child). Without a designed row Core writes
  *                            <div data-business-hours-line data-core-look><span>Monday – Friday</span><span>8 AM–5 PM</span></div>
+ *                            (unstyled: Core ships no CSS; style [data-business-hours] and the row with Webflow classes)
  *     [data-business-today]  text: "Open today, 8 AM–5 PM" / "Closed today" (empty when no hours are set)
  *
  * SCHEMA – Core writes the page's structured data from the same record, so it always matches what the site shows:
@@ -273,7 +274,7 @@
   window.addEventListener('load', fill);
 
   window.CoreBusiness = {
-    version: '1.4.0', get: get, fill: fill, hours: hours, groupedHours: groupedHours, schema: function(){ cache = read(); return schema(); },
+    version: '2.0.0', get: get, fill: fill, hours: hours, groupedHours: groupedHours, schema: function(){ cache = read(); return schema(); },
     all: function(){ cache = read(); return Object.assign({}, cache); }
   };
 })();

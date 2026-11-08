@@ -33,14 +33,14 @@ One base serves every project. A project adds its own script only when it needs 
 Head    1. consent head snippet          (dist/core-consent-head.html, pasted inline, above any Google tag)
         2. core.css                       every site
         3. <project>.css                  only if the project has one
-Footer  4. GSAP                           only if the site uses motion (Webflow Settings › GSAP)
+Footer  4. GSAP                           optional: the sheet engine animates with it when loaded
         5. core.js                        every site
         6. <project>.js                   only if the project has one
 ```
 
 | Layer | File | Lives in | Example |
 |---|---|---|---|
-| Base | `dist/core.css`, `dist/core.js` | this repo | sheet, bottom nav, consent, business record, motion |
+| Base | `dist/core.css`, `dist/core.js` | this repo | sheet engine, consent, business record and JSON-LD, announcement offset, install banner logic |
 | Product | `products/<name>/dist/<name>.css` / `.js` | this repo, `products/` | ShopFlow cart and product page; DetailFlow booking |
 | Client | none by default | Webflow inline custom code, kept tiny | a one-off tweak for one client |
 
@@ -63,11 +63,11 @@ A client changes **Primitives only**. Everything else references Primitives.
 Desktop is a normal website. Phones and tablets get an app-style layer from Core:
 
 - **Brand bar:** logo plus one useful action.
-- **Bottom nav:** 3–5 tabs; each tab is a link, `sheet:NAME` or `click:SELECTOR`.
-- **Sheets:** one shared engine; bottom sheet on phones, drawer or dialog above; heights compact / medium / tall / full.
+- **Bottom nav:** 3–5 tabs; each tab is a link (a sheet tab adds `data-sheet-open="NAME"`); the active tab uses Webflow's Current state.
+- **Sheets:** one shared engine and one designed host (Sheet / Host); bottom sheet on phones, drawer or dialog above; heights compact / medium / tall / full. Core sets `is-*` combos, Webflow styles them.
 - **Site Settings:** the More sheet, with contact, hours and privacy/cookie controls.
 
-Markup contract: `data-bottom-nav`, `data-bottom-nav-tab`, `data-tab-action`, `data-bottom-nav-link`, `data-sheet`, `data-sheet-open`, `data-sheet-mode`, `data-sheet-height`, `data-settings-section`, `data-consent-*`.
+Markup contract: `data-bottom-nav`, `data-sheet`, `data-sheet-open`, `data-sheet-open-mode`, `data-sheet-mode`, `data-sheet-height`, `data-sheet-host` (and its parts), `data-install-banner` (and its parts), `data-consent-*`.
 
 ## Business record (CMS)
 

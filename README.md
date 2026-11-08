@@ -16,8 +16,8 @@ mayes-core/
 │   └── spec/             Core Design System 2.0 framework + Implementation Addendum
 ├── base/                 the $500 Base site kit (pages, mobile app layer, CMS, client checklist)
 ├── products/             where ShopFlow and DetailFlow will live once re-based on Core v2
-├── javascript/           source: motion, components, privacy, utilities
-├── css/                  source styles
+├── javascript/           source: components, privacy, utilities
+├── css/                  core-base.css (the few rules Webflow can't express) + the optional Before and After styles
 ├── dist/                 built files Webflow loads from jsDelivr (core.js, core.css + single modules)
 ├── test/                 browser tests
 ├── build.sh
@@ -43,23 +43,25 @@ Head (consent snippet first, above any Google tag; then the app snippet; then th
 
     <!-- paste dist/core-consent-head.html here -->
     <!-- paste dist/core-app-head.html here (set the short name and theme color) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v1.7.0/dist/core.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v2.0.0/dist/core.css">
 
 Footer (after GSAP, if the site uses it):
 
-    <script src="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v1.7.0/dist/core.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v2.0.0/dist/core.js" defer></script>
 
-`core.js` = sheet + bottom nav + consent + business + announcement + install + motion. Each module also ships alone in `dist/`.
+`core.js` = sheet + consent + business (+ JSON-LD) + announcement + install. Each module also ships alone in `dist/`.
+
+`core.css` is only `core-base.css`: rules Webflow's style panel can't express (the `[hidden]` guard, `<html>` scroll behavior and the sheet scroll lock, tap highlight, reduced motion). **Core v2 ships no look and no layout.** Every visual, including sheet positions, safe areas and the install banner's position, is a Webflow class, and Core only toggles `is-*` combo classes that Webflow styles. See `docs/NATIVE_FIRST.md`.
+
+Sites built on v1 (DetailFlow, ShopFlow) stay pinned to their v1 tag until they're rebuilt on the master's components.
 
 | Module | Public API | Main attributes |
 |---|---|---|
-| Sheet | `CoreSheet.open/close/show` | `data-sheet`, `data-sheet-open`, `data-sheet-mode`, `data-sheet-height`; optional designed host `data-sheet-host` |
-| Bottom nav | — | `data-bottom-nav`, `data-bottom-nav-tab`, `data-tab-action`, `data-bottom-nav-link` |
+| Sheet | `CoreSheet.open/close/show` | `data-sheet`, `data-sheet-open`, `data-sheet-open-mode`, `data-sheet-mode`, `data-sheet-height`; the Sheet / Host component (`data-sheet-host`) is required. Combos: `is-open`, `is-visible`, `is-bottom/center/left/right`, `is-compact/medium/tall/full`, `is-gsap` |
 | Consent | `CoreConsent.get/set/open` | `data-consent-switch`, `data-consent-action`, `data-consent` (gated scripts) |
 | Business | `CoreBusiness.get/all/hours/fill` | `data-business-field` (source), `data-business` (target), `data-business-href`, `data-business-empty="hide"`, `data-business-hours`, `data-business-today` |
-| Announcement | `CoreAnnouncement.refresh` | `data-announcement`, `data-announcement-follow` |
-| Install (Add to Home Screen) | `CoreInstall.show/hide/state` | none required (builds its own banner); `data-install-open` trigger; `<html data-install="off">`, `data-install-name`, `data-install-delay` |
-| Motion | `CoreMotion` | `data-motion`, `data-scroll-state`, `data-animate` (older) |
+| Announcement | `CoreAnnouncement.refresh` | `data-announcement`; sets `--core-announcement-offset` (use it as the header class's `top`) |
+| Install (Add to Home Screen) | `CoreInstall.show/hide/state` | the Core / Install Banner component (`data-install-banner`) is required; `data-install-open` trigger; `<html data-install="off">`, `data-install-name`, `data-install-delay`; sets `--core-install-offset` |
 | Before and After (optional, separate file) | `CoreBeforeAfter.init` | `data-before-after`, `data-before-after-range` |
 
 ## Checks and tests
@@ -67,13 +69,11 @@ Footer (after GSAP, if the site uses it):
     ./check.sh            # syntax, dist in sync, product-neutral, version headers
     python3 test/run.py   # browser tests (first time: npm install --prefix test gsap)
 
-## Core Motion
+## Motion and the bottom nav
 
-Core Motion is the reusable motion and interaction layer.
-
-Webflow → HTML data attributes → Core Motion → GSAP / ScrollTrigger
-
-It owns reveal animations, scroll states, parallax, stagger, text animation and reduced-motion handling. It contains no project selectors or visual styling: for example, `data-scroll-state` makes Core Motion toggle `is-scrolled`, and the project's Webflow classes decide what `is-scrolled` looks like.
+Both are native Webflow since v2.0.0, so Core has no script for them:
+- **Motion:** the master's site-wide Interactions (Core / Fade, Rise, Scale, Stagger, Hero) target `[data-motion="…"]`.
+- **Bottom nav:** each tab is a link. Sheet tabs carry `data-sheet-open="NAME"`, which the sheet engine handles, and the active tab is styled with Webflow's **Current** state.
 
 ## Development
 
@@ -87,4 +87,4 @@ Built files go to `dist/`, which is what Webflow loads.
 
 Webflow sites load tagged releases only — never `@main`. See `docs/RELEASES.md`.
 
-> Transition note (2026-10-31): ShopFlow and DetailFlow still load `@main` and `@stable`. The file paths in `dist/` are kept unchanged on this branch so those sites keep working until they are pinned to `v1.1.0`.
+> v2.0.0 removed `core-bottom-nav.*`, `core-motion.js` and every module stylesheet from `dist/`. Sites pinned to a v1 tag keep loading them from that tag.

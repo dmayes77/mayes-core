@@ -1,4 +1,4 @@
-/* Mayes Core – Sheet v1.4.1
+/* Mayes Core – Sheet v2.0.0
  * One shared sheet for the whole site: bottom sheet, centered dialog, or left/right drawer.
  *
  * CONTENT BLOCKS – anything the site shows in a sheet is a hidden block somewhere on the page:
@@ -11,12 +11,19 @@
  *   While open, the parts move into the host and go back on close, so CMS bindings travel with them.
  *   The block's data-* attributes are mirrored onto the host, plus data-sheet-view="name".
  *
- * THE HOST – the engine builds one host ([data-sheet-host]). If the page already has a Webflow-authored host
- *   ([data-sheet-host] containing [data-sheet-panel]; optional [data-sheet-overlay], [data-sheet-grabber],
- *   [data-sheet-head] with [data-sheet-title] and [data-sheet-close], [data-sheet-body]) it adopts that one
- *   instead, so the sheet's look can be designed in Webflow. It is moved to the end of <body>.
- *   Only the host Core builds carries data-sheet-look="core" (Core's default look); an adopted host is styled by its
- *   Webflow classes. Keep data-sheet="drawer" on a Webflow-built host so it stays hidden until it opens.
+ * THE HOST – designed in Webflow (component Sheet / Host), once per page:
+ *   [data-sheet-host]  with [data-sheet-panel]; optional [data-sheet-overlay], [data-sheet-grabber],
+ *   [data-sheet-head] with [data-sheet-title] and [data-sheet-close], [data-sheet-body]. Missing parts are added
+ *   (unstyled). It is moved to the end of <body>. Without a host on the page, sheets do not open.
+ *
+ * STYLING – NATIVE: Core sets combo classes and Webflow styles them. Core ships no sheet CSS.
+ *   host     .is-open while open (display it), .is-visible while shown
+ *   overlay  .is-visible (fade in)
+ *   panel    .is-bottom | .is-center | .is-left | .is-right (the presentation in use: position, size, corners, the
+ *            closed transform) + .is-visible (the open transform); on bottom sheets also .is-compact | .is-medium |
+ *            .is-tall | .is-full; .is-gsap while GSAP animates it (turn transitions off)
+ *   grabber, head   the same presentation combo (show the grabber only on .is-bottom)
+ *   --sheet-width is set on the host when a block asks for a width.
  *
  * OPEN  any [data-sheet-open="name"], or CoreSheet.open(nameOrBlock, {returnFocus, mode, height, width, title})
  *       CoreSheet.show({title, html|node, mode, height, width, view}) for content built in JS
@@ -27,7 +34,7 @@
  *   bottom | center | left | right   the same presentation at every width
  * HEIGHTS (bottom sheets): data-sheet-height = compact | medium | tall | full (default: fits content, max 88%)
  * WIDTH  data-sheet-width="34rem" (or --sheet-width)
- * The host carries data-sheet-as="bottom|center|left|right" – the presentation in use – for styling.
+ * The host also carries data-sheet-as="bottom|center|left|right" (read it with CoreSheet.presentation()).
  * EVENTS "sheet:open" / "sheet:close" on the block and the host.
  *
  * Handles focus trap and return, inert background, scroll lock that also holds on iPhone, swipe-to-close,
@@ -84,24 +91,28 @@
     defBody.innerHTML = '';
   }
   function build(){
-    if(host) return;
+    if(host) return true;
     var authored = document.querySelector('[data-sheet-host]');
-    if(authored && authored.querySelector('[data-sheet-panel]')) adopt(authored);
-    else {
-      host = document.createElement('div');
-      host.setAttribute('data-sheet', 'drawer'); host.setAttribute('data-sheet-host', ''); host.setAttribute('data-sheet-look', 'core');
-      host.innerHTML = '<div data-sheet-overlay data-sheet-close></div>' +
-        '<div data-sheet-panel role="dialog" aria-modal="true" tabindex="-1">' +
-          '<div data-sheet-grabber aria-hidden="true"></div>' +
-          '<div data-sheet-head data-sheet-default><div data-sheet-title id="sheet-host-title"></div><div data-sheet-close>' + xButton() + '</div></div>' +
-          '<div data-sheet-body data-sheet-default></div>' +
-        '</div>';
-      overlay = host.children[0]; panel = host.children[1];
-      grab = panel.children[0]; defHead = panel.children[1]; defTitle = defHead.querySelector('[data-sheet-title]'); defBody = panel.children[2];
-      document.body.appendChild(host);
+    if(!authored || !authored.querySelector('[data-sheet-panel]')){
+      if(!build.warned && window.console) console.warn('Core Sheet: no [data-sheet-host] with [data-sheet-panel] on this page (add the Sheet / Host component).');
+      build.warned = true;
+      return false;
     }
+    adopt(authored);
     baseClass = host.className;
     panel.addEventListener('pointerdown', dragStart);
+    return true;
+  }
+
+  /* combo classes Webflow styles (Core ships no sheet CSS) */
+  var AS = ['is-bottom', 'is-center', 'is-left', 'is-right'], HEIGHTS = ['compact', 'medium', 'tall', 'full'];
+  function parts(){ return [panel, grab, defHead].filter(Boolean); }
+  function setVisible(on){ [host, overlay, panel].forEach(function(e){ e.classList.toggle('is-visible', on); }); }
+  function setGsap(on){ [host, overlay, panel].forEach(function(e){ e.classList.toggle('is-gsap', on); }); }
+  function clearCombos(){
+    parts().forEach(function(e){ e.classList.remove.apply(e.classList, AS); });
+    HEIGHTS.forEach(function(h){ panel.classList.remove('is-' + h); });
+    setVisible(false); setGsap(false);
   }
 
   /* which presentation the current mode resolves to at this width */
@@ -112,6 +123,9 @@
     else if(m === 'drawer') as = MQ_PHONE.matches ? 'bottom' : 'right';
     else as = (m === 'bottom' || m === 'center' || m === 'left' || m === 'right') ? m : 'center';
     host.setAttribute('data-sheet-as', as);
+    parts().forEach(function(e){ e.classList.remove.apply(e.classList, AS); e.classList.add('is-' + as); });
+    var h = host.getAttribute('data-sheet-height');
+    HEIGHTS.forEach(function(n){ panel.classList.toggle('is-' + n, as === 'bottom' && h === n); });
     return as;
   }
   function onResize(){ if(host && host.classList.contains('is-open')) present(); }
@@ -175,7 +189,7 @@
     if(!window.gsap || !panel) return;
     window.gsap.killTweensOf([panel, overlay]);
     window.gsap.set([panel, overlay], {clearProps: 'transform,opacity,visibility'});
-    host.classList.remove('is-gsap');
+    setGsap(false);
   }
 
   /* move a node into the host and remember where it came from */
@@ -234,6 +248,7 @@
     current.moved.reverse().forEach(function(p){ var n = p[0], m = p[1]; if(m.parentNode){ m.parentNode.insertBefore(n, m); m.parentNode.removeChild(m); } });
     current.attrs.forEach(function(a){ host.removeAttribute(a); });
     host.className = baseClass;                        // drop state classes a feature added (e.g. is-invalid)
+    clearCombos();
     host.removeAttribute('data-sheet-height');
     defHead.hidden = false; defBody.hidden = false; defBody.innerHTML = '';
     current = null;
@@ -247,7 +262,7 @@
 
   function open(target, opts){
     opts = opts || {};
-    build();
+    if(!build()) return null;
     var block = typeof target === 'string' ? byName(target) : target;
     if(block && block.closest && block.closest('[data-sheet-host]')) block = current && current.block;   // already inside the host
     if(!block && !opts.html && !opts.node) return null;
@@ -261,15 +276,15 @@
     setInert(true);
     if(motionOk()){
       var g = window.gsap, f = frames(as);
-      host.classList.add('is-gsap', 'is-open', 'is-visible');
+      host.classList.add('is-open'); setGsap(true); setVisible(true);
       g.killTweensOf([panel, overlay]);
       g.fromTo(panel, f[0], Object.assign({}, f[1], {duration: OPEN_S, ease: 'power3.out', overwrite: true,
-        onComplete: function(){ g.set(panel, {clearProps: 'transform,opacity,visibility'}); host.classList.remove('is-gsap'); }}));
+        onComplete: function(){ g.set(panel, {clearProps: 'transform,opacity,visibility'}); setGsap(false); }}));
       g.fromTo(overlay, {opacity: 0}, {opacity: 1, duration: OPEN_S, ease: 'power1.out', overwrite: true,
         onComplete: function(){ g.set(overlay, {clearProps: 'opacity'}); }});
     } else {
       host.classList.add('is-open');
-      requestAnimationFrame(function(){ requestAnimationFrame(function(){ if(host.classList.contains('is-open')) host.classList.add('is-visible'); }); });
+      requestAnimationFrame(function(){ requestAnimationFrame(function(){ if(host.classList.contains('is-open') && !finishClose) setVisible(true); }); });
     }
     setTimeout(function(){
       var f = panel.querySelector('[data-sheet-autofocus]');
@@ -294,14 +309,14 @@
     if(opts.instant){ flushClose(); }
     else if(animate){
       var g = window.gsap;
-      host.classList.add('is-gsap');
+      setGsap(true);
       g.killTweensOf([panel, overlay]);
       g.to(panel, Object.assign({}, frames(as)[0], {duration: CLOSE_S, ease: 'power2.in', overwrite: true,
         onComplete: function(){ g.set(panel, {clearProps: 'transform,opacity,visibility'}); if(finishClose){ var f = finishClose; finishClose = null; f(); } }}));
       g.to(overlay, {opacity: 0, duration: CLOSE_S, ease: 'power1.out', overwrite: true,
         onComplete: function(){ g.set(overlay, {clearProps: 'opacity'}); }});
     } else {
-      host.classList.remove('is-visible');
+      setVisible(false);
       closeTimer = setTimeout(flushClose, ANIM);
     }
     if(!opts.noFocus && r && r.focus && document.contains(r)) r.focus({preventScroll:true});
@@ -370,11 +385,11 @@
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', build); else build();
 
   window.CoreSheet = {
-    version: '1.4.1',
+    version: '2.0.0',
     open: open, show: show, close: close,
     top: function(){ return host && host.classList.contains('is-open') && !finishClose ? host : null; },
     current: function(){ return current && !finishClose ? current.block : null; },
-    host: function(){ build(); return host; },
+    host: function(){ build(); return host || null; },
     presentation: function(){ return host ? host.getAttribute('data-sheet-as') : null; }
   };
 })();
