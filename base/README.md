@@ -76,6 +76,8 @@ Site custom code loads the consent snippet, the app head snippet, `core.css` and
 
 **Utility classes stay pure:** `layout-column` (and `layout-row`) only lay things out: flex direction, wrap, gap. Padding, color and size go on the element's own class, never in a combo on a layout utility.
 
+**Buttons always sit in a `button-group`**, even a single button. The group owns spacing, wrapping and stacking, so a second button never means restructuring, and every CTA row lines up the same way. Use the `is-split` combo when the buttons should share the row equally. Don't leave an empty group on the page: hide it, or the gap stays.
+
 Add to Home Screen: the app head snippet makes the saved site open full screen, and Core shows phone visitors a banner on their second page view. The Settings sheet carries an "Add to Home Screen" row (`data-install-open`). Opened from the home screen there is no browser back button, so every page keeps the bottom nav.
 
 ## CMS
