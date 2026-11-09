@@ -101,6 +101,9 @@ def run():
         cls = lambda sel: pg.evaluate(f"{sel}.className")
         check("host adopted, moved to <body>, aria-hidden removed", pg.evaluate(f"document.querySelectorAll('[data-sheet-host]').length === 1 && {H}.parentNode === document.body && !{H}.hasAttribute('aria-hidden')"))
         check("host placeholder cleared", "Host body placeholder" not in pg.text_content("[data-sheet-host]"))
+        pg.click("#open-empty"); pg.wait_for_timeout(200)
+        check("empty data-sheet-open: plain link, no sheet", pg.evaluate("location.hash === '#plain-link' && !CoreSheet.current()"))
+        pg.evaluate("history.replaceState(null, '', location.pathname)")
         check("host closed: hidden by its class", pg.evaluate(f"getComputedStyle({H}).display") == "none")
 
         # cookie notice appears ~1.2s after first visit
