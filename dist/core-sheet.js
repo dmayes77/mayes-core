@@ -1,4 +1,4 @@
-/* Mayes Core – Sheet v2.0.0
+/* Mayes Core – Sheet v2.0.1
  * One shared sheet for the whole site: bottom sheet, centered dialog, or left/right drawer.
  *
  * CONTENT BLOCKS – anything the site shows in a sheet is a hidden block somewhere on the page:
@@ -25,7 +25,8 @@
  *   grabber, head   the same presentation combo (show the grabber only on .is-bottom)
  *   --sheet-width is set on the host when a block asks for a width.
  *
- * OPEN  any [data-sheet-open="name"], or CoreSheet.open(nameOrBlock, {returnFocus, mode, height, width, title})
+ * OPEN  any [data-sheet-open="name"], or CoreSheet.open(nameOrBlock, {returnFocus, mode, height, width, title}).
+ *       An empty data-sheet-open="" is ignored, so the link just goes to its href (lets a Webflow prop turn the sheet off).
  *       CoreSheet.show({title, html|node, mode, height, width, view}) for content built in JS
  * CLOSE [data-sheet-close], overlay tap, Escape, swipe down on the handle/head (bottom sheets), CoreSheet.close()
  * MODES (data-sheet-mode, or the mode option, which wins):
@@ -365,7 +366,7 @@
 
   document.addEventListener('click', function(e){
     if(!e.target.closest) return;
-    var t = e.target.closest('[data-sheet-open]');
+    var t = e.target.closest('[data-sheet-open]:not([data-sheet-open=""])');
     if(t){ e.preventDefault(); open(t.getAttribute('data-sheet-open'), {returnFocus: t, mode: t.getAttribute('data-sheet-open-mode') || undefined}); return; }
     var c = e.target.closest('[data-sheet-close]');
     if(c && host && host.contains(c)){ e.preventDefault(); close(); }

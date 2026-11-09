@@ -2,11 +2,12 @@
 
 ## v2.0.1 — 2026-11-08
 
-Patch: every image Core fills now has alt text.
+Patch: every image Core fills now has alt text, and a cleared sheet prop leaves a button as a plain link.
 - **Business v2.0.1:** a `[data-business]` image with no alt gets the business name as its alt, even when no logo is set and the placeholder stays.
 - **Install v2.0.1:** the banner icon's alt is "<site name> icon" (was empty).
+- **Sheet v2.0.1:** an empty `data-sheet-open=""` is ignored, so the link goes to its href. A Webflow button can bind the attribute to a prop and clear it to turn the sheet off.
 - **Consent v2.0.1:** header comment no longer mentions the old Overlay slot.
-- Test fixture comments no longer mention slots. 132 browser checks.
+- Test fixture comments no longer mention slots. 133 browser checks.
 
 ## v2.0.0 — 2026-11-07
 

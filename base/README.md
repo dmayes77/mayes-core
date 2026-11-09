@@ -78,6 +78,8 @@ Site custom code loads the consent snippet, the app head snippet, `core.css` and
 
 **Buttons always sit in a `button-group`**, even a single button. The group owns spacing, wrapping and stacking, so a second button never means restructuring, and every CTA row lines up the same way. Use the `is-split` combo when the buttons should share the row equally. Don't leave an empty group on the page: hide it, or the gap stays.
 
+**Every button's link is a prop** (Webflow link prop: a URL, a page, a section, phone or email). Buttons that also do something carry a second prop bound to the attribute: "Opens Sheet" → `data-sheet-open` (default `quote`; clear it and the button follows its Link) and "Fills From Business" → `data-business-href` (default `phone-href`; clear it to use the Link).
+
 **Every image has alt text and every link has a name.** Images: set the alt in the image settings or the component's Image Alt prop (Core gives `[data-business]` images the business name). Links: visible text that says where it goes; a link with only an icon gets an `aria-label`. "Learn more" links carry a hidden `sr-only` span with the subject ("Learn more about Service 1").
 
 Add to Home Screen: the app head snippet makes the saved site open full screen, and Core shows phone visitors a banner on their second page view. The Settings sheet carries an "Add to Home Screen" row (`data-install-open`). Opened from the home screen there is no browser back button, so every page keeps the bottom nav.
