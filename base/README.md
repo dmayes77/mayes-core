@@ -106,4 +106,6 @@ Business Settings (1 item) and Business Hours (7 items) only. Both exist in the 
 - [ ] Site head: `<meta name="core-schema-type" content="…">` with the schema.org type for the trade (Plumber, HVACBusiness, HairSalon, AutoRepair…). Check it with Google's Rich Results Test.
 - [ ] QA at Desktop, Tablet, Mobile Landscape, Mobile Portrait, on a real phone.
 - [ ] Custom code pins `mayes-core` to a release tag.
+- [ ] Business Settings and Business Hours template pages: keep their head code (noindex + redirect home) and turn off Sitemap indexing in their Page settings. They only feed data; their item pages aren't for visitors.
+- [ ] Delete the internal Components and Style Guide draft pages, or keep them as drafts (never publish them).
 - [ ] Connect domain, publish, start the 30-day support window.
