@@ -1,4 +1,4 @@
-/* Mayes Core – Consent v2.0.1 – cookie consent + the Site Settings sheet.
+/* Mayes Core – Consent v2.0.2 – cookie consent + the Site Settings sheet.
    Uses the Sheet engine (window.CoreSheet). Pairs with the head snippet (Consent Mode v2 defaults),
    which must run BEFORE the Google tag. Categories: essential (always on), analytics, marketing.
 
@@ -6,7 +6,8 @@
      [data-sheet="site-settings"]  the settings sheet (cog opens it). Sections: [data-settings-section] (privacy now, appearance later)
        [data-consent-switch="analytics|marketing|essential"]   role="switch" buttons
      [data-sheet="cookie-notice"]  first-visit notice
-     [data-consent-action="accept-all|necessary|save|customize"]
+     [data-consent-action="accept-all|necessary|save|customize"]   an empty value is ignored, so a Webflow button component can
+                                    bind it to a prop and leave it blank on ordinary buttons
    Opening: any [data-sheet-open="site-settings"] (the brand-bar cog) or CoreConsent.open().
    Deferred third-party scripts: <script type="text/plain" data-consent="analytics|marketing" src|inline> run once consent is given.
    Events: "core:consent" on document (detail = {analytics, marketing}).
@@ -14,6 +15,7 @@
    when on and .is-disabled when locked (essential), so on/off and locked are Webflow combo classes. */
 (function(){
   if(window.CoreConsent) return;
+  var ACTION = '[data-consent-action]:not([data-consent-action=""])';
   var KEY = document.documentElement.getAttribute('data-consent-key') || 'core-consent-v1', CATS = ['analytics','marketing'];
   function sheet(){ return window.CoreSheet || null; }
   function read(){ try{ return JSON.parse(localStorage.getItem(KEY)) || null; }catch(e){ return null; } }
@@ -68,7 +70,7 @@
       sw.setAttribute('aria-checked', nowOn ? 'true' : 'false'); sw.classList.toggle('is-on', nowOn);
       return;
     }
-    var b = e.target.closest('[data-consent-action]');
+    var b = e.target.closest(ACTION);
     if(!b) return;
     e.preventDefault();
     var a = b.getAttribute('data-consent-action');
@@ -80,13 +82,13 @@
   document.addEventListener('sheet:open', function(){ sync(); });
   /* Webflow renders these as div/link elements: make them real controls for keyboard and screen readers */
   function prepActions(){
-    document.querySelectorAll('[data-consent-action]').forEach(function(b){
+    document.querySelectorAll(ACTION).forEach(function(b){
       if(b.tagName === 'BUTTON'){ b.type = 'button'; return; }
       b.setAttribute('role', 'button'); if(!b.hasAttribute('tabindex')) b.setAttribute('tabindex', '0'); b.removeAttribute('href');
     });
   }
   document.addEventListener('keydown', function(e){
-    if((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('[data-consent-switch]:not(button),[data-consent-action]:not(button)')){ e.preventDefault(); e.target.click(); }
+    if((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('[data-consent-switch]:not(button),' + ACTION + ':not(button)')){ e.preventDefault(); e.target.click(); }
   });
 
   function init(){

@@ -104,6 +104,12 @@ def run():
         pg.click("#open-empty"); pg.wait_for_timeout(200)
         check("empty data-sheet-open: plain link, no sheet", pg.evaluate("location.hash === '#plain-link' && !CoreSheet.current()"))
         pg.evaluate("history.replaceState(null, '', location.pathname)")
+        check("button component: empty behavior attributes leave a plain link", pg.evaluate("""(() => { const a = document.getElementById('cb-plain-link');
+            return a.getAttribute('href') === '#cb-target' && !a.hasAttribute('role') && !a.hasAttribute('tabindex'); })()"""))
+        pg.evaluate("document.getElementById('cb-plain-link').click()"); pg.wait_for_timeout(200)
+        check("button component: empty behavior attributes still navigate", pg.evaluate("location.hash === '#cb-target' && !CoreSheet.current()"))
+        pg.evaluate("history.replaceState(null, '', location.pathname)")
+        check("button component: consent action link becomes a button", pg.get_attribute("#cb-necessary-link", "role") == "button" and pg.get_attribute("#cb-necessary-link", "href") is None)
         check("host closed: hidden by its class", pg.evaluate(f"getComputedStyle({H}).display") == "none")
 
         # cookie notice appears ~1.2s after first visit
@@ -318,6 +324,7 @@ def run():
         check("install: banner on second view (iPhone)", visible(pg))
         check("install: only the designed banner, moved to <body>", pg.evaluate(f"document.querySelectorAll('[data-install-banner]').length === 1 && {BANNER}.parentNode === document.body"))
         check("install: iOS hint only, no Install button", shown_hint(pg) == "hint-ios" and pg.evaluate("document.getElementById('banner-install').hidden"), shown_hint(pg))
+        check("install: Button component's wrapper hidden with its link (iOS)", pg.evaluate("document.getElementById('cb-install').hidden && getComputedStyle(document.getElementById('cb-install')).display === 'none'"))
         check("install: business name used", pg.text_content("[data-install-title]") == "Add Test Plumbing Co. to your Home Screen" and pg.text_content("[data-install-name]") == "Test Plumbing Co.")
         check("install: webclip icon set", pg.evaluate("document.querySelector('[data-install-icon]').getAttribute('src').startsWith('data:image/png')"))
         check("install: icon has alt text", pg.get_attribute("[data-install-icon]", "alt") == "Test Plumbing Co. icon", pg.get_attribute("[data-install-icon]", "alt"))
@@ -344,6 +351,14 @@ def run():
         check("install: no JS errors (consent)", not errors, errors)
         ctx.close()
 
+        ctx, pg, errors = phone(IPHONE, "")
+        pg.goto(base + plain); pg.wait_for_load_state("load"); pg.wait_for_timeout(300)
+        pg.evaluate("document.getElementById('cb-necessary-link').click()"); pg.wait_for_timeout(300)
+        saved = pg.evaluate("JSON.parse(localStorage.getItem('core-consent-v1'))")
+        check("consent: Button component overlay link saves its action", bool(saved) and saved.get("analytics") is False and saved.get("marketing") is False, saved)
+        check("consent: no JS errors (button component)", not errors, errors)
+        ctx.close()
+
         ctx, pg, errors = phone(ANDROID, CONSENTED + "localStorage.setItem('core-install-v1', JSON.stringify({views:1}));")
         pg.goto(base + plain); pg.wait_for_load_state("load")
         pg.evaluate("""() => { const e = new Event('beforeinstallprompt', {cancelable: true});
@@ -351,6 +366,7 @@ def run():
             window.dispatchEvent(e); }""")
         pg.wait_for_timeout(3500)
         check("install: Android prompt shows Install button", visible(pg) and not pg.evaluate("document.getElementById('banner-install').hidden"))
+        check("install: Button component's wrapper shown (Android)", not pg.evaluate("document.getElementById('cb-install').hidden"))
         pg.click("#banner-install"); pg.wait_for_timeout(500)
         check("install: Install opens browser prompt", pg.evaluate("window.__prompted === true"))
         check("install: accepted hides banner", not visible(pg))
