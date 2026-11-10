@@ -1,4 +1,4 @@
-/* Mayes Core – Install v2.0.1 – "Add to Home Screen" banner for the mobile app layer.
+/* Mayes Core – Install v2.0.2 – "Add to Home Screen" banner for the mobile app layer.
  *
  * Pairs with the head snippet dist/core-app-head.html (full-screen launch, status bar, theme color) and the
  * Webflow webclip (Site settings › General), which is the home-screen icon.
@@ -26,6 +26,8 @@
  *                                       (falls back to "other", then to the first hint)
  *     [data-install-action="prompt"]    the Install button, shown only when the browser offers its own install prompt
  *     [data-install-action="dismiss"]   the close button
+ *     An empty data-install-action is ignored. When the action is a link inside a [data-core-button] wrapper
+ *     (the Button component's overlay link), Core shows and hides the whole wrapper, not just the link.
  *   Core only fills it and toggles is-visible. Position it in Webflow with
  *     bottom: calc(var(--core-install-offset, env(safe-area-inset-bottom, 0px)) + 0.75rem)
  *   Core sets --core-install-offset to the bottom nav's height while the nav is showing, and removes it otherwise.
@@ -44,6 +46,8 @@
  */
 (function(){
   if(window.CoreInstall) return;
+  var ACTION = '[data-install-action]:not([data-install-action=""])';
+  function shell(a){ return a.closest('[data-core-button]') || a; }   // the Button component's wrapper, else the link itself
   var root = document.documentElement, KEY = 'core-install-v1', DAY = 864e5, SNOOZE = 30 * DAY;
   var ua = navigator.userAgent || '', deferred = null, el = null, offsetTimer = 0;
 
@@ -107,9 +111,9 @@
     var pick = hints.filter(function(h){ return h.getAttribute('data-install-hint') === p; })[0] ||
                hints.filter(function(h){ return h.getAttribute('data-install-hint') === 'other'; })[0] || hints[0];
     hints.forEach(function(h){ h.hidden = h !== pick; });
-    box.querySelectorAll('[data-install-action]').forEach(function(a){
+    box.querySelectorAll(ACTION).forEach(function(a){
       if(a.tagName === 'A'){ a.setAttribute('role', 'button'); a.removeAttribute('href'); a.setAttribute('tabindex', '0'); }
-      if(a.getAttribute('data-install-action') === 'prompt') a.hidden = p !== 'prompt';
+      if(a.getAttribute('data-install-action') === 'prompt') shell(a).hidden = p !== 'prompt';
       if(a.getAttribute('data-install-action') === 'dismiss' && !a.getAttribute('aria-label') && !(a.textContent || '').trim()) a.setAttribute('aria-label', 'Close');
     });
     if(box.parentNode !== document.body) document.body.appendChild(box);   // above everything, out of any slot
@@ -187,7 +191,7 @@
 
   document.addEventListener('click', function(e){
     if(!e.target.closest) return;
-    var a = e.target.closest('[data-install-action]');
+    var a = e.target.closest(ACTION);
     if(a){ e.preventDefault(); if(a.getAttribute('data-install-action') === 'prompt') prompt(); else { hide(true); emit('dismissed'); } return; }
     var t = e.target.closest('[data-install-open]');
     if(t){

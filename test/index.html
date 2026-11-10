@@ -60,6 +60,11 @@
     <p data-business-today id="today"></p>
     <button data-sheet-open="services" id="open-services">Services</button>
     <a href="#plain-link" data-sheet-open="" id="open-empty">Empty sheet name: plain link</a>
+    <!-- Button component (Webflow): a wrapper with an overlay link; unused behavior props render as empty attributes -->
+    <div class="button" data-core-button id="cb-plain"><div class="button-text">Go</div>
+      <a class="link-overlay" href="#cb-target" aria-label="Go" data-sheet-open="" data-business="" data-business-href="" data-consent-action="" data-install-action="" id="cb-plain-link"></a></div>
+    <div class="button" data-core-button id="cb-necessary"><div class="button-text">Necessary only</div>
+      <a class="link-overlay" href="#" aria-label="Necessary only" data-consent-action="necessary" id="cb-necessary-link"></a></div>
     <button data-sheet-open="services" data-sheet-open-mode="right" id="open-right">Services in a drawer</button>
   </main>
 
@@ -118,6 +123,8 @@
       <p data-install-hint="in-app" id="hint-in-app">Open this page in your browser first.</p>
       <p data-install-hint="other" id="hint-other">Use your browser menu.</p></div>
     <a href="#" data-install-action="prompt" id="banner-install">Install</a>
+    <div class="button" data-core-button id="cb-install"><div class="button-text">Install</div>
+      <a class="link-overlay" href="#" aria-label="Install" data-install-action="prompt" id="cb-install-link"></a></div>
     <a href="#" data-install-action="dismiss" id="banner-close">×</a>
   </div>
 

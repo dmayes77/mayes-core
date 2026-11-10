@@ -1,5 +1,12 @@
 # Changelog
 
+## v2.0.2 — 2026-11-10
+
+Patch: the Webflow Button component can carry Core's consent and install hooks.
+- **Consent v2.0.2:** an empty `data-consent-action=""` is ignored. Before, any element with the attribute, even empty, had its click blocked and its `href` removed, so a button component that binds the attribute to a prop would have broken every ordinary button.
+- **Install v2.0.2:** an empty `data-install-action=""` is ignored. When the Install action is a link inside a `[data-core-button]` wrapper (the Button component's overlay link), Core shows and hides the whole wrapper, not just the invisible link.
+- Tests: a Button-component fixture (wrapper + overlay link with empty behavior attributes) still navigates, its consent link saves, and the wrapped Install button hides on iPhone and shows on Android. 122 browser checks without GSAP.
+
 ## v2.0.1 — 2026-11-08
 
 Patch: every image Core fills now has alt text, and a cleared sheet prop leaves a button as a plain link.
