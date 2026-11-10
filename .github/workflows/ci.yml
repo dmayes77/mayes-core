@@ -1,0 +1,37 @@
+# Mayes Core CI: runs the repo checks and the browser tests on every pull request and push to main,
+# so a broken build can't be merged or tagged. Webflow sites load Core by release tag only (see docs/RELEASES.md).
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Repo checks (syntax, dist up to date, product-neutral, versions)
+        run: ./check.sh
+
+      - name: Install test tools (Playwright, GSAP for the GSAP tests)
+        run: |
+          pip install playwright
+          npm install --prefix test gsap
+
+      - name: Browser tests (phone and desktop, with and without GSAP)
+        run: python3 test/run.py

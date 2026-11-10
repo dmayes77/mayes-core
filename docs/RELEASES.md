@@ -8,6 +8,8 @@ Webflow sites load files from this repo through jsDelivr **by release tag only**
 
 Never `@main`, never `@stable`, never a bare commit. A push to `main` must never change a live site.
 
+CI (`.github/workflows/ci.yml`) runs `./check.sh` and `test/run.py`, GSAP tests included, on every pull request and every push to `main`. Only tag a commit whose CI run is green.
+
 ## Tags
 
 | Tag | Contents | Used by |
