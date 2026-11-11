@@ -4,7 +4,7 @@
 
 Webflow sites load files from this repo through jsDelivr **by release tag only**:
 
-    https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v2.0.2/dist/core.js
+    https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v2.0.3/dist/core.js
 
 Never `@main`, never `@stable`, never a bare commit. A push to `main` must never change a live site.
 
@@ -29,7 +29,8 @@ CI (`.github/workflows/ci.yml`) runs `./check.sh` and `test/run.py`, GSAP tests 
 | `v1.7.0` | Core writes the LocalBusiness / WebSite / WebPage JSON-LD from Business Settings and Business Hours | superseded by v2.0.0 |
 | `v2.0.0` | Native CSS: Core ships no look or layout; the sheet engine sets `is-*` combos that Webflow styles; bottom-nav and motion scripts, the built sheet host and install banner, and every module stylesheet removed. **Breaking.** | superseded by v2.0.1 |
 | `v2.0.1` | Alt text on every image Core fills (logo with no logo set, install icon); empty `data-sheet-open` is a plain link; stale slot comments fixed | superseded by v2.0.2 |
-| `v2.0.2` | Empty `data-consent-action` / `data-install-action` are ignored; Install hides the whole `[data-core-button]` wrapper, so the Button component can carry both | latest; the $500 Base site and every new site. v1 sites stay on v1 tags |
+| `v2.0.2` | Empty `data-consent-action` / `data-install-action` are ignored; Install hides the whole `[data-core-button]` wrapper, so the Button component can carry both | superseded by v2.0.3 |
+| `v2.0.3` | Before and After v1.1.0: native only (no GSAP), focus ring for keyboard only. `core.js` and `core.css` are unchanged from v2.0.2 | latest; the $500 Base site and every new site. v1 sites stay on v1 tags |
 
 ## Cutting a release
 
