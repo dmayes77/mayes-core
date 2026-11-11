@@ -254,6 +254,19 @@ def run():
         check("before/after: present photo hides placeholder", pg.evaluate("getComputedStyle(document.getElementById('ph-before')).display") == "none")
         pg.evaluate("document.getElementById('later').innerHTML = document.getElementById('ba').outerHTML.replace('id=\"ba\"','id=\"ba2\"').replace(/data-ba-ready=\"1\"/,''); CoreBeforeAfter.init(document.getElementById('later'))")
         check("before/after: init() wires later sliders", pg.get_attribute("#ba2", "data-ba-ready") == "1")
+        # v1.1.0: focus ring for keyboard only.
+        pg.click("#range"); pg.wait_for_timeout(50)
+        check("before/after: tap/click shows no focus ring", not pg.evaluate("document.getElementById('ba').classList.contains('is-focused')"))
+        pg.keyboard.press("ArrowLeft"); pg.wait_for_timeout(50)
+        check("before/after: keyboard shows focus ring", pg.evaluate("document.getElementById('ba').classList.contains('is-focused')"))
+        pg.mouse.down(); pg.mouse.up(); pg.wait_for_timeout(50)
+        check("before/after: pointer hides focus ring again", not pg.evaluate("document.getElementById('ba').classList.contains('is-focused')"))
+        pg.evaluate("document.getElementById('range').blur()")
+        check("before/after: blur removes focus ring", not pg.evaluate("document.getElementById('ba').classList.contains('is-focused')"))
+        # v1.1.0: native only. A gsap object on the page is never called; the split is an inline --pos.
+        pg.evaluate("window.gsap = {set: function(){ window.__gsapCalled = true; }}")
+        pg.fill("#range", "70"); pg.wait_for_timeout(50)
+        check("before/after: ignores GSAP, sets --pos inline", pg.evaluate("!window.__gsapCalled && document.getElementById('ba').style.getPropertyValue('--pos') === '70%'"))
         check("before/after: no JS errors", not errors, errors)
         ctx.close()
 
