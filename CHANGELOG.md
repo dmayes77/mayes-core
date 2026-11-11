@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.0.3 — 2026-11-11
+
+Patch: the optional Before and After module is native only.
+- **Before and After v1.1.0:** the split always moves with `style.setProperty('--pos', …)`. It no longer calls `gsap.set` when GSAP is on the page; that was an instant set with no easing, so nothing visible changes and the module no longer depends on GSAP.
+- Tests: a page with a `gsap` object still moves the split inline and never calls it.
+
 ## v2.0.2 — 2026-11-10
 
 Patch: the Webflow Button component can carry Core's consent and install hooks.

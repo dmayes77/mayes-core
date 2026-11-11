@@ -1,4 +1,4 @@
-/* Mayes Core – Before and After v1.0.0 – optional module (not in core.js; load dist/core-before-after.js on sites that use it).
+/* Mayes Core – Before and After v1.1.0 – optional module (not in core.js; load dist/core-before-after.js on sites that use it).
  * Drag, tap or use the keyboard to compare two photos of the same subject.
  *
  * Markup (Webflow component "Media / Before and After"):
@@ -36,8 +36,7 @@
 
       function update(){
         var v = Math.max(0, Math.min(100, Number(range.value) || 0)) + '%';
-        if(window.gsap) window.gsap.set(slider, {'--pos': v});   // tracks the finger directly, no easing lag
-        else slider.style.setProperty('--pos', v);
+        slider.style.setProperty('--pos', v);   // native: tracks the finger directly, no GSAP needed
       }
       update();
       range.addEventListener('input', update);
@@ -52,5 +51,5 @@
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ init(document); }, {once: true});
   else init(document);
 
-  window.CoreBeforeAfter = { version: '1.0.0', init: init };
+  window.CoreBeforeAfter = { version: '1.1.0', init: init };
 })();
