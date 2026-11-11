@@ -11,6 +11,7 @@
  *            aria-label="Drag to compare before and after photos"></form>
  *   </div>
  * The range input is the control (keyboard and screen readers); --pos on the slider (0–100%) draws the split.
+ * is-focused (the focus ring) is added for keyboard focus only, never for a tap or click.
  * A layer whose image has no src shows its placeholder instead.
  * Sliders added later (CMS lists, sheets): CoreBeforeAfter.init(container).
  */
@@ -41,7 +42,15 @@
       update();
       range.addEventListener('input', update);
       range.addEventListener('change', update);
-      range.addEventListener('focus', function(){ slider.classList.add('is-focused'); });
+      // Focus ring for keyboard users only (like :focus-visible): a tap or click never shows it.
+      function ring(){
+        var on = document.activeElement === range;
+        if(on){ try{ on = range.matches(':focus-visible'); }catch(e){} }
+        slider.classList.toggle('is-focused', on);
+      }
+      range.addEventListener('focus', ring);
+      range.addEventListener('keydown', function(){ slider.classList.add('is-focused'); });
+      range.addEventListener('pointerdown', function(){ slider.classList.remove('is-focused'); });
       range.addEventListener('blur', function(){ slider.classList.remove('is-focused'); });
       var form = range.closest('form');
       if(form) form.addEventListener('submit', function(e){ e.preventDefault(); });

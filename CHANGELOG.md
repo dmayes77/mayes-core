@@ -2,9 +2,11 @@
 
 ## v2.0.3 — 2026-11-11
 
-Patch: the optional Before and After module is native only.
-- **Before and After v1.1.0:** the split always moves with `style.setProperty('--pos', …)`. It no longer calls `gsap.set` when GSAP is on the page; that was an instant set with no easing, so nothing visible changes and the module no longer depends on GSAP.
-- Tests: a page with a `gsap` object still moves the split inline and never calls it.
+Patch: the optional Before and After module is native only, and its focus ring is keyboard-only.
+- **Before and After v1.1.0:**
+  - The split always moves with `style.setProperty('--pos', …)`. It no longer calls `gsap.set` when GSAP is on the page; that was an instant set with no easing, so nothing visible changes and the module no longer depends on GSAP.
+  - `is-focused` (the focus ring) is added for keyboard focus only, like `:focus-visible`. A tap or click no longer shows it, so phones never see the ring after dragging.
+- Tests: a page with a `gsap` object still moves the split inline and never calls it; a click shows no ring, a key press does, and a pointer press or blur removes it.
 
 ## v2.0.2 — 2026-11-10
 
