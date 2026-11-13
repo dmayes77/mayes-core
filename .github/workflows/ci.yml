@@ -28,10 +28,8 @@ jobs:
       - name: Repo checks (syntax, dist up to date, product-neutral, versions)
         run: ./check.sh
 
-      - name: Install test tools (Playwright, GSAP for the GSAP tests)
-        run: |
-          pip install playwright
-          npm install --prefix test gsap
+      - name: Install test tools (Playwright)
+        run: pip install playwright
 
-      - name: Browser tests (phone and desktop, with and without GSAP)
+      - name: Browser tests (phone, desktop, reduced motion)
         run: python3 test/run.py
