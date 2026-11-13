@@ -3,7 +3,7 @@
 Run from the repo root after ./build.sh:
     python3 test/run.py
 Serves the repo locally and opens test/index.html (the master in miniature: Webflow's classes are in
-test/webflow.css) in headless Chrome at phone and desktop widths. Exercises Core v3: business fill, hours
+test/webflow.css) in headless Chrome at phone and desktop widths. Exercises Core v2.1 (native sheets): business fill, hours
 and JSON-LD, native sheets (Webflow Modals: open by name, events, backdrop tap, swipe down to close, slide and
 backdrop from core-base.css, scroll lock, reduced motion), consent, the announcement offset, the install banner (iPhone, Android prompt,
 in-app browser, standalone, desktop), core-base.css, safe areas and the optional Before and After module.

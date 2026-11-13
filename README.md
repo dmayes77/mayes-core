@@ -44,11 +44,11 @@ Head (consent snippet first, above any Google tag; then the app snippet; then th
 
     <!-- paste dist/core-consent-head.html here -->
     <!-- paste dist/core-app-head.html here (set the short name and theme color) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v3.0.0/dist/core.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v2.1.0/dist/core.css">
 
 Footer:
 
-    <script src="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v3.0.0/dist/core.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v2.1.0/dist/core.js" defer></script>
 
 `core.js` = sheet + consent + business (+ JSON-LD) + announcement + install. Each module also ships alone in `dist/`.
 
@@ -88,4 +88,4 @@ Built files go to `dist/`, which is what Webflow loads.
 
 Webflow sites load tagged releases only — never `@main`. See `docs/RELEASES.md`.
 
-> v3.0.0 replaced the sheet engine and the Sheet / Host component with native Webflow Modals (see the upgrade note in `CHANGELOG.md`). v2.0.0 removed `core-bottom-nav.*`, `core-motion.js` and every module stylesheet from `dist/`. Sites pinned to a v1 tag keep loading them from that tag.
+> v2.1.0 replaced the sheet engine and the Sheet / Host component with native Webflow Modals (see the upgrade note in `CHANGELOG.md`). v2.0.0 removed `core-bottom-nav.*`, `core-motion.js` and every module stylesheet from `dist/`. Sites pinned to a v1 tag keep loading them from that tag.

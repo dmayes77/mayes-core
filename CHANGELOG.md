@@ -1,8 +1,10 @@
 # Changelog
 
-## v3.0.0 — 2026-11-13
+## v2.1.0 — 2026-11-13
 
-**Breaking.** Sheets are native Webflow Modals. Native first: Webflow and the browser now do what the sheet engine did, and Core keeps only what Webflow can't do.
+**Breaking, released as a minor.** Upgrading a v2.0.x site means rebuilding its sheets (see the upgrade note), which semver would number 3.0.0. It was released as v2.1.0 by choice; the module versions inside (Sheet v3.0.0, Base v3.0.0) still mark the breaking change. A `v3.0.0` tag was briefly created on the same commit and is not a release.
+
+Sheets are native Webflow Modals. Native first: Webflow and the browser now do what the sheet engine did, and Core keeps only what Webflow can't do.
 
 **What Webflow and the browser do now:** opening and closing from Webflow links (link mode "modal" › show / hide), focus moved in, trapped and returned, Escape, the inert page behind the sheet, the top layer, and light dismiss where `closedby="any"` is supported.
 
@@ -25,7 +27,7 @@
 1. Rebuild each sheet as a component whose root is a Modal with `data-sheet="NAME"` and `closedby="any"`: panel › grabber (`data-sheet-grabber`) › head (`data-sheet-head`, title, close link set to modal › hide) › body › footer. Style the Modal as a bottom sheet in Webflow (fixed, bottom 0, width 100%, max-width 36rem, margins auto, no border or padding, top radius).
 2. Remove Sheet / Host from the Page Shell.
 3. Keep `data-sheet-open` on triggers in other components. Inside a sheet's own component, use Webflow's modal link instead.
-4. Load `@v3.0.0` for both `core.css` and `core.js`.
+4. Load `@v2.1.0` for both `core.css` and `core.js`.
 
 **Tests:** native sheets: open by name, a missing name, events, backdrop tap and `closedby="none"`, close button, one sheet at a time, swipe (short drag springs back, long drag closes, body drag doesn't), slide-out before hiding, desktop size, reduced motion, safe areas. The GSAP runs are gone.
 
