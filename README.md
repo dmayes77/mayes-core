@@ -44,11 +44,11 @@ Head (consent snippet first, above any Google tag; then the app snippet; then th
 
     <!-- paste dist/core-consent-head.html here -->
     <!-- paste dist/core-app-head.html here (set the short name and theme color) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v2.1.0/dist/core.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v2.2.0/dist/core.css">
 
 Footer:
 
-    <script src="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v2.1.0/dist/core.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v2.2.0/dist/core.js" defer></script>
 
 `core.js` = sheet + consent + business (+ JSON-LD) + install. Each module also ships alone in `dist/`.
 

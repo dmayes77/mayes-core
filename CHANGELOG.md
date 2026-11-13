@@ -1,12 +1,14 @@
 # Changelog
 
-## Unreleased
+## v2.2.0 — 2026-11-13
+
+**Breaking, released as a minor** (like v2.1.0): it removes a file and an API, which semver would number 3.0.0. The master upgrades with no changes.
 
 **Announcement bar is native.** `core-announcement.js` is removed (from `dist/` and the `core.js` bundle), and with it `window.CoreAnnouncement` and the `--core-announcement-offset` variable.
 
 On the master the bar sits in the Page Shell above the header, in normal page flow, so it scrolls away; the Glass header is `position: sticky; top: 0`, so it pins at the top once the bar is gone. The text comes from the Business Settings **Announcement** field through Core Business (`data-business="announcement" data-business-empty="hide"`, plus the `hidden` attribute so an empty bar never flashes). Tested on the master 2026-11-13.
 
-**Upgrade note (Webflow):** a site whose header class uses `top: var(--core-announcement-offset, 0px)` should set `top: 0` and make the header sticky (its parent must run the full page height, like `page-shell`). Remove `data-announcement` from the bar. Under semver this removal is a major change; pick the version when tagging.
+**Upgrade note (Webflow):** a site whose header class uses `top: var(--core-announcement-offset, 0px)` should set `top: 0` and make the header sticky (its parent must run the full page height, like `page-shell`). Remove `data-announcement` from the bar.
 
 **Tests:** the announcement-offset checks are replaced by: the bar fills from Business Settings, and the offset variable is gone.
 
