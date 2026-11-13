@@ -40,7 +40,7 @@ Footer  4. (GSAP)                         only if a project's own script uses it
 
 | Layer | File | Lives in | Example |
 |---|---|---|---|
-| Base | `dist/core.css`, `dist/core.js` | this repo | sheet helper (open by name, swipe to close), consent, business record and JSON-LD, announcement offset, install banner logic |
+| Base | `dist/core.css`, `dist/core.js` | this repo | sheet helper (open by name, swipe to close), consent, business record and JSON-LD, install banner logic |
 | Product | `products/<name>/dist/<name>.css` / `.js` | this repo, `products/` | ShopFlow cart and product page; DetailFlow booking |
 | Client | none by default | Webflow inline custom code, kept tiny | a one-off tweak for one client |
 
