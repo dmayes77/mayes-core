@@ -44,21 +44,21 @@ Head (consent snippet first, above any Google tag; then the app snippet; then th
 
     <!-- paste dist/core-consent-head.html here -->
     <!-- paste dist/core-app-head.html here (set the short name and theme color) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v2.0.2/dist/core.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v3.0.0/dist/core.css">
 
-Footer (after GSAP, if the site uses it):
+Footer:
 
-    <script src="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v2.0.2/dist/core.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v3.0.0/dist/core.js" defer></script>
 
 `core.js` = sheet + consent + business (+ JSON-LD) + announcement + install. Each module also ships alone in `dist/`.
 
-`core.css` is only `core-base.css`: rules Webflow's style panel can't express (the `[hidden]` guard, `<html>` scroll behavior and the sheet scroll lock, tap highlight, reduced motion). **Core v2 ships no look and no layout.** Every visual, including sheet positions, safe areas and the install banner's position, is a Webflow class, and Core only toggles `is-*` combo classes that Webflow styles. See `docs/NATIVE_FIRST.md`.
+`core.css` is only `core-base.css`: rules Webflow's style panel can't express (the `[hidden]` guard, `<html>` scroll behavior, the sheet slide, `::backdrop` and scroll lock, tap highlight, reduced motion). **Core ships no look and no layout.** Every visual, including the sheets, safe areas and the install banner's position, is a Webflow class, and Core only toggles `is-*` combo classes that Webflow styles. See `docs/NATIVE_FIRST.md`.
 
 Sites built on v1 (DetailFlow, ShopFlow) stay pinned to their v1 tag until they're rebuilt on the master's components.
 
 | Module | Public API | Main attributes |
 |---|---|---|
-| Sheet | `CoreSheet.open/close/show` | `data-sheet`, `data-sheet-open`, `data-sheet-open-mode`, `data-sheet-mode`, `data-sheet-height`; the Sheet / Host component (`data-sheet-host`) is required. Combos: `is-open`, `is-visible`, `is-bottom/center/left/right`, `is-compact/medium/tall/full`, `is-gsap` |
+| Sheet | `CoreSheet.open/close/current/get` | Each sheet is a native Webflow Modal with `data-sheet="NAME"`; `data-sheet-open="NAME"` opens it from anywhere, `data-sheet-grabber` / `data-sheet-head` start swipe-down-to-close, `data-sheet-close` closes. Events `sheet:open` / `sheet:close` |
 | Consent | `CoreConsent.get/set/open` | `data-consent-switch`, `data-consent-action`, `data-consent` (gated scripts) |
 | Business | `CoreBusiness.get/all/hours/fill` | `data-business-field` (source), `data-business` (target), `data-business-href`, `data-business-empty="hide"`, `data-business-hours`, `data-business-today` |
 | Announcement | `CoreAnnouncement.refresh` | `data-announcement`; sets `--core-announcement-offset` (use it as the header class's `top`) |
@@ -68,13 +68,13 @@ Sites built on v1 (DetailFlow, ShopFlow) stay pinned to their v1 tag until they'
 ## Checks and tests
 
     ./check.sh            # syntax, dist in sync, product-neutral, version headers
-    python3 test/run.py   # browser tests (first time: npm install --prefix test gsap)
+    python3 test/run.py   # browser tests (needs Playwright and Chrome)
 
 ## Motion and the bottom nav
 
 Both are native Webflow since v2.0.0, so Core has no script for them:
 - **Motion:** the master's site-wide Interactions (Core / Fade, Rise, Scale, Stagger, Hero) target `[data-motion="…"]`.
-- **Bottom nav:** each tab is a link. Sheet tabs carry `data-sheet-open="NAME"`, which the sheet engine handles, and the active tab is styled with Webflow's **Current** state.
+- **Bottom nav:** each tab is a link. Sheet tabs carry `data-sheet-open="NAME"`, which opens that sheet's Modal, and the active tab is styled with Webflow's **Current** state.
 
 ## Development
 
@@ -88,4 +88,4 @@ Built files go to `dist/`, which is what Webflow loads.
 
 Webflow sites load tagged releases only — never `@main`. See `docs/RELEASES.md`.
 
-> v2.0.0 removed `core-bottom-nav.*`, `core-motion.js` and every module stylesheet from `dist/`. Sites pinned to a v1 tag keep loading them from that tag.
+> v3.0.0 replaced the sheet engine and the Sheet / Host component with native Webflow Modals (see the upgrade note in `CHANGELOG.md`). v2.0.0 removed `core-bottom-nav.*`, `core-motion.js` and every module stylesheet from `dist/`. Sites pinned to a v1 tag keep loading them from that tag.

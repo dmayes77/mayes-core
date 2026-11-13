@@ -4,11 +4,11 @@
 
 Webflow sites load files from this repo through jsDelivr **by release tag only**:
 
-    https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v2.0.3/dist/core.js
+    https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v3.0.0/dist/core.js
 
 Never `@main`, never `@stable`, never a bare commit. A push to `main` must never change a live site.
 
-CI (`.github/workflows/ci.yml`) runs `./check.sh` and `test/run.py`, GSAP tests included, on every pull request and every push to `main`. Only tag a commit whose CI run is green.
+CI (`.github/workflows/ci.yml`) runs `./check.sh` and `test/run.py` on every pull request and every push to `main`. Only tag a commit whose CI run is green.
 
 ## Tags
 
@@ -30,7 +30,8 @@ CI (`.github/workflows/ci.yml`) runs `./check.sh` and `test/run.py`, GSAP tests 
 | `v2.0.0` | Native CSS: Core ships no look or layout; the sheet engine sets `is-*` combos that Webflow styles; bottom-nav and motion scripts, the built sheet host and install banner, and every module stylesheet removed. **Breaking.** | superseded by v2.0.1 |
 | `v2.0.1` | Alt text on every image Core fills (logo with no logo set, install icon); empty `data-sheet-open` is a plain link; stale slot comments fixed | superseded by v2.0.2 |
 | `v2.0.2` | Empty `data-consent-action` / `data-install-action` are ignored; Install hides the whole `[data-core-button]` wrapper, so the Button component can carry both | superseded by v2.0.3 |
-| `v2.0.3` | Before and After v1.1.0: native only (no GSAP), focus ring for keyboard only. `core.js` and `core.css` are unchanged from v2.0.2 | latest; the $500 Base site and every new site. v1 sites stay on v1 tags |
+| `v2.0.3` | Before and After v1.1.0: native only (no GSAP), focus ring for keyboard only. `core.js` and `core.css` are unchanged from v2.0.2 | superseded by v3.0.0 |
+| `v3.0.0` | Native sheets: each sheet is a Webflow Modal; the sheet engine, Sheet / Host, modes, heights and GSAP motion removed; `core-sheet.js` keeps open by name, tap outside and swipe down to close; `core-base.css` adds the slide, backdrop and scroll lock. **Breaking.** | latest (once tagged); the $500 Base site and every new site. v1 sites stay on v1 tags |
 
 ## Cutting a release
 
@@ -47,7 +48,7 @@ Every tag is `vMAJOR.MINOR.PATCH`. Bump the part that matches the most significa
 **Core's public API** is everything a Webflow site depends on:
 - the `data-*` attributes Core reads, and their values
 - the classes Core adds or reads (`is-open`, `is-visible`, `is-on`, `is-disabled`, `is-business-filled`, …)
-- the markup contracts of the components Core adopts (Sheet / Host, Core / Install Banner, the business data layer)
+- the markup contracts of the components Core works with (the sheet Modals, Core / Install Banner, the business data layer)
 - the `window.Core*` APIs and the `core:*` and `sheet:*` events
 - the head snippets and meta switches (`core-motion`)
 - the file paths in `dist/`

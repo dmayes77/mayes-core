@@ -33,14 +33,14 @@ One base serves every project. A project adds its own script only when it needs 
 Head    1. consent head snippet          (dist/core-consent-head.html, pasted inline, above any Google tag)
         2. core.css                       every site
         3. <project>.css                  only if the project has one
-Footer  4. GSAP                           optional: the sheet engine animates with it when loaded
+Footer  4. (GSAP)                         only if a project's own script uses it; Core doesn't
         5. core.js                        every site
         6. <project>.js                   only if the project has one
 ```
 
 | Layer | File | Lives in | Example |
 |---|---|---|---|
-| Base | `dist/core.css`, `dist/core.js` | this repo | sheet engine, consent, business record and JSON-LD, announcement offset, install banner logic |
+| Base | `dist/core.css`, `dist/core.js` | this repo | sheet helper (open by name, swipe to close), consent, business record and JSON-LD, announcement offset, install banner logic |
 | Product | `products/<name>/dist/<name>.css` / `.js` | this repo, `products/` | ShopFlow cart and product page; DetailFlow booking |
 | Client | none by default | Webflow inline custom code, kept tiny | a one-off tweak for one client |
 
@@ -64,10 +64,10 @@ Desktop is a normal website. Phones and tablets get an app-style layer from Core
 
 - **Brand bar:** logo plus one useful action.
 - **Bottom nav:** 3–5 tabs; each tab is a link (a sheet tab adds `data-sheet-open="NAME"`); the active tab uses Webflow's Current state.
-- **Sheets:** one shared engine and one designed host (Sheet / Host); bottom sheet on phones, drawer or dialog above; heights compact / medium / tall / full. Core sets `is-*` combos, Webflow styles them.
+- **Sheets:** each sheet is a native Webflow Modal (`<dialog>`) in its own component, designed as a bottom sheet: full width and flush to the bottom on phones, 36rem wide and centered at the bottom above. Webflow and the browser handle opening and closing links, focus, Escape and the inert page; `core-base.css` adds the slide, backdrop and scroll lock; `core-sheet.js` adds open-by-name, tap-outside for Safari and swipe down to close.
 - **Site Settings:** the More sheet, with contact, hours and privacy/cookie controls.
 
-Markup contract: `data-bottom-nav`, `data-sheet`, `data-sheet-open`, `data-sheet-open-mode`, `data-sheet-mode`, `data-sheet-height`, `data-sheet-host` (and its parts), `data-install-banner` (and its parts), `data-consent-*`.
+Markup contract: `data-bottom-nav`, `data-sheet` (on the Modal), `data-sheet-open`, `data-sheet-grabber`, `data-sheet-head`, `data-sheet-close`, `data-install-banner` (and its parts), `data-consent-*`.
 
 ## Business record (CMS)
 

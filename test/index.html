@@ -65,33 +65,62 @@
       <a class="link-overlay" href="#cb-target" aria-label="Go" data-sheet-open="" data-business="" data-business-href="" data-consent-action="" data-install-action="" id="cb-plain-link"></a></div>
     <div class="button" data-core-button id="cb-necessary"><div class="button-text">Necessary only</div>
       <a class="link-overlay" href="#" aria-label="Necessary only" data-consent-action="necessary" id="cb-necessary-link"></a></div>
-    <button data-sheet-open="services" data-sheet-open-mode="right" id="open-right">Services in a drawer</button>
+    <a href="#no-such-sheet" data-sheet-open="nope" id="open-missing">Sheet that doesn't exist</a>
   </main>
 
-  <!-- shell-sheets: sheet content blocks -->
-  <div data-sheet="services" data-sheet-title="Services" data-sheet-height="medium" class="is-hidden">
-    <a href="#drains" id="svc-first">Drain cleaning</a>
-    <a href="#heaters">Water heaters</a>
-  </div>
-  <div data-sheet="location" data-sheet-title="Location" class="is-hidden">
-    <p data-business="address"></p>
-  </div>
-  <div data-sheet="site-settings" data-sheet-title="Settings" class="is-hidden">
-    <div data-settings-section="privacy">
-      <div data-settings-row><span data-settings-row-title>Essential</span><a href="#" class="settings_switch" data-consent-switch="essential" id="sw-essential" aria-label="Essential"></a></div>
-      <div data-settings-row><span data-settings-row-title>Analytics</span><a href="#" class="settings_switch" data-consent-switch="analytics" id="sw-analytics" aria-label="Analytics"></a></div>
-      <div data-settings-row><span data-settings-row-title>Marketing</span><a href="#" class="settings_switch" data-consent-switch="marketing" id="sw-marketing" aria-label="Marketing"></a></div>
-      <button data-consent-action="save" id="save">Save</button>
+  <!-- shell-sheets: native Webflow Modals (<dialog>) styled as bottom sheets -->
+  <dialog class="sheet" data-sheet="services" closedby="any" aria-labelledby="services-title">
+    <div class="sheet_panel">
+      <div class="sheet_grabber" data-sheet-grabber aria-hidden="true"><div class="sheet_bar"></div></div>
+      <div class="sheet_head" data-sheet-head><h2 class="sheet_title" id="services-title">Services</h2>
+        <a href="#" class="sheet_close" data-sheet-close aria-label="Close services" id="services-close">×</a></div>
+      <div class="sheet_body">
+        <a href="#drains" id="svc-first">Drain cleaning</a>
+        <a href="#heaters">Water heaters</a>
+        <div style="height:1200px">tall content (scrolls inside the sheet)</div>
+      </div>
     </div>
-    <div data-settings-section="app">
-      <a href="#" data-install-open id="install-open">Add to Home Screen</a>
+  </dialog>
+  <dialog class="sheet" data-sheet="location" closedby="any" aria-labelledby="location-title">
+    <div class="sheet_panel">
+      <div class="sheet_grabber" data-sheet-grabber aria-hidden="true"><div class="sheet_bar"></div></div>
+      <div class="sheet_head" data-sheet-head><h2 class="sheet_title" id="location-title">Location</h2>
+        <a href="#" class="sheet_close" data-sheet-close aria-label="Close location" id="location-close">×</a></div>
+      <div class="sheet_body">
+        <p data-business="address"></p>
+      </div>
     </div>
-  </div>
-  <div data-sheet="cookie-notice" data-sheet-mode="bottom" data-sheet-height="compact" class="is-hidden">
-    <p>We use cookies.</p>
-    <button data-consent-action="accept-all" id="accept-all">Accept all</button>
-    <button data-consent-action="necessary" id="necessary">Necessary only</button>
-  </div>
+  </dialog>
+  <dialog class="sheet" data-sheet="site-settings" closedby="any" aria-labelledby="site-settings-title">
+    <div class="sheet_panel">
+      <div class="sheet_grabber" data-sheet-grabber aria-hidden="true"><div class="sheet_bar"></div></div>
+      <div class="sheet_head" data-sheet-head><h2 class="sheet_title" id="site-settings-title">Settings</h2>
+        <a href="#" class="sheet_close" data-sheet-close aria-label="Close settings" id="site-settings-close">×</a></div>
+      <div class="sheet_body">
+        <div data-settings-section="privacy">
+          <div data-settings-row><span data-settings-row-title>Essential</span><a href="#" class="settings_switch" data-consent-switch="essential" id="sw-essential" aria-label="Essential"></a></div>
+          <div data-settings-row><span data-settings-row-title>Analytics</span><a href="#" class="settings_switch" data-consent-switch="analytics" id="sw-analytics" aria-label="Analytics"></a></div>
+          <div data-settings-row><span data-settings-row-title>Marketing</span><a href="#" class="settings_switch" data-consent-switch="marketing" id="sw-marketing" aria-label="Marketing"></a></div>
+        </div>
+        <div data-settings-section="app">
+          <a href="#" data-install-open id="install-open">Add to Home Screen</a>
+        </div>
+      </div>
+      <div class="button-group"><button data-consent-action="save" id="save">Save</button></div>
+    </div>
+  </dialog>
+  <dialog class="sheet" data-sheet="cookie-notice" closedby="any" aria-labelledby="cookie-notice-title">
+    <div class="sheet_panel">
+      <div class="sheet_grabber" data-sheet-grabber aria-hidden="true"><div class="sheet_bar"></div></div>
+      <div class="sheet_head" data-sheet-head><h2 class="sheet_title" id="cookie-notice-title">We use cookies</h2>
+        <a href="#" class="sheet_close" data-sheet-close aria-label="Close we use cookies" id="cookie-notice-close">×</a></div>
+      <div class="sheet_body">
+        <p>We use cookies.</p>
+      </div>
+      <div class="button-group"><button data-consent-action="accept-all" id="accept-all">Accept all</button>
+        <button data-consent-action="necessary" id="necessary">Necessary only</button></div>
+    </div>
+  </dialog>
 
   <!-- shell-mobile-nav: tabs are links; sheet tabs carry data-sheet-open (no bottom-nav script) -->
   <div class="bottom-nav" data-bottom-nav>
@@ -99,22 +128,11 @@
       <div class="bottom-nav_tab"><a class="bottom-nav_hit w--current" aria-current="page" href="/test/_plain.html" id="tab-home">Home</a></div>
       <div class="bottom-nav_tab"><a class="bottom-nav_hit" href="/services" data-sheet-open="services" id="tab-services">Services</a></div>
       <div class="bottom-nav_tab"><a class="bottom-nav_hit" href="#location" data-sheet-open="location" id="tab-location">Location</a></div>
-      <div class="bottom-nav_tab"><a class="bottom-nav_hit" href="#more" data-sheet-open="site-settings" data-sheet-open-mode="bottom" id="tab-more">More</a></div>
+      <div class="bottom-nav_tab"><a class="bottom-nav_hit" href="#more" data-sheet-open="site-settings" id="tab-more">More</a></div>
     </nav>
   </div>
 
-  <!-- Page Shell root: Sheet / Host and Core / Install Banner, designed in Webflow -->
-  <div class="sheet-host" data-sheet="drawer" data-sheet-host aria-hidden="true">
-    <div class="sheet-host_overlay" data-sheet-overlay></div>
-    <div class="sheet-host_panel" data-sheet-panel>
-      <div class="sheet-host_grabber" data-sheet-grabber><div class="sheet-host_bar"></div></div>
-      <div class="sheet-host_head" data-sheet-head>
-        <h2 class="sheet-host_title" data-sheet-title>Title</h2>
-        <a href="#" class="sheet-host_close" data-sheet-close role="button" aria-label="Close" id="host-close">×</a>
-      </div>
-      <div class="sheet-host_body" data-sheet-body><p>Host body placeholder</p></div>
-    </div>
-  </div>
+  <!-- Page Shell root: Core / Install Banner, designed in Webflow -->
   <div class="install-banner" data-install-banner id="banner">
     <img data-install-icon src="placeholder.svg" alt="">
     <div><p data-install-title>Add this site to your Home Screen</p><span data-install-name>name</span>
@@ -128,7 +146,6 @@
     <a href="#" data-install-action="dismiss" id="banner-close">×</a>
   </div>
 
-  <!--GSAP-->
-  <script src="../dist/core.js" defer></script>
+    <script src="../dist/core.js" defer></script>
 </body>
 </html>

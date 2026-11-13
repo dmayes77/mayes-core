@@ -1,5 +1,31 @@
 # Changelog
 
+## v3.0.0 — 2026-11-13
+
+**Breaking.** Sheets are native Webflow Modals. Native first: Webflow and the browser now do what the sheet engine did, and Core keeps only what Webflow can't do.
+
+**What Webflow and the browser do now:** opening and closing from Webflow links (link mode "modal" › show / hide), focus moved in, trapped and returned, Escape, the inert page behind the sheet, the top layer, and light dismiss where `closedby="any"` is supported.
+
+**Sheet v3.0.0** (`core-sheet.js`, 396 → about 120 lines):
+- `[data-sheet-open="NAME"]` opens the Modal with `data-sheet="NAME"` from anywhere on the page. A Webflow modal link can only target a Modal in the same component, and the bottom nav, the top nav's ⋯ button, the footer and the Button component's Opens Sheet prop all live in other components. An empty value, or a name with no sheet on the page, leaves a plain link.
+- Swipe down on `[data-sheet-grabber]` or `[data-sheet-head]` (not their buttons or links) to close. The sheet follows the finger and springs back on a short drag.
+- A tap on the backdrop closes the sheet in browsers without `closedby="any"` (Safari). `closedby="none"` opts out.
+- `[data-sheet-close]` closes the sheet it is in.
+- `sheet:open` / `sheet:close` fire on the Modal however it was opened.
+- Opening a sheet closes any other open sheet.
+- `window.CoreSheet`: `open(name)`, `close([name], {instant})`, `current()`, `top()`, `get(name)`. Consent and Install use these and are unchanged.
+- Removed: the Sheet / Host component and everything it carried (`data-sheet-host`, `-panel`, `-overlay`, `-body`, `-footer`, `-title` handling), moving content into the host, `data-sheet-mode`, `data-sheet-open-mode`, `data-sheet-height`, `data-sheet-width`, `CoreSheet.show()`, `CoreSheet.host()`, `CoreSheet.presentation()`, the `is-open / is-visible / is-bottom / is-center / is-left / is-right / is-compact / is-medium / is-tall / is-full / is-gsap` combos, the GSAP motion, the body pinning and the scrollbar-gutter tint.
+
+**Base v3.0.0** (`core-base.css`): for `dialog[data-sheet]`, the slide up and down (`@starting-style`, `transition-behavior: allow-discrete`), the dimmed `::backdrop`, the scroll lock (`html:has(dialog[data-sheet][open])`) and reduced motion. The style panel can't target `[open]`, `::backdrop` or `@starting-style`. `html.sheet-lock` is gone.
+
+**Upgrade note (Webflow):**
+1. Rebuild each sheet as a component whose root is a Modal with `data-sheet="NAME"` and `closedby="any"`: panel › grabber (`data-sheet-grabber`) › head (`data-sheet-head`, title, close link set to modal › hide) › body › footer. Style the Modal as a bottom sheet in Webflow (fixed, bottom 0, width 100%, max-width 36rem, margins auto, no border or padding, top radius).
+2. Remove Sheet / Host from the Page Shell.
+3. Keep `data-sheet-open` on triggers in other components. Inside a sheet's own component, use Webflow's modal link instead.
+4. Load `@v3.0.0` for both `core.css` and `core.js`.
+
+**Tests:** native sheets: open by name, a missing name, events, backdrop tap and `closedby="none"`, close button, one sheet at a time, swipe (short drag springs back, long drag closes, body drag doesn't), slide-out before hiding, desktop size, reduced motion, safe areas. The GSAP runs are gone.
+
 ## v2.0.3 — 2026-11-11
 
 Patch: the optional Before and After module is native only, and its focus ring is keyboard-only.

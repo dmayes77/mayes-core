@@ -3,9 +3,9 @@
 Run from the repo root after ./build.sh:
     python3 test/run.py
 Serves the repo locally and opens test/index.html (the master in miniature: Webflow's classes are in
-test/webflow.css) in headless Chrome at phone and desktop widths. Exercises Core v2: business fill, hours
-and JSON-LD, the sheet engine's is-* combos (bottom sheet, dialog, drawers, heights, GSAP, reduced motion,
-iPhone-safe scroll lock), consent, the announcement offset, the install banner (iPhone, Android prompt,
+test/webflow.css) in headless Chrome at phone and desktop widths. Exercises Core v3: business fill, hours
+and JSON-LD, native sheets (Webflow Modals: open by name, events, backdrop tap, swipe down to close, slide and
+backdrop from core-base.css, scroll lock, reduced motion), consent, the announcement offset, the install banner (iPhone, Android prompt,
 in-app browser, standalone, desktop), core-base.css, safe areas and the optional Before and After module.
 """
 import http.server, os, socketserver, sys, threading, tempfile, shutil
@@ -20,13 +20,12 @@ def check(name, ok, detail=""):
     print(("PASS " if ok else "FAIL ") + name + (f"  ({detail})" if detail and not ok else ""))
     if not ok: failures.append(name)
 
-def make_page(gsap_paths=None):
-    """Write a variant of test/index.html with the consent head snippet (and optionally GSAP) inlined."""
+def make_page():
+    """Write a variant of test/index.html with the consent head snippet inlined."""
     src = open(os.path.join(ROOT, "test/index.html")).read()
     head = open(os.path.join(ROOT, "dist/core-consent-head.html")).read()
-    gsap = "".join(f'<script src="{p}"></script>' for p in (gsap_paths or []))
-    name = "_gsap.html" if gsap_paths else "_plain.html"
-    out = src.replace("<!--CONSENT_HEAD-->", head).replace("<!--GSAP-->", gsap).replace("/test/index.html", "/test/" + name)
+    name = "_plain.html"
+    out = src.replace("<!--CONSENT_HEAD-->", head).replace("/test/index.html", "/test/" + name)
     open(os.path.join(ROOT, "test", name), "w").write(out)
     return f"/test/{name}"
 
@@ -43,13 +42,11 @@ def serve():
 def run():
     httpd = serve()
     plain = make_page()
-    gsap_dir = os.path.join(ROOT, "test/node_modules/gsap/dist")
-    gsap = make_page(["/test/node_modules/gsap/dist/gsap.min.js", "/test/node_modules/gsap/dist/ScrollTrigger.min.js"]) if os.path.isdir(gsap_dir) else None
     base = f"http://127.0.0.1:{PORT}"
     with sync_playwright() as p:
         browser = p.chromium.launch(executable_path="/usr/bin/google-chrome", args=["--no-sandbox"])
 
-        # ---------- phone, no GSAP ----------
+        # ---------- phone ----------
         ctx = browser.new_context(viewport={"width": 390, "height": 844})
         pg = ctx.new_page()
         errors = []
@@ -57,13 +54,13 @@ def run():
         pg.on("console", lambda m: m.type == "error" and not m.text.startswith("Failed to load resource") and errors.append(m.text))
         pg.on("response", lambda r: r.status >= 400 and not r.url.endswith("placeholder.svg") and errors.append(f"{r.status} {r.url}"))
         pg.goto(base + plain); pg.wait_for_load_state("load")
-        check("globals present, v2 modules only", pg.evaluate("!!(window.CoreSheet && window.CoreConsent && window.CoreBusiness && window.CoreAnnouncement && window.CoreInstall) && !window.CoreMotion && !window.__coreBottomNav"))
-        check("versions are 2.0.0", pg.evaluate("[CoreSheet, CoreConsent, CoreBusiness, CoreAnnouncement, CoreInstall].every(m => m.version === '2.0.0')"))
+        check("globals present, no retired modules", pg.evaluate("!!(window.CoreSheet && window.CoreConsent && window.CoreBusiness && window.CoreAnnouncement && window.CoreInstall) && !window.CoreMotion && !window.__coreBottomNav"))
+        check("versions: Sheet 3.0.0, the rest 2.0.0", pg.evaluate("CoreSheet.version === '3.0.0' && [CoreConsent, CoreBusiness, CoreAnnouncement, CoreInstall].every(m => m.version === '2.0.0')"))
         css = open(os.path.join(ROOT, "dist/core.css")).read()
         rules = css.split("*/", 1)[1] if "*/" in css else css
         import re as _re
         classes = set(_re.findall(r"\.([a-zA-Z][\w-]*)", "".join(_re.split(r"/\*.*?\*/", rules, flags=_re.S))))
-        check("core.css styles no Webflow classes (only html.sheet-lock)", classes <= {"sheet-lock"}, classes)
+        check("core.css styles no Webflow classes", not classes, classes)
         check("phone filled", pg.text_content("#phone") == "(423) 555-0100", pg.text_content("#phone"))
         check("phone link", pg.get_attribute("#phone", "href") == "tel:4235550100", pg.get_attribute("#phone", "href"))
         check("email link", pg.get_attribute("#email", "href") == "mailto:hello@example.com")
@@ -96,13 +93,16 @@ def run():
         today = pg.text_content("#today")
         check("today line", today.startswith("Open today") or today == "Closed today", today)
 
-        H = "document.querySelector('[data-sheet-host]')"
-        P = "document.querySelector('[data-sheet-panel]')"
-        cls = lambda sel: pg.evaluate(f"{sel}.className")
-        check("host adopted, moved to <body>, aria-hidden removed", pg.evaluate(f"document.querySelectorAll('[data-sheet-host]').length === 1 && {H}.parentNode === document.body && !{H}.hasAttribute('aria-hidden')"))
-        check("host placeholder cleared", "Host body placeholder" not in pg.text_content("[data-sheet-host]"))
+        S = lambda n: f"document.querySelector('dialog[data-sheet=\"{n}\"]')"
+        is_open = lambda n: pg.evaluate(f"{S(n)}.open && {S(n)}.matches(':modal')")
+        R = lambda n: pg.evaluate(f"(() => {{ const r = {S(n)}.getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top), Math.round(r.right), Math.round(r.bottom)]; }})()")
+        pg.evaluate("window.__ev = []; ['sheet:open','sheet:close'].forEach(t => document.addEventListener(t, e => __ev.push(t + ':' + e.target.getAttribute('data-sheet'))))")
+        check("sheets closed: not displayed, nothing open", pg.evaluate("[...document.querySelectorAll('dialog[data-sheet]')].every(d => !d.open && getComputedStyle(d).display === 'none')") and pg.evaluate("CoreSheet.current() === null"))
         pg.click("#open-empty"); pg.wait_for_timeout(200)
         check("empty data-sheet-open: plain link, no sheet", pg.evaluate("location.hash === '#plain-link' && !CoreSheet.current()"))
+        pg.evaluate("history.replaceState(null, '', location.pathname)")
+        pg.click("#open-missing"); pg.wait_for_timeout(200)
+        check("data-sheet-open with no such sheet: plain link", pg.evaluate("location.hash === '#no-such-sheet' && !CoreSheet.current() && CoreSheet.open('nope') === null"))
         pg.evaluate("history.replaceState(null, '', location.pathname)")
         check("button component: empty behavior attributes leave a plain link", pg.evaluate("""(() => { const a = document.getElementById('cb-plain-link');
             return a.getAttribute('href') === '#cb-target' && !a.hasAttribute('role') && !a.hasAttribute('tabindex'); })()"""))
@@ -110,50 +110,94 @@ def run():
         check("button component: empty behavior attributes still navigate", pg.evaluate("location.hash === '#cb-target' && !CoreSheet.current()"))
         pg.evaluate("history.replaceState(null, '', location.pathname)")
         check("button component: consent action link becomes a button", pg.get_attribute("#cb-necessary-link", "role") == "button" and pg.get_attribute("#cb-necessary-link", "href") is None)
-        check("host closed: hidden by its class", pg.evaluate(f"getComputedStyle({H}).display") == "none")
 
         # cookie notice appears ~1.2s after first visit
         pg.wait_for_timeout(1500)
-        check("cookie notice opens on first visit", pg.evaluate("CoreSheet.current() && CoreSheet.current().getAttribute('data-sheet') === 'cookie-notice'"))
-        check("cookie notice: bottom + compact combos", all(c in cls(P).split() for c in ("is-bottom", "is-compact", "is-visible")), cls(P))
+        check("cookie notice opens on first visit, as a modal dialog", is_open("cookie-notice") and pg.evaluate("CoreSheet.current().getAttribute('data-sheet') === 'cookie-notice'"))
+        check("sheet:open fired for the cookie notice", "sheet:open:cookie-notice" in pg.evaluate("__ev"), pg.evaluate("__ev"))
         pg.click("#accept-all"); pg.wait_for_timeout(400)
         saved = pg.evaluate("JSON.parse(localStorage.getItem('core-consent-v1'))")
         check("accept-all saved", bool(saved and saved["analytics"] and saved["marketing"]), saved)
         check("consent update sent to gtag", pg.evaluate("__gtagCalls.some(c => c[0]==='consent' && c[1]==='update' && c[2].analytics_storage==='granted')"))
-        check("combos cleared after close", not any(c in cls(P).split() for c in ("is-bottom", "is-compact", "is-visible")), cls(P))
+        check("accept-all closes the notice, sheet:close fired", not is_open("cookie-notice") and "sheet:close:cookie-notice" in pg.evaluate("__ev"))
 
         # bottom sheet from a tab link (opened while scrolled down, to test the scroll lock)
         pg.evaluate("window.scrollTo(0, 300)"); pg.wait_for_timeout(100)
         url = pg.url
         pg.click("#tab-services"); pg.wait_for_timeout(450)
-        check("tab link with data-sheet-open opens the sheet, no navigation", pg.url == url and pg.evaluate(f"{H}.classList.contains('is-open')"))
-        check("host: data-sheet-as and is-open/is-visible", pg.get_attribute("[data-sheet-host]", "data-sheet-as") == "bottom" and all(c in cls(H).split() for c in ("is-open", "is-visible")), cls(H))
-        check("panel: is-bottom is-medium is-visible", all(c in cls(P).split() for c in ("sheet-host_panel", "is-bottom", "is-medium", "is-visible")), cls(P))
-        check("grabber, head and overlay get their combos", "is-bottom" in cls("document.querySelector('[data-sheet-grabber]')") and "is-bottom" in cls("document.querySelector('[data-sheet-head]')") and "is-visible" in cls("document.querySelector('[data-sheet-overlay]')"))
-        R = f"(() => {{ const r = {P}.getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top), Math.round(r.right), Math.round(r.bottom)]; }})()"
-        r = pg.evaluate(R); cw = pg.evaluate(f"Math.round({H}.getBoundingClientRect().width)")
-        check("bottom sheet: full width at the bottom, medium height", r[0] == 0 and r[2] == cw and r[3] == 844 and r[3] - r[1] <= round(844 * 0.7) + 1, r)
-        check("title set, close is a button", pg.text_content(".sheet-host_title") == "Services" and pg.get_attribute("#host-close", "role") == "button" and pg.get_attribute("#host-close", "href") is None)
-        check("focus moved into sheet", pg.evaluate(f"{H}.contains(document.activeElement)"))
-        check("page behind is inert", pg.evaluate("[...document.body.children].some(e => e.contains(document.querySelector('main')) && e.hasAttribute('inert'))"))
-        check("scroll locked", pg.evaluate("document.documentElement.classList.contains('sheet-lock')"))
-        check("body pinned (iPhone-safe lock)", pg.evaluate("document.body.style.position === 'fixed' && document.body.style.top === '-300px'"), pg.evaluate("[document.body.style.position, document.body.style.top]"))
+        check("tab link with data-sheet-open opens the sheet (showModal), no navigation", pg.url == url and is_open("services"))
+        r = R("services"); cw = pg.evaluate("Math.round(document.body.getBoundingClientRect().width)")   # page width (headless Chrome keeps a scrollbar gutter)
+        check("bottom sheet: full width, flush to the bottom, at most 88% tall", r[0] == 0 and r[2] == cw and r[3] == 844 and r[3] - r[1] <= round(844 * 0.88) + 1, r)
+        check("sheet slid in (no transform at rest)", pg.evaluate(f"getComputedStyle({S('services')}).transform") in ("none", "matrix(1, 0, 0, 1, 0, 0)"))
+        check("backdrop dims the page", pg.evaluate(f"getComputedStyle({S('services')}, '::backdrop').backgroundColor") == "rgba(17, 17, 17, 0.45)")
+        check("focus moved into sheet", pg.evaluate(f"{S('services')}.contains(document.activeElement)"))
+        check("page behind is inert (native modal)", pg.evaluate("document.elementFromPoint(195, 400) && !document.querySelector('main').contains(document.elementFromPoint(195, 30))"))
+        check("scroll locked", pg.evaluate("getComputedStyle(document.documentElement).overflowY === 'hidden' && getComputedStyle(document.body).overflowY === 'hidden'"))
         pg.keyboard.press("Escape"); pg.wait_for_timeout(450)
-        check("Escape closes, host hidden by its class", not pg.evaluate(f"{H}.classList.contains('is-open')") and pg.evaluate(f"getComputedStyle({H}).display") == "none")
-        check("scroll position restored", pg.evaluate("window.scrollY") == 300 and pg.evaluate("document.body.style.position") == "", pg.evaluate("window.scrollY"))
+        check("Escape closes, sheet no longer displayed", not is_open("services") and pg.evaluate(f"getComputedStyle({S('services')}).display") == "none")
+        check("scroll position kept", pg.evaluate("window.scrollY") == 300, pg.evaluate("window.scrollY"))
         check("focus returned to tab", pg.evaluate("document.activeElement === document.getElementById('tab-services')"))
-        check("content block restored", pg.evaluate("document.querySelector('[data-sheet=\"services\"]').contains(document.getElementById('svc-first'))"))
-        check("Webflow classes kept after close", cls(H) == "sheet-host" and cls(P) == "sheet-host_panel", [cls(H), cls(P)])
+        check("sheet:open and sheet:close fired for services", all(e in pg.evaluate("__ev") for e in ("sheet:open:services", "sheet:close:services")), pg.evaluate("__ev"))
+
+        # close button, backdrop tap, closedby="none"
+        pg.click("#tab-services"); pg.wait_for_timeout(450)
+        pg.click("#services-close"); pg.wait_for_timeout(450)
+        check("[data-sheet-close] closes, link not followed", not is_open("services") and pg.evaluate("location.hash") == "")
+        pg.click("#tab-location"); pg.wait_for_timeout(450)
+        r = R("location")
+        pg.mouse.click(195, max(10, r[1] - 40)); pg.wait_for_timeout(450)
+        check("tap on the backdrop closes", not is_open("location"))
+        pg.evaluate(f"{S('location')}.setAttribute('closedby', 'none'); CoreSheet.open('location')"); pg.wait_for_timeout(450)
+        pg.mouse.click(195, max(10, R("location")[1] - 40)); pg.wait_for_timeout(300)
+        check("closedby=\"none\": backdrop tap does not close", is_open("location"))
+        pg.evaluate(f"CoreSheet.close('location'); {S('location')}.setAttribute('closedby', 'any')"); pg.wait_for_timeout(450)
+
+        # one sheet at a time
+        pg.evaluate("CoreSheet.open('services')"); pg.wait_for_timeout(300)
+        pg.evaluate("CoreSheet.open('location')"); pg.wait_for_timeout(450)
+        check("opening a second sheet closes the first", is_open("location") and not is_open("services") and pg.evaluate("CoreSheet.current().getAttribute('data-sheet') === 'location'"))
+        pg.evaluate("CoreSheet.close()"); pg.wait_for_timeout(450)
+        check("CoreSheet.close() closes the current sheet", pg.evaluate("CoreSheet.current() === null"))
+
+        # swipe down to close
+        def swipe(sel, dy, steps=8):
+            box = pg.evaluate(f"(() => {{ const r = document.querySelector('{sel}').getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }})()")
+            pg.mouse.move(box[0], box[1]); pg.mouse.down()
+            for i in range(1, steps + 1): pg.mouse.move(box[0], box[1] + dy * i / steps); pg.wait_for_timeout(16)
+            mid = pg.evaluate(f"{S('services')}.style.transform")
+            pg.mouse.up(); return mid
+        pg.click("#tab-services"); pg.wait_for_timeout(450)
+        mid = swipe("dialog[data-sheet=services] [data-sheet-grabber]", 30, steps=10)
+        pg.wait_for_timeout(300)
+        check("short drag follows the finger, then springs back open", mid == "translateY(30px)" and is_open("services") and pg.evaluate(f"{S('services')}.style.transform") == "", mid)
+        mid = swipe("dialog[data-sheet=services] .sheet_title", 220)
+        pg.wait_for_timeout(450)
+        check("swipe down on the head closes", mid == "translateY(220px)" and not is_open("services"), mid)
+        check("swipe close leaves no inline styles", pg.evaluate(f"{S('services')}.getAttribute('style') || ''") == '', pg.evaluate(f"{S('services')}.getAttribute('style')"))
+        pg.click("#tab-services"); pg.wait_for_timeout(450)
+        swipe("dialog[data-sheet=services] .sheet_body a", 220); pg.wait_for_timeout(300)
+        check("dragging the body does not close", is_open("services"))
+        pg.keyboard.press("Escape"); pg.wait_for_timeout(450)
+
+        # motion: the closing sheet stays visible while it slides down (transition-behavior: allow-discrete)
+        pg.click("#tab-services"); pg.wait_for_timeout(450)
+        check("sheet transition from core-base.css", "0.26s" in pg.evaluate(f"getComputedStyle({S('services')}).transitionDuration"))
+        pg.keyboard.press("Escape"); pg.wait_for_timeout(60)
+        check("close animates before hiding", pg.evaluate(f"getComputedStyle({S('services')}).display") != "none" and not is_open("services"))
+        pg.wait_for_timeout(450)
+        check("sheet hidden after the slide", pg.evaluate(f"getComputedStyle({S('services')}).display") == "none")
 
         # consent switches via More
         pg.click("#tab-more"); pg.wait_for_timeout(450)
+        cls = lambda sel: pg.evaluate(f"{sel}.className")
+        check("More tab opens Site Settings", is_open("site-settings"))
         check("switch reflects saved choice (is-on)", pg.get_attribute("#sw-analytics", "aria-checked") == "true" and "is-on" in cls("document.getElementById('sw-analytics')"))
         check("switch look from Webflow combo", pg.evaluate("getComputedStyle(document.getElementById('sw-analytics')).backgroundColor") == "rgb(0, 128, 0)")
         check("essential switch is-on and is-disabled", all(c in cls("document.getElementById('sw-essential')").split() for c in ("is-on", "is-disabled")))
-        check("no data-look marking in v2", not pg.evaluate("!!document.querySelector('[data-look]')"))
+        check("no data-look marking", not pg.evaluate("!!document.querySelector('[data-look]')"))
         pg.click("#sw-marketing"); pg.click("#save"); pg.wait_for_timeout(450)
         saved = pg.evaluate("JSON.parse(localStorage.getItem('core-consent-v1'))")
-        check("save writes switch state", saved["analytics"] is True and saved["marketing"] is False, saved)
+        check("save writes switch state and closes the sheet", saved["analytics"] is True and saved["marketing"] is False and not is_open("site-settings"), saved)
 
         # announcement
         pg.evaluate("window.scrollTo(0, 0)"); pg.wait_for_timeout(200)
@@ -176,68 +220,24 @@ def run():
         pg.add_init_script("localStorage.setItem('core-consent-v1', JSON.stringify({analytics:false,marketing:false}))")
         pg.goto(base + plain); pg.wait_for_load_state("load")
         pg.click("#open-services"); pg.wait_for_timeout(450)
-        r = pg.evaluate(R); cw = pg.evaluate(f"{H}.getBoundingClientRect().width")
-        check("center dialog on desktop: is-center, centered", "is-center" in cls(P) and abs((r[0] + r[2]) / 2 - cw / 2) <= 1 and abs((r[1] + r[3]) / 2 - 400) <= 1 and r[2] - r[0] <= 480, [cls(P), r])
-        check("no grabber on a dialog, no bottom height", pg.evaluate("getComputedStyle(document.querySelector('[data-sheet-grabber]')).display") == "none" and "is-medium" not in cls(P))
-        check("scrollbar gutter takes the overlay color while open", pg.evaluate("document.documentElement.style.backgroundColor") == "rgb(148, 148, 148)", pg.evaluate("document.documentElement.style.backgroundColor"))
-        pg.keyboard.press("Escape"); pg.wait_for_timeout(450)
-        check("gutter tint cleared after close", pg.evaluate("document.documentElement.style.backgroundColor") == "")
-        pg.click("#open-right"); pg.wait_for_timeout(450)
-        r = pg.evaluate(R)
-        check("data-sheet-open-mode: right drawer, full height at the right edge", "is-right" in cls(P) and r[1] == 0 and r[3] == 800 and r[2] == round(cw) and r[0] >= cw - 448, [cls(P), r])
-        pg.keyboard.press("Escape"); pg.wait_for_timeout(450)
-        pg.click("#tab-more"); pg.wait_for_timeout(450)
-        check("tab data-sheet-open-mode=bottom on desktop", "is-bottom" in cls(P), cls(P))
-        pg.keyboard.press("Escape"); pg.wait_for_timeout(450)
-        check("block mode restored after override", pg.evaluate("CoreSheet.open('services'), document.querySelector('[data-sheet-host]').getAttribute('data-sheet-as')") == "center")
-        pg.set_viewport_size({"width": 390, "height": 844}); pg.wait_for_timeout(300)
-        check("resize while open switches the combo to is-bottom", "is-bottom" in cls(P) and "is-center" not in cls(P), cls(P))
+        r = R("services"); cw = pg.evaluate("Math.round(document.body.getBoundingClientRect().width)")   # page width (headless Chrome keeps a scrollbar gutter)
+        check("desktop: still a bottom sheet, centered, 36rem wide, flush to the bottom", r[2] - r[0] == 576 and abs((r[0] + r[2]) / 2 - cw / 2) <= 1 and r[3] == 800, r)
         pg.keyboard.press("Escape"); pg.wait_for_timeout(450)
         check("no JS errors (desktop)", not errors, errors)
         ctx.close()
 
-        # ---------- no Sheet / Host on the page ----------
-        ctx = browser.new_context(viewport={"width": 390, "height": 844})
-        pg = ctx.new_page(); warns = []; errors = []
-        pg.on("console", lambda m: m.type == "warning" and warns.append(m.text))
+        # ---------- reduced motion ----------
+        ctx = browser.new_context(viewport={"width": 390, "height": 844}, reduced_motion="reduce")
+        ctx.add_init_script("localStorage.setItem('core-consent-v1', JSON.stringify({analytics:false,marketing:false}))")
+        pg = ctx.new_page(); errors = []
         pg.on("pageerror", lambda e: errors.append(str(e)))
-        pg.goto(base + "/test/no-host.html"); pg.wait_for_load_state("load")
-        pg.click("#open"); pg.wait_for_timeout(200)
-        check("no host: nothing is built, one console warning", pg.evaluate("!document.querySelector('[data-sheet-host]') && CoreSheet.open('services') === null") and len(warns) == 1 and not errors, [warns, errors])
+        pg.goto(base + plain); pg.wait_for_load_state("load")
+        pg.click("#tab-services"); pg.wait_for_timeout(60)
+        check("reduced motion: no slide", pg.evaluate(f"getComputedStyle({S('services')}).transitionDuration").replace(" ", "").strip(",").split(",")[0] == "0s" and pg.evaluate(f"getComputedStyle({S('services')}).transform") in ("none", "matrix(1, 0, 0, 1, 0, 0)"))
+        pg.keyboard.press("Escape"); pg.wait_for_timeout(60)
+        check("reduced motion: hidden at once", pg.evaluate(f"getComputedStyle({S('services')}).display") == "none")
+        check("reduced motion: no JS errors", not errors, errors)
         ctx.close()
-
-        # ---------- with GSAP ----------
-        if gsap:
-            for reduced in (False, True):
-                ctx = browser.new_context(viewport={"width": 390, "height": 844}, reduced_motion="reduce" if reduced else "no-preference")
-                ctx.add_init_script("localStorage.setItem('core-consent-v1', JSON.stringify({analytics:false,marketing:false}))")
-                pg = ctx.new_page(); errors = []
-                pg.on("pageerror", lambda e: errors.append(str(e)))
-                pg.goto(base + gsap); pg.wait_for_load_state("load"); pg.wait_for_timeout(600)
-                label = "reduced motion" if reduced else "GSAP"
-                pg.click("#tab-services"); pg.wait_for_timeout(60)
-                animating = pg.evaluate(f"{P}.classList.contains('is-gsap') && document.querySelector('[data-sheet-overlay]').classList.contains('is-gsap')")
-                check(f"{label}: sheet motion {'skipped' if reduced else 'runs on GSAP (is-gsap on panel + overlay)'}", animating == (not reduced), animating)
-                if reduced:
-                    check("reduced motion: core-base turns transitions off", pg.evaluate(f"getComputedStyle({P}).transitionDuration") == "0s")
-                pg.wait_for_timeout(500)
-                check(f"{label}: sheet opens", pg.evaluate(f"{H}.classList.contains('is-open') && {P}.classList.contains('is-visible')"))
-                check(f"{label}: panel at rest after open", pg.evaluate(f"{P}.style.transform === '' && !{P}.classList.contains('is-gsap')"))
-                pg.keyboard.press("Escape"); pg.wait_for_timeout(60)
-                if not reduced:
-                    check("GSAP: close animates before hiding", pg.evaluate(f"{H}.classList.contains('is-open') && CoreSheet.top() === null"))
-                pg.wait_for_timeout(450)
-                check(f"{label}: sheet closed", not pg.evaluate(f"{H}.classList.contains('is-open')"))
-                check(f"{label}: content restored", pg.evaluate("document.querySelector('[data-sheet=\"services\"]').contains(document.getElementById('svc-first'))"))
-                pg.evaluate("CoreSheet.open('services')"); pg.wait_for_timeout(400)
-                pg.evaluate("CoreSheet.close(); CoreSheet.open('location')"); pg.wait_for_timeout(600)
-                check(f"{label}: reopen during close ends open", pg.evaluate(f"{H}.classList.contains('is-open') && {P}.classList.contains('is-visible') && CoreSheet.current() && CoreSheet.current().getAttribute('data-sheet') === 'location'"))
-                check(f"{label}: services content back home", pg.evaluate("document.querySelector('[data-sheet=\"services\"]').contains(document.getElementById('svc-first'))"))
-                pg.keyboard.press("Escape"); pg.wait_for_timeout(500)
-                check(f"{label}: no JS errors", not errors, errors)
-                ctx.close()
-        else:
-            print("SKIP GSAP tests (run: npm install --prefix test gsap)")
 
         # ---------- Before and After (optional module) ----------
         ctx = browser.new_context(viewport={"width": 390, "height": 844})
@@ -296,21 +296,20 @@ def run():
         check("safe area: page content clear of the notch", px(pg, "body", "paddingLeft") == 47 and px(pg, "body", "paddingRight") == 47)
         check("safe area: header clear of the notch", px(pg, "#shell-header", "paddingLeft") == 47 and px(pg, "#shell-header", "paddingRight") == 47)
         check("safe area: bottom nav clear of the notch", px(pg, ".bottom-nav_bar", "paddingLeft") == 47 and px(pg, ".bottom-nav_bar", "paddingRight") == 47)
-        pg.evaluate("CoreSheet.open('services', {mode: 'left'})"); pg.wait_for_timeout(500)
-        content_left = pg.evaluate("(() => { const b = document.querySelector('[data-sheet-host].is-open [data-sheet-body]'); return b.getBoundingClientRect().left + parseFloat(getComputedStyle(b).paddingLeft); })()")
+        pg.evaluate("CoreSheet.open('services')"); pg.wait_for_timeout(500)
+        content_left = pg.evaluate("(() => { const b = document.querySelector('dialog[data-sheet=services] .sheet_body'); return b.getBoundingClientRect().left; })()")
         check("safe area: sheet content clear of the notch", content_left >= 47, content_left)
-        pg.evaluate("CoreSheet.close(null, {instant: true}); CoreSheet.open('services', {mode: 'bottom'})"); pg.wait_for_timeout(500)
-        body_bottom = pg.evaluate("document.querySelector('[data-sheet-host].is-open [data-sheet-body]').getBoundingClientRect().bottom")
+        body_bottom = pg.evaluate("document.querySelector('dialog[data-sheet=services] .sheet_body').getBoundingClientRect().bottom")
         check("safe area: sheet clear of the home bar", body_bottom <= 390 - 21, body_bottom)
-        pg.evaluate("CoreSheet.close()"); pg.wait_for_timeout(400)
+        pg.evaluate("CoreSheet.close(null, {instant: true})"); pg.wait_for_timeout(100)
         pg.evaluate("CoreInstall.show(true)"); pg.wait_for_timeout(400)
         check("safe area: install banner clear of the notch", pg.evaluate("document.getElementById('banner').getBoundingClientRect().left") >= 47)
         ctx.close()
         ctx, pg = notched(390, 844, {"left": 0, "right": 0, "top": 47, "bottom": 34})
         check("safe area: portrait spacing unchanged", px(pg, "body", "paddingLeft") == 0 and px(pg, ".bottom-nav_bar", "paddingLeft") == 6)
-        pg.evaluate("CoreSheet.open('services', {mode: 'left'})"); pg.wait_for_timeout(500)
-        head_top = pg.evaluate("document.querySelector('[data-sheet-host].is-open [data-sheet-head]').getBoundingClientRect().top")
-        check("safe area: side drawer clear of the status bar", head_top >= 47, head_top)
+        pg.evaluate("CoreSheet.open('services')"); pg.wait_for_timeout(500)
+        bottom_pad = pg.evaluate("parseFloat(getComputedStyle(document.querySelector('dialog[data-sheet=services] .sheet_panel')).paddingBottom)")
+        check("safe area: bottom sheet padded above the home bar", bottom_pad >= 34, bottom_pad)
         pg.evaluate("CoreSheet.close(null, {instant: true}); document.querySelector('[data-bottom-nav]').remove(); CoreInstall.show(true)"); pg.wait_for_timeout(400)
         check("install: no bottom nav → offset removed, banner clears the home bar", pg.evaluate("getComputedStyle(document.documentElement).getPropertyValue('--core-install-offset').trim()") == "" and pg.evaluate("Math.round(844 - document.getElementById('banner').getBoundingClientRect().bottom)") == 34 + 12)
         ctx.close()
@@ -406,7 +405,7 @@ def run():
 
         browser.close()
     httpd.shutdown()
-    for name in ("_plain.html", "_gsap.html"):
+    for name in ("_plain.html",):
         path = os.path.join(ROOT, "test", name)
         if os.path.exists(path): os.remove(path)
     print(f"\n{'All browser tests passed.' if not failures else str(len(failures)) + ' failed: ' + ', '.join(failures)}")
