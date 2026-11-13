@@ -58,7 +58,7 @@ Sites built on v1 (DetailFlow, ShopFlow) stay pinned to their v1 tag until they'
 
 | Module | Public API | Main attributes |
 |---|---|---|
-| Sheet | `CoreSheet.open/close/current/get` | Each sheet is a native Webflow Modal with `data-sheet="NAME"`; `data-sheet-open="NAME"` opens it from anywhere, `data-sheet-grabber` / `data-sheet-head` start swipe-down-to-close, `data-sheet-close` closes. Events `sheet:open` / `sheet:close` |
+| Sheet | `CoreSheet.open/close/current/get` | Each sheet is a native Webflow Modal with `data-sheet="NAME"`; `data-sheet-open="NAME"` opens it from anywhere, `data-sheet-grabber` / `data-sheet-head` start swipe-down-to-close, `data-sheet-close` closes, `data-sheet-nonmodal="desktop|always"` opens without blocking the page (cookie bar). Events `sheet:open` / `sheet:close` |
 | Consent | `CoreConsent.get/set/open` | `data-consent-switch`, `data-consent-action`, `data-consent` (gated scripts) |
 | Business | `CoreBusiness.get/all/hours/fill` | `data-business-field` (source), `data-business` (target), `data-business-href`, `data-business-empty="hide"`, `data-business-hours`, `data-business-today` |
 | Announcement | `CoreAnnouncement.refresh` | `data-announcement`; sets `--core-announcement-offset` (use it as the header class's `top`) |

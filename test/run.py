@@ -113,6 +113,7 @@ def run():
 
         # cookie notice appears ~1.2s after first visit
         pg.wait_for_timeout(1500)
+        check("phone: cookie notice is modal (data-sheet-nonmodal=desktop)", pg.evaluate(f"{S('cookie-notice')}.matches(':modal') && {S('cookie-notice')}.getAttribute('closedby') === 'any'"))
         check("cookie notice opens on first visit, as a modal dialog", is_open("cookie-notice") and pg.evaluate("CoreSheet.current().getAttribute('data-sheet') === 'cookie-notice'"))
         check("sheet:open fired for the cookie notice", "sheet:open:cookie-notice" in pg.evaluate("__ev"), pg.evaluate("__ev"))
         pg.click("#accept-all"); pg.wait_for_timeout(400)
@@ -224,6 +225,28 @@ def run():
         check("desktop: still a bottom sheet, centered, 36rem wide, flush to the bottom", r[2] - r[0] == 576 and abs((r[0] + r[2]) / 2 - cw / 2) <= 1 and r[3] == 800, r)
         pg.keyboard.press("Escape"); pg.wait_for_timeout(450)
         check("no JS errors (desktop)", not errors, errors)
+        ctx.close()
+
+        # ---------- desktop cookie banner: non-blocking ----------
+        ctx = browser.new_context(viewport={"width": 1280, "height": 800})
+        pg = ctx.new_page(); errors = []
+        pg.on("pageerror", lambda e: errors.append(str(e)))
+        pg.goto(base + plain); pg.wait_for_load_state("load"); pg.wait_for_timeout(1700)
+        C = S("cookie-notice")
+        check("desktop: cookie notice opens non-modal (show)", pg.evaluate(f"{C}.open && !{C}.matches(':modal')"))
+        check("desktop: no scroll lock, page still scrolls", pg.evaluate("getComputedStyle(document.documentElement).overflowY") != "hidden" and pg.evaluate("window.scrollTo(0, 200), window.scrollY") == 200)
+        r = R("cookie-notice")
+        check("desktop: banner is full width at the bottom", r[0] == 0 and r[3] == 800 and r[2] >= 1265, r)
+        pg.click("#open-empty"); pg.wait_for_timeout(200)
+        check("desktop: page links still work, click on the page doesn't close the banner", pg.evaluate("location.hash === '#plain-link'") and pg.evaluate(f"{C}.open"))
+        pg.keyboard.press("Escape"); pg.wait_for_timeout(300)
+        check("desktop: Escape doesn't close the banner", pg.evaluate(f"{C}.open"))
+        pg.click("#necessary"); pg.wait_for_timeout(450)
+        check("desktop: a choice closes it and restores closedby", not pg.evaluate(f"{C}.open") and pg.evaluate(f"{C}.getAttribute('closedby')") == "any")
+        pg.click("#open-services"); pg.wait_for_timeout(450)
+        check("desktop: other sheets stay modal", is_open("services"))
+        pg.keyboard.press("Escape"); pg.wait_for_timeout(450)
+        check("no JS errors (desktop banner)", not errors, errors)
         ctx.close()
 
         # ---------- reduced motion ----------

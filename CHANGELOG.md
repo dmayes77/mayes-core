@@ -13,10 +13,11 @@
 - `[data-sheet-close]` closes the sheet it is in.
 - `sheet:open` / `sheet:close` fire on the Modal however it was opened.
 - Opening a sheet closes any other open sheet.
+- `data-sheet-nonmodal="desktop"` (992px and up) or `"always"` opens a sheet without blocking the page (`show()` instead of `showModal()`): no backdrop or scroll lock, page clicks and Escape don't close it, no swipe. The master's cookie notice uses it, so on desktop it's a normal full-width cookie bar (text left, buttons right) and on phones the bottom sheet.
 - `window.CoreSheet`: `open(name)`, `close([name], {instant})`, `current()`, `top()`, `get(name)`. Consent and Install use these and are unchanged.
 - Removed: the Sheet / Host component and everything it carried (`data-sheet-host`, `-panel`, `-overlay`, `-body`, `-footer`, `-title` handling), moving content into the host, `data-sheet-mode`, `data-sheet-open-mode`, `data-sheet-height`, `data-sheet-width`, `CoreSheet.show()`, `CoreSheet.host()`, `CoreSheet.presentation()`, the `is-open / is-visible / is-bottom / is-center / is-left / is-right / is-compact / is-medium / is-tall / is-full / is-gsap` combos, the GSAP motion, the body pinning and the scrollbar-gutter tint.
 
-**Base v3.0.0** (`core-base.css`): for `dialog[data-sheet]`, the slide up and down (`@starting-style`, `transition-behavior: allow-discrete`), the dimmed `::backdrop`, the scroll lock (`html:has(dialog[data-sheet][open])`) and reduced motion. The style panel can't target `[open]`, `::backdrop` or `@starting-style`. `html.sheet-lock` is gone.
+**Base v3.0.0** (`core-base.css`): for `dialog[data-sheet]`, the slide up and down (`@starting-style`, `transition-behavior: allow-discrete`), the dimmed `::backdrop`, the scroll lock while a sheet is modal (`html:has(dialog[data-sheet]:modal)`) and reduced motion. The style panel can't target `[open]`, `::backdrop` or `@starting-style`. `html.sheet-lock` is gone.
 
 **Upgrade note (Webflow):**
 1. Rebuild each sheet as a component whose root is a Modal with `data-sheet="NAME"` and `closedby="any"`: panel › grabber (`data-sheet-grabber`) › head (`data-sheet-head`, title, close link set to modal › hide) › body › footer. Style the Modal as a bottom sheet in Webflow (fixed, bottom 0, width 100%, max-width 36rem, margins auto, no border or padding, top radius).

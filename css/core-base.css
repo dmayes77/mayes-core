@@ -8,6 +8,7 @@
  *   phones, and the scroll lock while a sheet is open
  * - sheets (native Webflow Modals, dialog[data-sheet]): the slide up and down, the dimmed ::backdrop. The style panel
  *   can't target [open], ::backdrop or @starting-style. The sheet's closed position is off the bottom of the screen.
+ *   The scroll lock holds only while a sheet is modal (a non-blocking banner leaves the page scrollable).
  * - -webkit-tap-highlight-color is rejected by Webflow
  * - "reduce motion" media queries are not available in Webflow
  */
@@ -22,7 +23,7 @@ dialog[data-sheet]::backdrop{background:rgba(17,17,17,.45);opacity:0;transition:
 dialog[data-sheet][open]::backdrop{opacity:1}
 @starting-style{dialog[data-sheet][open]::backdrop{opacity:0}}
 dialog[data-sheet][data-sheet-instant],dialog[data-sheet][data-sheet-instant]::backdrop{transition:none}
-html:has(dialog[data-sheet][open]),html:has(dialog[data-sheet][open]) body{overflow:hidden}
+html:has(dialog[data-sheet]:modal),html:has(dialog[data-sheet]:modal) body{overflow:hidden}
 
 [data-bottom-nav] a,dialog[data-sheet] a,[data-install-banner] a{-webkit-tap-highlight-color:transparent}
 @media (prefers-reduced-motion:reduce){
