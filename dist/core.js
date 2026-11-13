@@ -260,7 +260,11 @@
   window.CoreConsent = { version: '2.0.0', key: KEY, get: read, set: set, open: open };
 })();
 
-/* Mayes Core – Business v2.0.1 – one business record, shown anywhere on the page.
+/* Mayes Core – Business v2.1.0 – one business record, shown anywhere on the page.
+ *
+ * MISSING DATA LAYER – Webflow can't put a CMS Collection List inside a component, so the data layer (shell-data,
+ *   [data-business-source]) sits on each page. A page without it logs one console warning, so a page built from scratch
+ *   instead of a copy of the "Page Template" page shows up during the build check.
  *
  * SOURCE – the hidden CMS layer in the Page Shell (the one Business Settings item, rendered on every page):
  *   <a data-business-field="phone">…</a>      any Business Settings field, as a native Webflow element bound in the Designer:
@@ -499,8 +503,13 @@
 
   /* ---------- fill ---------- */
   function attr(el, name){ return el.getAttribute('data-business' + name) || el.getAttribute('data-store' + name); }
+  var warned = false;
   function fill(){
     cache = read();
+    if(!warned && !document.querySelector('[data-business-field],[data-store-field],[data-store-settings],[data-business-source]')){
+      warned = true;
+      if(window.console) console.warn('Core Business: no business data on this page. Add shell-data ([data-business-source]) or build the page from a copy of Page Template.');
+    }
     Array.prototype.forEach.call(document.querySelectorAll('[data-business],[data-business-href],[data-store],[data-store-href]'), function(el){
       if(el.closest('[data-store-settings]') || el.hasAttribute('data-store-field') || el.hasAttribute('data-business-field')) return;
       var key = attr(el, ''), v = key ? get(key) : '';

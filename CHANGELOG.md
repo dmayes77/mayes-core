@@ -17,6 +17,8 @@
 - `window.CoreSheet`: `open(name)`, `close([name], {instant})`, `current()`, `top()`, `get(name)`. Consent and Install use these and are unchanged.
 - Removed: the Sheet / Host component and everything it carried (`data-sheet-host`, `-panel`, `-overlay`, `-body`, `-footer`, `-title` handling), moving content into the host, `data-sheet-mode`, `data-sheet-open-mode`, `data-sheet-height`, `data-sheet-width`, `CoreSheet.show()`, `CoreSheet.host()`, `CoreSheet.presentation()`, the `is-open / is-visible / is-bottom / is-center / is-left / is-right / is-compact / is-medium / is-tall / is-full / is-gsap` combos, the GSAP motion, the body pinning and the scrollbar-gutter tint.
 
+**Business v2.1.0:** a page with no business data layer (`[data-business-field]` / `[data-business-source]`) logs one console warning. Webflow can't hold a CMS Collection List in a component, so the data layer lives on each page; the master has a draft **Page Template** page (Page Shell + data layer) to duplicate for new pages.
+
 **Base v3.0.0** (`core-base.css`): for `dialog[data-sheet]`, the slide up and down (`@starting-style`, `transition-behavior: allow-discrete`), the dimmed `::backdrop`, the scroll lock while a sheet is modal (`html:has(dialog[data-sheet]:modal)`) and reduced motion. The style panel can't target `[open]`, `::backdrop` or `@starting-style`. `html.sheet-lock` is gone.
 
 **Upgrade note (Webflow):**

@@ -249,6 +249,15 @@ def run():
         check("no JS errors (desktop banner)", not errors, errors)
         ctx.close()
 
+        # ---------- a page without the business data layer ----------
+        ctx = browser.new_context(viewport={"width": 390, "height": 844})
+        pg = ctx.new_page(); warns = []; errors = []
+        pg.on("console", lambda m: m.type == "warning" and warns.append(m.text))
+        pg.on("pageerror", lambda e: errors.append(str(e)))
+        pg.goto(base + "/test/no-data.html"); pg.wait_for_load_state("load"); pg.wait_for_timeout(200)
+        check("no data layer: one console warning, no errors", len([w for w in warns if w.startswith("Core Business: no business data")]) == 1 and not errors, [warns, errors])
+        ctx.close()
+
         # ---------- reduced motion ----------
         ctx = browser.new_context(viewport={"width": 390, "height": 844}, reduced_motion="reduce")
         ctx.add_init_script("localStorage.setItem('core-consent-v1', JSON.stringify({analytics:false,marketing:false}))")
