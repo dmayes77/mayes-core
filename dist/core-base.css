@@ -1,6 +1,6 @@
 /* Mayes Core – Base v3.0.0
  * The only CSS Core ships: rules Webflow's style panel cannot express. Everything else (the sheet's look and position,
- * bottom nav, consent switches, hours rows, install banner, safe areas, announcement offset) is Webflow classes and
+ * bottom nav, consent switches, hours rows, install banner, safe areas, the announcement bar) is Webflow classes and
  * is-* combos.
  *
  * - [hidden] wins over a Webflow class's display (Core hides parts with the hidden attribute)

@@ -50,7 +50,7 @@ Footer:
 
     <script src="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v2.1.0/dist/core.js" defer></script>
 
-`core.js` = sheet + consent + business (+ JSON-LD) + announcement + install. Each module also ships alone in `dist/`.
+`core.js` = sheet + consent + business (+ JSON-LD) + install. Each module also ships alone in `dist/`.
 
 `core.css` is only `core-base.css`: rules Webflow's style panel can't express (the `[hidden]` guard, `<html>` scroll behavior, the sheet slide, `::backdrop` and scroll lock, tap highlight, reduced motion). **Core ships no look and no layout.** Every visual, including the sheets, safe areas and the install banner's position, is a Webflow class, and Core only toggles `is-*` combo classes that Webflow styles. See `docs/NATIVE_FIRST.md`.
 
@@ -61,7 +61,6 @@ Sites built on v1 (DetailFlow, ShopFlow) stay pinned to their v1 tag until they'
 | Sheet | `CoreSheet.open/close/current/get` | Each sheet is a native Webflow Modal with `data-sheet="NAME"`; `data-sheet-open="NAME"` opens it from anywhere, `data-sheet-grabber` / `data-sheet-head` start swipe-down-to-close, `data-sheet-close` closes, `data-sheet-nonmodal="desktop|always"` opens without blocking the page (cookie bar). Events `sheet:open` / `sheet:close` |
 | Consent | `CoreConsent.get/set/open` | `data-consent-switch`, `data-consent-action`, `data-consent` (gated scripts) |
 | Business | `CoreBusiness.get/all/hours/fill` | `data-business-field` (source), `data-business` (target), `data-business-href`, `data-business-empty="hide"`, `data-business-hours`, `data-business-today` |
-| Announcement | `CoreAnnouncement.refresh` | `data-announcement`; sets `--core-announcement-offset` (use it as the header class's `top`) |
 | Install (Add to Home Screen) | `CoreInstall.show/hide/state` | the Core / Install Banner component (`data-install-banner`) is required; `data-install-open` trigger; `<html data-install="off">`, `data-install-name`, `data-install-delay`; sets `--core-install-offset` |
 | Before and After (optional, separate file) | `CoreBeforeAfter.init` | `data-before-after`, `data-before-after-range` |
 

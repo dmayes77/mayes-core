@@ -5,7 +5,7 @@ Run from the repo root after ./build.sh:
 Serves the repo locally and opens test/index.html (the master in miniature: Webflow's classes are in
 test/webflow.css) in headless Chrome at phone and desktop widths. Exercises Core v2.1 (native sheets): business fill, hours
 and JSON-LD, native sheets (Webflow Modals: open by name, events, backdrop tap, swipe down to close, slide and
-backdrop from core-base.css, scroll lock, reduced motion), consent, the announcement offset, the install banner (iPhone, Android prompt,
+backdrop from core-base.css, scroll lock, reduced motion), consent, the install banner (iPhone, Android prompt,
 in-app browser, standalone, desktop), core-base.css, safe areas and the optional Before and After module.
 """
 import http.server, os, socketserver, sys, threading, tempfile, shutil
@@ -54,8 +54,8 @@ def run():
         pg.on("console", lambda m: m.type == "error" and not m.text.startswith("Failed to load resource") and errors.append(m.text))
         pg.on("response", lambda r: r.status >= 400 and not r.url.endswith("placeholder.svg") and errors.append(f"{r.status} {r.url}"))
         pg.goto(base + plain); pg.wait_for_load_state("load")
-        check("globals present, no retired modules", pg.evaluate("!!(window.CoreSheet && window.CoreConsent && window.CoreBusiness && window.CoreAnnouncement && window.CoreInstall) && !window.CoreMotion && !window.__coreBottomNav"))
-        check("versions: Sheet 3.0.0, the rest 2.0.0", pg.evaluate("CoreSheet.version === '3.0.0' && [CoreConsent, CoreBusiness, CoreAnnouncement, CoreInstall].every(m => m.version === '2.0.0')"))
+        check("globals present, no retired modules", pg.evaluate("!!(window.CoreSheet && window.CoreConsent && window.CoreBusiness && window.CoreInstall) && !window.CoreAnnouncement && !window.CoreMotion && !window.__coreBottomNav"))
+        check("versions: Sheet 3.0.0, the rest 2.0.0", pg.evaluate("CoreSheet.version === '3.0.0' && [CoreConsent, CoreBusiness, CoreInstall].every(m => m.version === '2.0.0')"))
         css = open(os.path.join(ROOT, "dist/core.css")).read()
         rules = css.split("*/", 1)[1] if "*/" in css else css
         import re as _re
@@ -200,14 +200,9 @@ def run():
         saved = pg.evaluate("JSON.parse(localStorage.getItem('core-consent-v1'))")
         check("save writes switch state and closes the sheet", saved["analytics"] is True and saved["marketing"] is False and not is_open("site-settings"), saved)
 
-        # announcement
-        pg.evaluate("window.scrollTo(0, 0)"); pg.wait_for_timeout(200)
-        off = pg.evaluate("getComputedStyle(document.documentElement).getPropertyValue('--core-announcement-offset').trim()")
-        check("announcement offset = bar height", off == "40px", off)
-        check("header sits under the bar (Webflow class uses the offset)", pg.evaluate("Math.round(document.getElementById('shell-header').getBoundingClientRect().top)") == 40)
-        pg.evaluate("window.scrollTo(0, 400)"); pg.wait_for_timeout(300)
-        check("offset 0 after scroll", pg.evaluate("getComputedStyle(document.documentElement).getPropertyValue('--core-announcement-offset').trim()") == "0px")
-
+        # announcement bar: native (Business field + sticky header), no script
+        check("announcement bar filled from Business Settings (native, no script)", pg.text_content("#bar") == "Free estimates this month" and not pg.evaluate("document.getElementById('bar').hidden"))
+        check("no announcement offset variable any more", pg.evaluate("getComputedStyle(document.documentElement).getPropertyValue('--core-announcement-offset').trim()") == "")
         # core-base.css
         check("[hidden] wins over a Webflow class display", pg.evaluate("(() => { const b = document.getElementById('banner'); b.classList.add('is-visible'); b.hidden = true; const d = getComputedStyle(b).display; b.hidden = false; b.classList.remove('is-visible'); return d; })()") == "none")
         check("html keeps a stable scrollbar gutter", pg.evaluate("getComputedStyle(document.documentElement).scrollbarGutter") == "stable")

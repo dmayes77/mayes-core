@@ -2,7 +2,7 @@
    Keep in step with the master: these are what Core's is-* combos are designed against. */
 body{margin:0;font-family:system-ui,sans-serif;background:#fff;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);overscroll-behavior-x:none}
 .is-hidden{display:none}
-.shell-header{position:fixed;top:var(--core-announcement-offset,0px);left:0;width:100%;z-index:100;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);background:#fff}
+.shell-header{position:sticky;top:0;left:0;width:100%;z-index:100;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);background:#fff}
 .announcement-bar{position:relative;z-index:1001;height:40px;background:#f60}
 main{padding:120px 16px 1600px}
 
