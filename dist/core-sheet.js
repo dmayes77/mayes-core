@@ -11,6 +11,10 @@
  *   SWIPE DOWN    drag down on [data-sheet-grabber] or [data-sheet-head] (not on their buttons or links) to close.
  *   TAP OUTSIDE   closes the sheet in browsers without closedby="any" (Safari). Opt out with closedby="none".
  *   CLOSE         [data-sheet-close] closes the sheet it is in (Webflow's modal › hide link does the same natively).
+ *   NON-BLOCKING  data-sheet-nonmodal="desktop" (992px and up) or "always" opens the sheet with show() instead of
+ *                 showModal(): no backdrop, no scroll lock, the page stays usable (a cookie bar). Tapping the page or
+ *                 pressing Escape doesn't close it, and swipe is off; it closes from its own buttons. Give its class a
+ *                 z-index in Webflow (it isn't in the top layer).
  *   EVENTS        "sheet:open" / "sheet:close" on the Modal (they bubble), for consent and install.
  *
  * Markup (Webflow component, root = Modal):
@@ -27,6 +31,7 @@
 (function(){
   if(window.CoreSheet) return;
   var MQ_REDUCE = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var MQ_DESKTOP = window.matchMedia('(min-width: 992px)');
 
   function esc(n){ return window.CSS && CSS.escape ? CSS.escape(n) : n; }
   function fire(el, type){ try{ el.dispatchEvent(new CustomEvent(type, {bubbles: true})); }catch(e){} }
@@ -38,6 +43,8 @@
     return el.tagName === 'DIALOG' ? el : (el.querySelector('dialog') || el.closest('dialog'));
   }
   function isOpen(d){ return !!(d && d.open); }
+  function nonmodal(d){ var v = d.getAttribute('data-sheet-nonmodal'); return v === 'always' || (v === 'desktop' && MQ_DESKTOP.matches); }
+  function isModal(d){ try{ return d.matches(':modal'); }catch(e){ return true; } }
   function current(){
     var all = document.querySelectorAll('dialog[data-sheet]'), top = null;
     for(var i = 0; i < all.length; i++){ if(all[i].open) top = all[i]; }
@@ -49,7 +56,11 @@
   function watch(d){
     if(!d || (seen && seen.has(d)) || d.__coreSheet) return;
     if(seen) seen.add(d); else d.__coreSheet = true;
-    d.addEventListener('close', function(){ resetDrag(d); fire(d, 'sheet:close'); });
+    d.addEventListener('close', function(){
+      resetDrag(d);
+      if(d.hasAttribute('data-sheet-closedby')){ d.setAttribute('closedby', d.getAttribute('data-sheet-closedby')); d.removeAttribute('data-sheet-closedby'); }
+      fire(d, 'sheet:close');
+    });
     new MutationObserver(function(){ if(d.open && !d.__wasOpen){ d.__wasOpen = true; fire(d, 'sheet:open'); } else if(!d.open) d.__wasOpen = false; })
       .observe(d, {attributes: true, attributeFilter: ['open']});
   }
@@ -63,7 +74,12 @@
     if(cur && cur !== d) close(cur, {instant: true});
     if(!d.open){
       d.__wasOpen = true;
-      d.showModal();
+      if(nonmodal(d)){
+        // a non-modal dialog would light-dismiss on any page click with closedby="any"; it closes from its buttons only
+        if(d.hasAttribute('closedby')) d.setAttribute('data-sheet-closedby', d.getAttribute('closedby'));
+        d.setAttribute('closedby', 'none');
+        d.show();
+      } else d.showModal();
       fire(d, 'sheet:open');
     }
     return d;
@@ -85,7 +101,7 @@
     if(!e.target.closest || (e.pointerType === 'mouse' && e.button !== 0)) return;
     var zone = e.target.closest('[data-sheet-grabber], [data-sheet-head]');
     var d = zone && zone.closest('dialog[data-sheet]');
-    if(!d || !d.open || e.target.closest('button, a, input, select, textarea, label')) return;
+    if(!d || !d.open || !isModal(d) || e.target.closest('button, a, input, select, textarea, label')) return;
     drag = { d: d, id: e.pointerId, y0: e.clientY, t0: e.timeStamp, dy: 0, h: d.offsetHeight };
     d.style.transition = 'none';
     try{ zone.setPointerCapture(e.pointerId); }catch(err){}
