@@ -4,7 +4,7 @@
 
 Webflow sites load files from this repo through jsDelivr **by release tag only**:
 
-    https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v2.1.0/dist/core.js
+    https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v2.2.0/dist/core.js
 
 Never `@main`, never `@stable`, never a bare commit. A push to `main` must never change a live site.
 
@@ -31,7 +31,8 @@ CI (`.github/workflows/ci.yml`) runs `./check.sh` and `test/run.py` on every pul
 | `v2.0.1` | Alt text on every image Core fills (logo with no logo set, install icon); empty `data-sheet-open` is a plain link; stale slot comments fixed | superseded by v2.0.2 |
 | `v2.0.2` | Empty `data-consent-action` / `data-install-action` are ignored; Install hides the whole `[data-core-button]` wrapper, so the Button component can carry both | superseded by v2.0.3 |
 | `v2.0.3` | Before and After v1.1.0: native only (no GSAP), focus ring for keyboard only. `core.js` and `core.css` are unchanged from v2.0.2 | superseded by v2.1.0 |
-| `v2.1.0` | Native sheets: each sheet is a Webflow Modal; the sheet engine, Sheet / Host, modes, heights and GSAP motion removed; `core-sheet.js` keeps open by name, tap outside and swipe down to close; `core-base.css` adds the slide, backdrop and scroll lock. **Breaking** (released as a minor; see below). Also: missing business data warning | latest; the $500 Base site and every new site. v1 sites stay on v1 tags |
+| `v2.1.0` | Native sheets: each sheet is a Webflow Modal; the sheet engine, Sheet / Host, modes, heights and GSAP motion removed; `core-sheet.js` keeps open by name, tap outside and swipe down to close; `core-base.css` adds the slide, backdrop and scroll lock. **Breaking** (released as a minor; see below). Also: missing business data warning | superseded by v2.2.0 |
+| `v2.2.0` | Announcement bar is native: `core-announcement.js`, `CoreAnnouncement` and `--core-announcement-offset` removed (bar in the Page Shell, sticky header, text from Business Settings). **Breaking** (released as a minor) | latest; the $500 Base site and every new site. v1 sites stay on v1 tags |
 
 ## Cutting a release
 
@@ -71,6 +72,7 @@ Rules:
 - v1.4.1, v1.4.3, v1.4.4 and v1.4.5 each added a feature (Add to Home Screen, no-bounce, safe areas, hiding empty icon links), so each should have been a minor.
 - v1.5.0 includes two look changes that could affect existing sites (see its upgrade note in `CHANGELOG.md`).
 - v2.1.0 is breaking (sheets become native Webflow Modals; Sheet / Host is removed), so semver would make it 3.0.0. It was released as v2.1.0 by choice; its Sheet and Base modules are numbered v3.0.0. A `v3.0.0` tag was briefly created on the same commit; it is not a release, and no site should load it.
+- v2.2.0 removes `core-announcement.js` and `CoreAnnouncement`, which semver would also number as a major; it was released as a minor the same way.
 
 ## Live sites
 
