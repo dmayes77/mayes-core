@@ -54,7 +54,7 @@ Rules:
 
 ## Tokens (Webflow variable collections)
 
-Core (spacing, layout, type: Display through H3 are fluid `clamp()` sizes; 4 modes: Base, Tablet, Mobile Landscape, Mobile Portrait) · Theme (every semantic color, including feedback, glass, on-* text and gradients) · Surface (border widths, radii) · Motion (durations, distances, scale, stagger) · Primitives (raw palette, size steps, font weights, line heights, base sizes; listed last because styles should never pick from it directly). Colors live only in Theme, so a Theme mode can re-skin a site.
+Core (spacing, layout, type: Display through H3 are fluid `clamp()` sizes; 4 modes: Base, Tablet, Mobile Landscape, Mobile Portrait) · Theme (every semantic color, including feedback, glass, on-* text and gradients) · Surface (border widths, radii) · Motion (durations, distances, scale, stagger) · Primitives (raw palette, size steps, font weights, line heights, base sizes; listed last because styles should never pick from it directly). Colors live only in Theme, so a Theme mode can re-skin a site. Theme naming: *primary*, *secondary* and *accent* only ever mean brand colors; neutral shades use page / subtle / muted / dark (Background), default / subtle / muted (Text) and default / subtle / strong (Border); text that sits on a filled color is `on-<fill>` (on-dark, on-brand, on-accent).
 
 A client changes **Primitives only**. Everything else references Primitives.
 
