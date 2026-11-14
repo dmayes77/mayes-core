@@ -1,5 +1,15 @@
 # Changelog
 
+## v2.3.0 — 2026-11-14
+
+Not breaking: every change falls back to the old value on sites that don't have the new Webflow variables.
+
+**Sheet timing reads the Motion tokens.** The sheet slide and backdrop use `--_motion---duration--standard` and `--_motion---duration--fast` from the Webflow Motion collection, falling back to the old 260ms / 200ms. On the master (Duration/standard = 300) the slide becomes 300ms.
+
+**Before/after slider follows the new Theme names.** Its background reads `--_theme---background--subtle` and falls back to `--_theme---background--secondary`, then `#e5e5e5`. On the master, Background/secondary now means the secondary brand color, so without this the slider would have turned brand-colored.
+
+**Webflow master (no code, for reference):** collection Core 2.0 renamed Core; every color moved into Theme with plain names (primary/secondary/accent = brand only; page/subtle/muted/dark for neutrals); sizes aligned to Tailwind defaults (headings, 1280px container, 64px header, 96px sections, 14px buttons, letter spacing); Primitives listed last.
+
 ## v2.2.0 — 2026-11-13
 
 **Breaking, released as a minor** (like v2.1.0): it removes a file and an API, which semver would number 3.0.0. The master upgrades with no changes.
