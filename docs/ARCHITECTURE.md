@@ -54,7 +54,7 @@ Rules:
 
 ## Tokens (Webflow variable collections)
 
-Primitives (brand colors, fonts, base sizes) · Core 2.0 (responsive type and spacing, 4 modes: Base, Tablet, Mobile Landscape, Mobile Portrait) · Theme (semantic colors) · Surface · Motion.
+Core (spacing, layout, type: Display through H3 are fluid `clamp()` sizes; 4 modes: Base, Tablet, Mobile Landscape, Mobile Portrait) · Theme (every semantic color, including feedback, glass, on-* text and gradients) · Surface (border widths, radii) · Motion (durations, distances, scale, stagger) · Primitives (raw palette, size steps, font weights, line heights, base sizes; listed last because styles should never pick from it directly). Colors live only in Theme, so a Theme mode can re-skin a site.
 
 A client changes **Primitives only**. Everything else references Primitives.
 
