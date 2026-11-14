@@ -1,6 +1,6 @@
 /* Mayes Core – Before and After v1.0.0 – optional module (load dist/core-before-after.css on sites that use it).
  * Colors come from the site's Core tokens; restyle freely with Webflow classes. */
-.ba-slider{--pos:50%;position:relative;isolation:isolate;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:1rem;background:var(--_theme---background--secondary,#e5e5e5)}
+.ba-slider{--pos:50%;position:relative;isolation:isolate;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:1rem;background:var(--_theme---background--subtle,var(--_theme---background--secondary,#e5e5e5))}
 .ba-slider.is-focused{outline:3px solid var(--_theme---focus--ring,currentColor);outline-offset:4px}
 .ba-before-layer,.ba-after-layer,.ba-image-before,.ba-image-after{position:absolute;inset:0;width:100%;height:100%}
 .ba-after-layer{z-index:1;background:#323232;clip-path:inset(0 0 0 var(--pos))}
