@@ -54,9 +54,40 @@ Rules:
 
 ## Tokens (Webflow variable collections)
 
-Core (spacing, layout, type: Display through H3 are fluid `clamp()` sizes; 4 modes: Base, Tablet, Mobile Landscape, Mobile Portrait) · Theme (every semantic color, including feedback, glass, on-* text and gradients) · Surface (border widths, radii) · Motion (durations, distances, scale, stagger) · Primitives (raw palette, size steps, font weights, line heights, base sizes; listed last because styles should never pick from it directly). Colors live only in Theme, so a Theme mode can re-skin a site. Theme naming: *primary*, *secondary* and *accent* only ever mean brand colors; neutral shades use page / subtle / muted / dark (Background), default / subtle / muted (Text) and default / subtle / strong (Border); text that sits on a filled color is `on-<fill>` (on-dark, on-brand, on-accent).
+| Collection | Holds |
+|---|---|
+| **Core** | Spacing, layout and type. 4 modes: Base (desktop), Tablet, Mobile Landscape, Mobile Portrait |
+| **Theme** | Every semantic color: Background, Text, Border, Action, Feedback, glass and overlay |
+| **Surface** | Border widths and radii |
+| **Motion** | Durations, distances, scale and stagger. The sheet slide reads `Duration/standard` and `Duration/fast` |
+| **Primitives** | Raw palette, size steps, font weights, line heights, letter spacing, base sizes. Listed last: styles never pick from it directly |
 
-A client changes **Primitives only**. Everything else references Primitives.
+Webflow's default **Base collection** is left empty; Webflow doesn't allow deleting it.
+
+Colors live only in Theme, so a Theme mode can re-skin a site. A client changes **Primitives only**; everything else references Primitives.
+
+**Theme naming:** *primary*, *secondary* and *accent* only ever mean brand colors. Neutral shades use page / subtle / muted / dark (Background), default / subtle / muted (Text) and default / subtle / strong (Border). Text that sits on a filled color is `on-<fill>` (on-dark, on-brand, on-accent).
+
+### Sizing follows Tailwind
+
+So a site built on Core feels familiar, and so values carry over to Next.js + Tailwind work:
+
+- **Size steps:** `Sizes/N` = N × 0.25rem (base `0.25rem`, base font size `1rem`). Off-scale values are `calc()` from the base, never new primitives.
+- **Containers:** small 48rem, medium 64rem, large 72rem, xlarge 80rem (Tailwind `7xl`), xxlarge 96rem.
+- **Headings are fluid** (`clamp()`, from a 360px to a 1280px viewport):
+
+  | Token | Phone → desktop | Line height |
+  |---|---|---|
+  | H1 | 2.25rem → 3.75rem | 1.1 |
+  | H2 | 1.875rem → 3rem | 1.2 |
+  | H3 | 1.25rem → 1.5rem (semibold) | 1.4 |
+  | H4 (card titles) | 1.125rem → 1.25rem | 1.4 |
+
+  Body text, buttons and labels are fixed sizes. Card text is Body Small (14px).
+- **Letter spacing:** tighter −0.05em, tight −0.025em, default 0, wide 0.025em, wider 0.05em, widest 0.1em. Headings use tight, eyebrows widest, buttons and navigation default.
+- **Section spacing** (desktop / tablet / phones): small 4 / 4 / 3rem, medium 6 / 5 / 4rem, large 8 / 6 / 5rem.
+- **Page padding:** 2rem desktop, 1.5rem tablet and mobile landscape, 1rem mobile portrait.
+- **Components:** navbar 4rem tall; buttons 14px text (16px on `is-large`); feature cards padded 1.5rem; form inputs at least 2.5rem tall, 14px on desktop and 16px on phones so the browser doesn't zoom in on focus.
 
 ## Mobile app layer (991px and below)
 
