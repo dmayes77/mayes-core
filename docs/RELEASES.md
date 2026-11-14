@@ -4,7 +4,7 @@
 
 Webflow sites load files from this repo through jsDelivr **by release tag only**:
 
-    https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v2.2.0/dist/core.js
+    https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v2.3.0/dist/core.js
 
 Never `@main`, never `@stable`, never a bare commit. A push to `main` must never change a live site.
 
@@ -32,7 +32,8 @@ CI (`.github/workflows/ci.yml`) runs `./check.sh` and `test/run.py` on every pul
 | `v2.0.2` | Empty `data-consent-action` / `data-install-action` are ignored; Install hides the whole `[data-core-button]` wrapper, so the Button component can carry both | superseded by v2.0.3 |
 | `v2.0.3` | Before and After v1.1.0: native only (no GSAP), focus ring for keyboard only. `core.js` and `core.css` are unchanged from v2.0.2 | superseded by v2.1.0 |
 | `v2.1.0` | Native sheets: each sheet is a Webflow Modal; the sheet engine, Sheet / Host, modes, heights and GSAP motion removed; `core-sheet.js` keeps open by name, tap outside and swipe down to close; `core-base.css` adds the slide, backdrop and scroll lock. **Breaking** (released as a minor; see below). Also: missing business data warning | superseded by v2.2.0 |
-| `v2.2.0` | Announcement bar is native: `core-announcement.js`, `CoreAnnouncement` and `--core-announcement-offset` removed (bar in the Page Shell, sticky header, text from Business Settings). **Breaking** (released as a minor) | latest; the $500 Base site and every new site. v1 sites stay on v1 tags |
+| `v2.2.0` | Announcement bar is native: `core-announcement.js`, `CoreAnnouncement` and `--core-announcement-offset` removed (bar in the Page Shell, sticky header, text from Business Settings). **Breaking** (released as a minor) | superseded by v2.3.0 |
+| `v2.3.0` | Sheet timing reads the Webflow Motion tokens; before/after slider reads `Background/subtle`. Both fall back to the old values. Not breaking | latest; the $500 Base site and every new site. v1 sites stay on v1 tags |
 
 ## Cutting a release
 
