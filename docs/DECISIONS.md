@@ -26,11 +26,18 @@
 | 2026-11-07 | Structured data comes from Core, built from Business Settings; page-level JSON-LD stays empty | Webflow can't bind page JSON-LD to a CMS item outside a template, and hand-typed schema drifted on the master |
 | 2026-11-07 | Core v2.0.0 ships no look or layout CSS: sheet presentations, safe areas, banner position and the bottom nav are Webflow classes; Core sets `is-*` combos | Tested: Webflow's style system accepts `env()`, `dvh`, `var()`, `max()`, `overscroll-behavior`, `scrollbar-*`, `touch-action`, `clip-path`. It can't style `<html>`, `[hidden]`, reduced-motion queries or `-webkit-tap-highlight-color`, so those stay in `core-base.css` |
 | 2026-11-07 | Webflow can't style a child from its parent's state, so Core puts the state combo on each part (host, overlay, panel, grabber, head) | No descendant selectors in the style panel |
-| 2026-11-13 | Sheets are native Webflow Modals styled as bottom sheets (slide up from the bottom, full width and flush on phones, never a floating dialog); Core release v2.1.0 (Sheet module v3.0.0) drops the sheet engine and Sheet / Host and keeps only open-by-name and swipe down to close | David tested a native Modal sheet on his iPhone against the Core sheet: works the same. Native first. Webflow modal links can't reach a Modal in another component, so `data-sheet-open` stays |
+| 2026-11-13 | Sheets are native Webflow Modals styled as bottom sheets (slide up from the bottom, full width and flush on phones, never a floating dialog); Core release v2.1.0 (Sheet module v3.0.0) drops the sheet engine and Sheet / Host and keeps only open-by-name and swipe down to close | David tested a native Modal sheet on his phone (Android, Motorola Razr) against the Core sheet: works the same. Native first. Webflow modal links can't reach a Modal in another component, so `data-sheet-open` stays |
 | 2026-11-07 | Bottom nav tabs are the links themselves (icon and label inside), styled with Webflow's Current state | The API can't author the Current state, so it's set once in the Designer |
+| 2026-11-13 | The master's variable collection is named **Core** (was Core 2.0) | Paths become `--_core---…`. Webflow's own default collection (Base collection) is left empty: Webflow doesn't let it be deleted |
+| 2026-11-13 | Keep five collections: Core, Theme, Surface, Motion, Primitives (last) | Theme stays separate so a Theme mode can re-skin colors, including Feedback. Primitives can't be hidden from the picker, so it is ordered last |
+| 2026-11-13 | Theme names say what they are: *primary*, *secondary*, *accent* mean brand colors only; neutrals are page / subtle / muted / dark; text on a fill is `on-<fill>`. The Brand and Accent groups and the gradient ramps are removed | Replaces names like *inverse* that didn't say which way they went |
+| 2026-11-14 | Sizing follows Tailwind's scale | David uses Tailwind in Next.js and wants sites to look and feel familiar. See ARCHITECTURE.md › Tokens |
+| 2026-11-14 | Off-scale sizes are `calc()` from the base size, not new primitives | e.g. 0.875rem = `calc(var(--_primitives---base--font-size) * 0.875)` |
+| 2026-11-14 | Buttons: 14px text (16px for `is-large`); form inputs 14px on desktop and 16px on phones | 14px matches Amazon and most app UIs; 16px inputs stop phone browsers zooming in on focus |
 
 ## Open
 
-- [ ] Token names: keep ShopFlow's `Primary/*` ramp or restore the master's `Brand/*` (recommended: `Primary/*`).
+- [ ] Test on an iPhone (Safari): sheets, tap outside to close, swipe down, form fields not zooming. Only Android has been tested.
+- [x] Token names: brand colors are Theme *primary* / *secondary* / *accent*; the `Brand/*` group is gone (2026-11-13).
 - [ ] Consent storage key: keep `core-consent-v1` (recommended).
 - [ ] ShopFlow: one repo instead of `shopflow` + `shopflow-code` subtree split (recommended).
