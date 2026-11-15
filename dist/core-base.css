@@ -1,4 +1,4 @@
-/* Mayes Core – Base v3.0.0
+/* Mayes Core – Base v3.1.0
  * The only CSS Core ships: rules Webflow's style panel cannot express. Everything else (the sheet's look and position,
  * bottom nav, consent switches, hours rows, install banner, safe areas, the announcement bar) is Webflow classes and
  * is-* combos.
@@ -6,7 +6,8 @@
  * - [hidden] wins over a Webflow class's display (Core hides parts with the hidden attribute)
  * - <html> cannot be styled in Webflow: the reserved scrollbar gutter, no sideways bounce, no pull-to-refresh bounce on
  *   phones, and the scroll lock while a sheet is open
- * - sheets (native Webflow Modals, dialog[data-sheet]): the slide up and down, the dimmed ::backdrop. The style panel
+ * - sheets (native Webflow Modals, dialog[data-sheet]): the slide up and down, the dimmed and blurred ::backdrop
+ *   (override the tint with --core-sheet-backdrop). The style panel
  *   can't target [open], ::backdrop or @starting-style. The sheet's closed position is off the bottom of the screen.
  *   The scroll lock holds only while a sheet is modal (a non-blocking banner leaves the page scrollable).
  * - -webkit-tap-highlight-color is rejected by Webflow
@@ -20,11 +21,14 @@ html{scrollbar-gutter:stable;overscroll-behavior-x:none}
 dialog[data-sheet]{transform:translateY(100%);transition:transform calc(var(--_motion---duration--standard,260)*1ms) cubic-bezier(.2,.8,.2,1),overlay calc(var(--_motion---duration--standard,260)*1ms) allow-discrete,display calc(var(--_motion---duration--standard,260)*1ms) allow-discrete}
 dialog[data-sheet][open]{transform:none}
 @starting-style{dialog[data-sheet][open]{transform:translateY(100%)}}
-dialog[data-sheet]::backdrop{background:rgba(17,17,17,.45);opacity:0;transition:opacity calc(var(--_motion---duration--fast,200)*1ms) ease,overlay calc(var(--_motion---duration--standard,260)*1ms) allow-discrete,display calc(var(--_motion---duration--standard,260)*1ms) allow-discrete}
+dialog[data-sheet]::backdrop{background:var(--core-sheet-backdrop,rgba(6,8,30,.55));-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);opacity:0;transition:opacity calc(var(--_motion---duration--fast,200)*1ms) ease,overlay calc(var(--_motion---duration--standard,260)*1ms) allow-discrete,display calc(var(--_motion---duration--standard,260)*1ms) allow-discrete}
 dialog[data-sheet][open]::backdrop{opacity:1}
 @starting-style{dialog[data-sheet][open]::backdrop{opacity:0}}
 dialog[data-sheet][data-sheet-instant],dialog[data-sheet][data-sheet-instant]::backdrop{transition:none}
-html:has(dialog[data-sheet]:modal),html:has(dialog[data-sheet]:modal) body{overflow:hidden}
+/* Scroll lock while a sheet is modal. The attribute is set by core-sheet.js for browsers where :has(:modal) misses; overscroll
+ * containment stops a swipe that reaches the end of the sheet from scrolling the page behind it (Android). */
+html:has(dialog[data-sheet]:modal),html:has(dialog[data-sheet]:modal) body,html[data-core-sheet-lock],html[data-core-sheet-lock] body{overflow:hidden}
+dialog[data-sheet],dialog[data-sheet] *{overscroll-behavior:contain}
 
 [data-bottom-nav] a,dialog[data-sheet] a,[data-install-banner] a{-webkit-tap-highlight-color:transparent}
 @media (prefers-reduced-motion:reduce){
