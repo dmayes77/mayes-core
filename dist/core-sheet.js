@@ -1,4 +1,4 @@
-/* Mayes Core – Sheet v3.0.0
+/* Mayes Core – Sheet v3.0.1
  * Sheets are native Webflow Modals (<dialog>), designed in Webflow as bottom sheets. Webflow and the browser do the work:
  * show/hide links (link mode "modal"), focus moved in, trapped and returned, Escape, the inert page, the top layer.
  * core-base.css adds the slide-up motion, the dimmed ::backdrop and the scroll lock (the style panel can't express them).
@@ -51,6 +51,13 @@
     return top;
   }
 
+  /* html[data-core-sheet-lock] mirrors "a sheet is modal", so the CSS scroll lock holds where :has(:modal) is not supported */
+  function syncLock(){
+    var on = false, all = document.querySelectorAll('dialog[data-sheet]');
+    for(var i = 0; i < all.length; i++){ try{ if(all[i].open && all[i].matches(':modal')){ on = true; break; } }catch(e){ if(all[i].open && !nonmodal(all[i])){ on = true; break; } } }
+    document.documentElement.toggleAttribute('data-core-sheet-lock', on);
+  }
+
   /* every Modal that opens fires sheet:open, however it was opened (Core, a Webflow link, or the browser) */
   var seen = typeof WeakSet === 'function' ? new WeakSet() : null;
   function watch(d){
@@ -58,10 +65,11 @@
     if(seen) seen.add(d); else d.__coreSheet = true;
     d.addEventListener('close', function(){
       resetDrag(d);
+      syncLock();
       if(d.hasAttribute('data-sheet-closedby')){ d.setAttribute('closedby', d.getAttribute('data-sheet-closedby')); d.removeAttribute('data-sheet-closedby'); }
       fire(d, 'sheet:close');
     });
-    new MutationObserver(function(){ if(d.open && !d.__wasOpen){ d.__wasOpen = true; fire(d, 'sheet:open'); } else if(!d.open) d.__wasOpen = false; })
+    new MutationObserver(function(){ syncLock(); if(d.open && !d.__wasOpen){ d.__wasOpen = true; fire(d, 'sheet:open'); } else if(!d.open) d.__wasOpen = false; })
       .observe(d, {attributes: true, attributeFilter: ['open']});
   }
   function watchAll(){ Array.prototype.forEach.call(document.querySelectorAll('dialog[data-sheet]'), watch); }
@@ -145,7 +153,7 @@
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', watchAll); else watchAll();
 
   window.CoreSheet = {
-    version: '3.0.0',
+    version: '3.0.1',
     open: open, close: close, get: get,
     current: current,
     top: current

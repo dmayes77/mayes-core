@@ -1,5 +1,17 @@
 # Changelog
 
+## v2.3.1 — 2026-11-15
+
+Not breaking. Sheets now match the quiz overlay and hold the page still on Android.
+
+**Backdrop dims and blurs.** The sheet `::backdrop` is a navy tint at 55% with a 4px blur (was a light gray at 45%, no blur), so every sheet reads as one system with full-screen overlays. A site can set its own tint with `--core-sheet-backdrop`.
+
+**Scroll lock holds on touch.** Sheets and everything inside them use `overscroll-behavior: contain`, so a swipe that reaches the end of a sheet no longer scrolls the page behind it. Core Sheet v3.0.1 also sets `data-core-sheet-lock` on `<html>` while a sheet is modal, a fallback for browsers where `:has(:modal)` misses. Non-blocking sheets (the desktop cookie bar) still leave the page scrollable.
+
+Module versions: Base v3.1.0 (`core-base.css`), Sheet v3.0.1.
+
+**Tests:** backdrop tint and blur, overscroll containment, and the lock attribute set while modal, cleared on close and never set by a non-blocking sheet.
+
 ## v2.3.0 — 2026-11-14
 
 Not breaking: every change falls back to the old value on sites that don't have the new Webflow variables.
