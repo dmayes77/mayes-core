@@ -1,5 +1,22 @@
 # Changelog
 
+## v2.4.0 — 2026-11-15
+
+Not breaking. Two new options, plus Webflow master updates promoted from the Mayes Digital site.
+
+**Opt-out consent, as a setting.** Add `<meta name="core-consent-mode" content="opt-out">` to the site head, above the consent head snippet (now v1.2.0). Until the visitor saves a choice, analytics counts as on and marketing as off: Consent Mode defaults grant analytics, the Cookie settings switches show it, and the cookie notice never opens. Turning analytics off in Cookie settings saves and sends the update as before. Without the meta tag nothing changes (opt-in). This replaces the custom head code a site needed for opt-out.
+
+**Add to Home Screen opens from the start page.** A home-screen icon opens the page it was added from, so adding from an inner page made the app open there. The automatic banner now waits for the start page (`/`, or `<html data-install-start="/path">`), and an Add to Home Screen trigger on any other page goes to the start page first and opens the banner there. A browser install prompt still works anywhere. The banner also no longer waits for a cookie notice on opt-out sites.
+
+Module versions: Consent v2.1.0, Install v2.1.0, consent head snippet v1.2.0.
+
+**Webflow master (Core Design System 2.0), no code needed:**
+- Buttons (`button`) have a 2.75rem (44px) minimum height, the recommended tap size, instead of a maximum height.
+- Pricing cards line up: `card-pricing` is a 3-row subgrid (header, features, footer). Use Section / Card Row with the new **Pricing** variant so the features and buttons align across cards.
+- Sheet / Services rows have an icon tile (`sheet-row_icon`, 44px, Background/brand-subtle, Text/brand) with a Core icon; swap the icon per service.
+
+**Tests:** opt-out mode (Consent Mode default, no notice, switches, nothing saved until changed, saved choice wins), start-page install (no automatic banner on inner pages, trigger goes to the start page and opens the banner, hash cleaned up).
+
 ## v2.3.1 — 2026-11-15
 
 Not breaking. Sheets now match the quiz overlay and hold the page still on Android.
