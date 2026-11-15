@@ -27,6 +27,10 @@ def make_page():
     name = "_plain.html"
     out = src.replace("<!--CONSENT_HEAD-->", head).replace("/test/index.html", "/test/" + name)
     open(os.path.join(ROOT, "test", name), "w").write(out)
+    # same page at another path (the install start page stays _plain.html), and an opt-out consent site
+    open(os.path.join(ROOT, "test", "_inner.html"), "w").write(out)
+    optout = src.replace("<!--CONSENT_HEAD-->", '<meta name="core-consent-mode" content="opt-out">\n' + head).replace("/test/index.html", "/test/_optout.html")
+    open(os.path.join(ROOT, "test", "_optout.html"), "w").write(optout)
     return f"/test/{name}"
 
 class Quiet(http.server.SimpleHTTPRequestHandler):
@@ -55,7 +59,7 @@ def run():
         pg.on("response", lambda r: r.status >= 400 and not r.url.endswith("placeholder.svg") and errors.append(f"{r.status} {r.url}"))
         pg.goto(base + plain); pg.wait_for_load_state("load")
         check("globals present, no retired modules", pg.evaluate("!!(window.CoreSheet && window.CoreConsent && window.CoreBusiness && window.CoreInstall) && !window.CoreAnnouncement && !window.CoreMotion && !window.__coreBottomNav"))
-        check("versions: Sheet 3.0.1, the rest 2.0.0", pg.evaluate("CoreSheet.version === '3.0.1' && [CoreConsent, CoreBusiness, CoreInstall].every(m => m.version === '2.0.0')"))
+        check("versions: Sheet 3.0.1, Consent and Install 2.1.0, Business 2.0.0", pg.evaluate("CoreSheet.version === '3.0.1' && CoreConsent.version === '2.1.0' && CoreInstall.version === '2.1.0' && CoreBusiness.version === '2.0.0'"))
         css = open(os.path.join(ROOT, "dist/core.css")).read()
         rules = css.split("*/", 1)[1] if "*/" in css else css
         import re as _re
@@ -426,6 +430,37 @@ def run():
         pg.goto(base + plain); pg.wait_for_load_state("load"); pg.wait_for_timeout(3500)
         check("install: never shown when standalone", not visible(pg))
         check("install: trigger hidden when standalone ([hidden] beats its class)", pg.evaluate("document.getElementById('install-open').hidden && getComputedStyle(document.getElementById('install-open')).display === 'none'"))
+        ctx.close()
+
+        # start page: a home-screen icon opens the page it was added from, so the banner belongs on the start page
+        ctx, pg, errors = phone(IPHONE, CONSENTED + "localStorage.setItem('core-install-v1', JSON.stringify({views:5}));")
+        pg.goto(base + "/test/_inner.html"); pg.wait_for_load_state("load"); pg.wait_for_timeout(3500)
+        check("install: no automatic banner on an inner page", not visible(pg) and pg.evaluate("CoreInstall.state().atStart === false"))
+        pg.click("#tab-more"); pg.wait_for_timeout(450)
+        pg.click("#install-open"); pg.wait_for_url("**" + plain); pg.wait_for_load_state("load"); pg.wait_for_timeout(1200)
+        check("install: trigger on an inner page goes to the start page and opens the banner there", visible(pg) and pg.evaluate("location.pathname") == plain, pg.evaluate("location.href"))
+        check("install: arrival hash cleaned up", pg.evaluate("location.hash") == "")
+        check("install: no JS errors (start page)", not errors, errors)
+        ctx.close()
+
+        # opt-out consent: analytics on until turned off, no cookie notice, nothing saved until the visitor changes it
+        ctx, pg, errors = phone(IPHONE, "localStorage.setItem('core-install-v1', JSON.stringify({views:1}));")
+        pg.goto(base + "/test/_optout.html"); pg.wait_for_load_state("load"); pg.wait_for_timeout(1800)
+        check("opt-out: mode read from the meta tag", pg.evaluate("CoreConsent.mode()") == "opt-out")
+        check("opt-out: Consent Mode default grants analytics, denies ads", pg.evaluate("__gtagCalls.some(c => c[0]==='consent' && c[1]==='default' && c[2].analytics_storage==='granted' && c[2].ad_storage==='denied')"))
+        check("opt-out: cookie notice never opens", not pg.evaluate("CoreSheet.current()"))
+        check("opt-out: nothing saved until the visitor chooses", pg.evaluate("localStorage.getItem('core-consent-v1')") is None)
+        pg.wait_for_timeout(2500)
+        check("opt-out: install banner does not wait for a notice that never comes", visible(pg))
+        pg.click("#banner-close"); pg.wait_for_timeout(300)
+        pg.click("#tab-more"); pg.wait_for_timeout(450)
+        check("opt-out: switches show analytics on, marketing off", pg.get_attribute("#sw-analytics", "aria-checked") == "true" and pg.get_attribute("#sw-marketing", "aria-checked") == "false")
+        pg.click("#sw-analytics"); pg.click("#save"); pg.wait_for_timeout(450)
+        saved = pg.evaluate("JSON.parse(localStorage.getItem('core-consent-v1'))")
+        check("opt-out: turning analytics off is saved and sent", bool(saved) and saved["analytics"] is False and pg.evaluate("__gtagCalls.some(c => c[0]==='consent' && c[1]==='update' && c[2].analytics_storage==='denied')"), saved)
+        pg.reload(); pg.wait_for_load_state("load"); pg.wait_for_timeout(300)
+        check("opt-out: saved choice wins over the default on the next page", pg.evaluate("__gtagCalls.some(c => c[0]==='consent' && c[1]==='default' && c[2].analytics_storage==='denied')"))
+        check("opt-out: no JS errors", not errors, errors)
         ctx.close()
 
         ctx = browser.new_context(viewport={"width": 1280, "height": 900})

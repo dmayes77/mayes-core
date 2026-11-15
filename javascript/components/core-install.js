@@ -1,4 +1,4 @@
-/* Mayes Core – Install v2.0.2 – "Add to Home Screen" banner for the mobile app layer.
+/* Mayes Core – Install v2.1.0 – "Add to Home Screen" banner for the mobile app layer.
  *
  * Pairs with the head snippet dist/core-app-head.html (full-screen launch, status bar, theme color) and the
  * Webflow webclip (Site settings › General), which is the home-screen icon.
@@ -8,6 +8,12 @@
  *   · while a sheet is open, including the cookie notice (shows once it closes, whether or not a choice was made)
  *   · for 30 days after the visitor closes it
  *   · when <html data-install="off">
+ *
+ * WHERE IT SHOWS – only on the start page (default "/", or <html data-install-start="/path">). A home-screen icon opens the
+ *   page it was added from, so adding from an inner page would open the app there. The automatic banner waits for the
+ *   start page; an [data-install-open] trigger on any other page goes to the start page first (start-page#add-to-home-screen)
+ *   and the banner opens there. A browser install prompt (Android, beforeinstallprompt) is fine anywhere: the manifest
+ *   decides where that app opens.
  *
  * WHAT IT SAYS – picked from the browser:
  *   · Android Chrome with an install prompt available → an "Install" button that opens the browser's own prompt
@@ -76,10 +82,15 @@
   function snoozed(s){ return s.dismissed && (Date.now() - s.dismissed) < SNOOZE; }
   /* the cookie notice opens about a second after load; give it the first chance before showing */
   function consentNoticeDue(){
-    if(!window.CoreConsent || !document.querySelector('[data-sheet="cookie-notice"]')) return false;
+    if(!window.CoreConsent || optOutConsent() || !document.querySelector('[data-sheet="cookie-notice"]')) return false;
     var key = root.getAttribute('data-consent-key') || 'core-consent-v1';
     try{ return !localStorage.getItem(key); }catch(e){ return false; }
   }
+  var HASH = '#add-to-home-screen';
+  function startPath(){ return root.getAttribute('data-install-start') || '/'; }
+  function atStart(){ return location.pathname === startPath(); }
+  /* the cookie notice never opens on an opt-out site */
+  function optOutConsent(){ return !!(window.CoreConsent && CoreConsent.mode && CoreConsent.mode() === 'opt-out'); }
   function sheetOpen(){ return !!(window.CoreSheet && window.CoreSheet.current && window.CoreSheet.current()); }
   function emit(action){ try{ document.dispatchEvent(new CustomEvent('core:install', {detail: {action: action, platform: platform()}})); }catch(e){} }
 
@@ -169,6 +180,7 @@
   function views(){ var s = read(); s.views = (s.views || 0) + 1; write(s); return s.views; }
   function tryAuto(){
     if(root.getAttribute('data-install') === 'off' || standalone() || !mobile() || snoozed(read())) return;
+    if(!deferred && !atStart()) return;   /* wait for the start page, so the icon opens the app there */
     if(sheetOpen()){ document.addEventListener('sheet:close', function once(){ document.removeEventListener('sheet:close', once); setTimeout(tryAuto, 800); }); return; }
     show(false);
   }
@@ -197,7 +209,9 @@
     if(t){
       e.preventDefault();
       if(window.CoreSheet && CoreSheet.current && CoreSheet.current()) CoreSheet.close(null, {noFocus: true});
-      if(deferred) prompt(); else setTimeout(function(){ show(true); }, 300);
+      if(deferred) prompt();
+      else if(!atStart()) location.href = startPath() + HASH;
+      else setTimeout(function(){ show(true); }, 300);
     }
   });
   document.addEventListener('keydown', function(e){
@@ -207,6 +221,10 @@
 
   function init(){
     prepTriggers();
+    if(location.hash === HASH){   /* arrived from a trigger on another page */
+      try{ history.replaceState(null, '', location.pathname + location.search); }catch(e){}
+      if(!standalone()) setTimeout(function(){ show(true); }, 600);
+    }
     var n = views();
     if(n < 2) return;
     var delay = parseInt(root.getAttribute('data-install-delay'), 10);
@@ -217,9 +235,9 @@
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 
   window.CoreInstall = {
-    version: '2.0.0',
+    version: '2.1.0',
     show: function(force){ return show(force !== false); },
     hide: function(){ hide(true); },
-    state: function(){ var s = read(); return {platform: platform(), standalone: standalone(), mobile: mobile(), snoozed: snoozed(s), views: s.views || 0, canPrompt: !!deferred}; }
+    state: function(){ var s = read(); return {platform: platform(), standalone: standalone(), mobile: mobile(), snoozed: snoozed(s), views: s.views || 0, canPrompt: !!deferred, start: startPath(), atStart: atStart()}; }
   };
 })();

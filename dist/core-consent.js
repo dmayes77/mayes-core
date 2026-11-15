@@ -1,4 +1,4 @@
-/* Mayes Core – Consent v2.0.2 – cookie consent + the Site Settings sheet.
+/* Mayes Core – Consent v2.1.0 – cookie consent + the Site Settings sheet.
    Uses the Sheet engine (window.CoreSheet). Pairs with the head snippet (Consent Mode v2 defaults),
    which must run BEFORE the Google tag. Categories: essential (always on), analytics, marketing.
 
@@ -11,6 +11,10 @@
    Opening: any [data-sheet-open="site-settings"] (the brand-bar cog) or CoreConsent.open().
    Deferred third-party scripts: <script type="text/plain" data-consent="analytics|marketing" src|inline> run once consent is given.
    Events: "core:consent" on document (detail = {analytics, marketing}).
+   Model: opt-in by default (nothing on until the visitor accepts; the cookie notice opens on the first visit).
+   <meta name="core-consent-mode" content="opt-out"> switches a site to opt-out: until the visitor saves a choice,
+   analytics counts as on and marketing as off, the switches show that, and the cookie notice never opens.
+   Nothing is saved until the visitor changes something in Cookie settings.
    NATIVE: Core ships no consent CSS. Style the switches, rows and buttons with Webflow classes; switches get .is-on
    when on and .is-disabled when locked (essential), so on/off and locked are Webflow combo classes. */
 (function(){
@@ -18,6 +22,9 @@
   var ACTION = '[data-consent-action]:not([data-consent-action=""])';
   var KEY = document.documentElement.getAttribute('data-consent-key') || 'core-consent-v1', CATS = ['analytics','marketing'];
   function sheet(){ return window.CoreSheet || null; }
+  function optOut(){ var m = document.querySelector('meta[name="core-consent-mode"]'); return !!m && (m.getAttribute('content') || '').trim() === 'opt-out'; }
+  /* the choice in effect: the saved one, else the opt-out default (analytics on, marketing off), else none */
+  function effective(){ var s = read(); if(s) return s; return optOut() ? {analytics: true, marketing: false} : null; }
   function read(){ try{ return JSON.parse(localStorage.getItem(KEY)) || null; }catch(e){ return null; } }
   function write(s){ try{ localStorage.setItem(KEY, JSON.stringify(s)); }catch(e){} }
   function g(v){ return v ? 'granted' : 'denied'; }
@@ -38,7 +45,7 @@
   }
 
   function sync(s){
-    s = s || read() || {};
+    s = s || effective() || {};
     document.querySelectorAll('[data-consent-switch]').forEach(function(sw){
       var c = sw.getAttribute('data-consent-switch'), on = c === 'essential' ? true : !!s[c];
       sw.setAttribute('role', 'switch'); if(sw.tagName === 'BUTTON') sw.type = 'button'; else if(!sw.hasAttribute('tabindex')) sw.setAttribute('tabindex', '0');
@@ -95,11 +102,12 @@
     var s = read();
     prepActions(); sync(s);
     if(s) apply(s);
+    else if(optOut()) apply(effective());
     else if(document.querySelector('[data-sheet="cookie-notice"]')){
       setTimeout(function(){ if(!read() && sheet() && !sheet().top()) sheet().open('cookie-notice'); }, 1200);
     }
   }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 
-  window.CoreConsent = { version: '2.0.0', key: KEY, get: read, set: set, open: open };
+  window.CoreConsent = { version: '2.1.0', key: KEY, get: read, set: set, open: open, mode: function(){ return optOut() ? 'opt-out' : 'opt-in'; }, effective: effective };
 })();
