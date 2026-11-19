@@ -7,9 +7,9 @@ mayes-core (this repo, tagged releases)
         │  loaded by release tag
         ▼
 Core Design System 2.0 master (Webflow)
-  tokens · components · CMS (Business Settings, Business Hours)
+  tokens · components · CMS (Business Settings, Business Hours, Reviews, Projects)
         │  duplicated
-        ├──────────────► $500 Base site ──► one site per client
+        ├──────────────► $500 site (per-trade demo templates) ──► one site per client
         ├──────────────► ShopFlow   (later: commerce)
         └──────────────► DetailFlow (later: detailing)
 ```
@@ -19,11 +19,13 @@ Core Design System 2.0 master (Webflow)
 | Site | Short name | Role |
 |---|---|---|
 | Core Design System 2.0 | `core-design-system-2-0` | The master. Everything reusable lands here first. |
-| $500 Base | to be created | Duplicate of the master: Home, Services, Contact |
+| Mayes Digital 2.0 | `mayes-digital-2-0` | Mayes Digital's own site, live. The first site built on Core 2.0 and the reference build: its bottom nav, Settings sheet and quiz-style quote (in its own Page Shell) are what the master is catching up to |
+| Apex | `apex-mayesdigital` | Client build on Core 2.0, in progress |
+| $500 site templates | to be created | Duplicates of the master, one demo per trade (see `base/README.md`) |
 | ShopFlow | `shopflow-mayesdigital` | Commerce product; re-based on Core v2 later |
 | DetailFlow | `detailflow-mayesdigital` | Detailing product; re-based on Core v2 later |
-| Southern Reflexions | `southern-reflexions-mayesdigital` | Client build on Core 2.0 (Apex demo) |
-| ServicePro, ProofBook, Mayes Digital, Core 1.0 | — | Older, separate token systems; not on Core 2.0 |
+| Southern Reflexions | `southern-reflexions-mayesdigital` | Earlier client build |
+| ServicePro, ProofBook | `servicepro-mayesdigital`, `proofbook-mayesdigital` | Older, separate token systems; not on Core 2.0 |
 
 ## How a site loads code
 
@@ -93,10 +95,10 @@ So a site built on Core feels familiar, and so values carry over to Next.js + Ta
 
 Desktop is a normal website. Phones and tablets get an app-style layer from Core:
 
-- **Brand bar:** logo plus one useful action.
-- **Bottom nav:** 3–5 tabs; each tab is a link (a sheet tab adds `data-sheet-open="NAME"`); the active tab uses Webflow's Current state.
+- **Brand bar:** logo plus a ⋯ button that opens the business info and settings sheet.
+- **Bottom nav:** 5 tabs, standard set decided 2026-11-19: Home · Services (with prices) · Call (middle) · Our Work · Quote (quiz-style). Home, Services and Call are fixed; tabs 4 and 5 can be swapped per trade or per client. Each tab is a link (a sheet tab adds `data-sheet-open="NAME"`); the active tab uses Webflow's Current state. The master still has the earlier Home · Services · Book · Location · Quote until it is updated.
 - **Sheets:** each sheet is a native Webflow Modal (`<dialog>`) in its own component, designed as a bottom sheet: full width and flush to the bottom on phones, 36rem wide and centered at the bottom above. Webflow and the browser handle opening and closing links, focus, Escape and the inert page; `core-base.css` adds the slide, backdrop and scroll lock; `core-sheet.js` adds open-by-name, tap-outside for Safari and swipe down to close.
-- **Site Settings:** the More sheet, with contact, hours and privacy/cookie controls.
+- **Site Settings (the ⋯ sheet):** today Privacy & cookies and Add to Home Screen. Under the 2026-11-19 standard it also holds the hours and location (address, directions), which replaces the Location tab and sheet.
 
 Markup contract: `data-bottom-nav`, `data-sheet` (on the Modal), `data-sheet-open`, `data-sheet-grabber`, `data-sheet-head`, `data-sheet-close`, `data-install-banner` (and its parts), `data-consent-*`.
 
@@ -106,8 +108,10 @@ Markup contract: `data-bottom-nav`, `data-sheet` (on the Modal), `data-sheet-ope
 |---|---|---|
 | Business Settings | 1 | name, short name, tagline, logos, phone, email, address, directions URL, service area, social links, default SEO title/description, share image, booking URL, GoHighLevel location ID |
 | Business Hours | 7 | day, order, open, close, closed |
+| Reviews | any | name, initial, review text, date, review link, featured |
+| Projects | any | before/after photos and alt text, service, area, completed, show on home |
 
-Rendered once, hidden, in the Page Shell. Core scripts fill `data-business="field"` targets anywhere on the page from it.
+Business Settings and Business Hours are rendered once, hidden, on each page (`shell-data`, which comes with the Page Template page; Webflow won't hold a CMS Collection List in a component). Core scripts fill `data-business="field"` targets anywhere on the page from it.
 
 ## Page structure (from the spec)
 
