@@ -14,11 +14,11 @@
 | 2026-11-06 | Add to Home Screen is part of Core: head snippet + banner, no service worker | Webflow cannot serve a service worker from the site root; a hosted wrapper (e.g. Progressier) stays an option per client |
 | 2026-11-07 | Top bar and bottom nav are flush, never floating; the page does not bounce on phones | Page stability v1.2.0 |
 | 2026-11-07 | The ⋯ button in the top bar opens Settings (privacy, cookies, Add to Home Screen); the bottom nav is for quick actions only | Replaces the More tab |
-| 2026-11-07 | $500 site bottom nav: Home · Services · Call · Location · Quote; creator sites use Collab instead of Quote | Closes the Call-or-Book question |
+| 2026-11-07 | ~~$500 site bottom nav: Home · Services · Call · Location · Quote; creator sites use Collab instead of Quote~~ | Closes the Call-or-Book question. Superseded 2026-11-19 |
 | 2026-11-07 | Each sheet is its own component (`Sheet / Name`) placed in the Page Shell's Sheets slot; root class `name is-hidden` | Replaces Sheet / Content in the Overlay slot |
 | 2026-11-08 | The sheets live in a fixed `shell-sheets` div inside the Page Shell, not a slot | Every page gets the same sheets with nothing to place per page; edit a sheet once in its component |
 | 2026-11-08 | The top nav, footer and bottom nav are built into the Page Shell too; Main Content is its only slot. The Glass nav's actions slot is replaced by a fixed Get a quote button (CTA Text / Show CTA props, `data-sheet-open="quote"`) | Same chrome on every page with nothing to place or forget; the actions slot had been left empty, so desktop showed no CTA |
-| 2026-11-08 | The bottom nav's Services tab goes to the Services page; Location and Quote stay sheets | David's call: Services is a full page, Location and Quote are quick actions. Sheet / Services stays in the Page Shell for any button that wants it |
+| 2026-11-08 | The bottom nav's Services tab goes to the Services page; Location and Quote stay sheets (Location retired 2026-11-19) | David's call: Services is a full page, Location and Quote are quick actions. Sheet / Services stays in the Page Shell for any button that wants it |
 | 2026-11-07 | The phone number is not shown as text where a Call button exists | |
 | 2026-11-07 | The business data layer stays on the page, not in a component | Webflow rejects live Collection Lists in API-made components |
 | 2026-11-13 | New pages start from the draft **Page Template** page (Page Shell + `shell-data`); Core Business warns in the console when a page has no data layer | Rechecked: Webflow refuses any component holding a CMS-bound Collection List, even in the Designer, so neither the Page Shell nor a drop-in component can carry it |
@@ -34,6 +34,10 @@
 | 2026-11-14 | Sizing follows Tailwind's scale | David uses Tailwind in Next.js and wants sites to look and feel familiar. See ARCHITECTURE.md › Tokens |
 | 2026-11-14 | Off-scale sizes are `calc()` from the base size, not new primitives | e.g. 0.875rem = `calc(var(--_primitives---base--font-size) * 0.875)` |
 | 2026-11-14 | Buttons: 14px text (16px for `is-large`); form inputs 14px on desktop and 16px on phones | 14px matches Amazon and most app UIs; 16px inputs stop phone browsers zooming in on focus |
+| 2026-11-19 | Standard bottom nav: Home · Services · Call · Our Work · Quote. Home is always first and Call always in the middle; Services is second | Replaces the 2026-11-07 Home · Services · Call · Location · Quote. David: tabs 4 and 5 are "Swapped per trade or per client some may want something different". Not yet built in the master, which still shows Home · Services · Book · Location · Quote |
+| 2026-11-19 | The ⋯ in the top nav opens one sheet of general business info: hours, location and directions, Add to Home Screen, cookie settings. Location is no longer a tab, and Sheet / Location retires | David: "We should not need location as a tab anymore" |
+| 2026-11-19 | Services show prices: Card / Service and Card / Service Item get a Price prop and a Show Price switch | David: Services "will have pricing" |
+| 2026-11-19 | The quote is quiz-style: 3–4 tap questions, then name and phone, sent as one native Webflow form; it opens as a sheet from the Quote tab and buttons and can sit inline on a page | David: "even quotes could be quiz like". The working reference is the quiz in Mayes Digital 2.0's own Page Shell; it moves into Core |
 
 ## Open
 
