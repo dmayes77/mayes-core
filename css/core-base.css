@@ -1,4 +1,4 @@
-/* Mayes Core – Base v3.1.0
+/* Mayes Core – Base v3.1.1
  * The only CSS Core ships: rules Webflow's style panel cannot express. Everything else (the sheet's look and position,
  * bottom nav, consent switches, hours rows, install banner, safe areas, the announcement bar) is Webflow classes and
  * is-* combos.
@@ -29,6 +29,9 @@ dialog[data-sheet][data-sheet-instant],dialog[data-sheet][data-sheet-instant]::b
  * containment stops a swipe that reaches the end of the sheet from scrolling the page behind it (Android). */
 html:has(dialog[data-sheet]:modal),html:has(dialog[data-sheet]:modal) body,html[data-core-sheet-lock],html[data-core-sheet-lock] body{overflow:hidden}
 dialog[data-sheet],dialog[data-sheet] *{overscroll-behavior:contain}
+/* iPhone Safari still scrolls the page when a swipe starts on the backdrop, whatever the overflow. While a sheet is modal,
+ * core-sheet.js also pins the page where it is (--core-sheet-lock-y = minus the scroll position) and puts it back on close. */
+html[data-core-sheet-lock] body{position:fixed;top:var(--core-sheet-lock-y,0px);left:0;right:0}
 
 [data-bottom-nav] a,dialog[data-sheet] a,[data-install-banner] a{-webkit-tap-highlight-color:transparent}
 @media (prefers-reduced-motion:reduce){

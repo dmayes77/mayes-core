@@ -55,6 +55,7 @@ About 220 of Core's ~1,100 JS lines (bottom nav, motion, announcement) could go 
 - **v2.3.0 (2026-11-14):** the sheet slide and backdrop take their timing from the Webflow Motion collection (`Duration/standard`, `Duration/fast`), so timing is edited in Webflow, not in Core. Checked on the master on Android (Motorola Razr): smooth.
 - **v2.3.1 (2026-11-15):** the sheet backdrop dims and blurs like full-screen overlays, and the scroll lock holds on touch (overscroll containment, plus a `data-core-sheet-lock` fallback). `::backdrop`, `overscroll-behavior` and `<html>` can't be set in Webflow, so they stay in Core.
 - **v2.4.0 (2026-11-15):** opt-out consent is a `<meta>` setting instead of custom head code, and Add to Home Screen opens from the start page. The Webflow side got 44px buttons, aligned pricing cards (Card Row › Pricing variant) and icon tiles in the Services sheet, all native Webflow styles.
+- **v2.4.1 (2026-11-20):** the scroll lock holds on iPhone. Webflow's Modal has no page scroll lock setting, so Core pins the page while a sheet is open and puts it back on close (Finsweet's Disable Scrolling would add a second script for the same job).
 
 ## Release plan
 

@@ -1,4 +1,4 @@
-/* Mayes Core – Sheet v3.0.1
+/* Mayes Core – Sheet v3.0.2
  * Sheets are native Webflow Modals (<dialog>), designed in Webflow as bottom sheets. Webflow and the browser do the work:
  * show/hide links (link mode "modal"), focus moved in, trapped and returned, Escape, the inert page, the top layer.
  * core-base.css adds the slide-up motion, the dimmed ::backdrop and the scroll lock (the style panel can't express them).
@@ -51,11 +51,26 @@
     return top;
   }
 
-  /* html[data-core-sheet-lock] mirrors "a sheet is modal", so the CSS scroll lock holds where :has(:modal) is not supported */
+  /* html[data-core-sheet-lock] mirrors "a sheet is modal", so the CSS scroll lock holds where :has(:modal) is not supported.
+   * It also pins the page in place (core-base.css: body position fixed at --core-sheet-lock-y), because iPhone Safari scrolls
+   * the page under a swipe that starts on the backdrop even with overflow hidden. On close the page goes back where it was. */
+  var lockY = 0;
   function syncLock(){
-    var on = false, all = document.querySelectorAll('dialog[data-sheet]');
+    var on = false, all = document.querySelectorAll('dialog[data-sheet]'), h = document.documentElement;
     for(var i = 0; i < all.length; i++){ try{ if(all[i].open && all[i].matches(':modal')){ on = true; break; } }catch(e){ if(all[i].open && !nonmodal(all[i])){ on = true; break; } } }
-    document.documentElement.toggleAttribute('data-core-sheet-lock', on);
+    if(on === h.hasAttribute('data-core-sheet-lock')) return;
+    if(on){
+      lockY = window.scrollY || window.pageYOffset || 0;
+      h.style.setProperty('--core-sheet-lock-y', (-lockY) + 'px');
+      h.setAttribute('data-core-sheet-lock', '');
+    } else {
+      h.removeAttribute('data-core-sheet-lock');
+      h.style.removeProperty('--core-sheet-lock-y');
+      var sb = h.style.scrollBehavior;
+      h.style.scrollBehavior = 'auto';           // jump straight back, even on sites with smooth scrolling
+      window.scrollTo(0, lockY);
+      h.style.scrollBehavior = sb;
+    }
   }
 
   /* every Modal that opens fires sheet:open, however it was opened (Core, a Webflow link, or the browser) */
