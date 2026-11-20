@@ -4,7 +4,7 @@
 
 Webflow sites load files from this repo through jsDelivr **by release tag only**:
 
-    https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v2.4.0/dist/core.js
+    https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v2.4.1/dist/core.js
 
 Never `@main`, never `@stable`, never a bare commit. A push to `main` must never change a live site.
 
@@ -35,7 +35,8 @@ CI (`.github/workflows/ci.yml`) runs `./check.sh` and `test/run.py` on every pul
 | `v2.2.0` | Announcement bar is native: `core-announcement.js`, `CoreAnnouncement` and `--core-announcement-offset` removed (bar in the Page Shell, sticky header, text from Business Settings). **Breaking** (released as a minor) | superseded by v2.3.0 |
 | `v2.3.0` | Sheet timing reads the Webflow Motion tokens; before/after slider reads `Background/subtle`. Both fall back to the old values. Not breaking | superseded by v2.3.1 |
 | `v2.3.1` | Sheet backdrop dims and blurs (navy 55%, 4px; `--core-sheet-backdrop` to override); overscroll containment and a `data-core-sheet-lock` fallback keep the page still behind a sheet on Android. Not breaking | superseded by v2.4.0 |
-| `v2.4.0` | Opt-out consent as a setting (`core-consent-mode` meta, head snippet v1.2.0); Add to Home Screen opens from the start page (`data-install-start`). Not breaking | latest; the $500 Base site and every new site. v1 sites stay on v1 tags |
+| `v2.4.0` | Opt-out consent as a setting (`core-consent-mode` meta, head snippet v1.2.0); Add to Home Screen opens from the start page (`data-install-start`). Not breaking | superseded by v2.4.1 |
+| `v2.4.1` | Scroll lock holds on iPhone: while a sheet is modal the page is pinned where it was (body fixed at `--core-sheet-lock-y`) and put back on close, because Safari scrolls the page under a swipe that starts on the backdrop. Not breaking | latest; the $500 Base site and every new site. v1 sites stay on v1 tags |
 
 ## Cutting a release
 

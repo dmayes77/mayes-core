@@ -141,10 +141,13 @@ def run():
         check("page behind is inert (native modal)", pg.evaluate("document.elementFromPoint(195, 400) && !document.querySelector('main').contains(document.elementFromPoint(195, 30))"))
         check("scroll locked", pg.evaluate("getComputedStyle(document.documentElement).overflowY === 'hidden' && getComputedStyle(document.body).overflowY === 'hidden'"))
         check("scroll lock attribute set while modal", pg.evaluate("document.documentElement.hasAttribute('data-core-sheet-lock')"))
+        check("scroll lock pins the page where it was (iPhone Safari)", pg.evaluate("getComputedStyle(document.body).position === 'fixed' && Math.round(document.body.getBoundingClientRect().top) === -300"),
+              pg.evaluate("[getComputedStyle(document.body).position, document.body.getBoundingClientRect().top]"))
         pg.keyboard.press("Escape"); pg.wait_for_timeout(450)
         check("scroll lock attribute cleared on close", not pg.evaluate("document.documentElement.hasAttribute('data-core-sheet-lock')"))
         check("Escape closes, sheet no longer displayed", not is_open("services") and pg.evaluate(f"getComputedStyle({S('services')}).display") == "none")
         check("scroll position kept", pg.evaluate("window.scrollY") == 300, pg.evaluate("window.scrollY"))
+        check("page unpinned on close", pg.evaluate("getComputedStyle(document.body).position !== 'fixed' && !document.documentElement.style.getPropertyValue('--core-sheet-lock-y')"))
         check("focus returned to tab", pg.evaluate("document.activeElement === document.getElementById('tab-services')"))
         check("sheet:open and sheet:close fired for services", all(e in pg.evaluate("__ev") for e in ("sheet:open:services", "sheet:close:services")), pg.evaluate("__ev"))
 

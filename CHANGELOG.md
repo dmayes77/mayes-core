@@ -1,5 +1,15 @@
 # Changelog
 
+## v2.4.1 — 2026-11-20
+
+Not breaking. The page behind a sheet stays still on iPhone.
+
+**Scroll lock holds on iPhone.** Safari scrolls the page under a swipe that starts on the sheet's backdrop, even with `overflow: hidden`, so the page moved behind an open sheet. While a sheet is modal, Core Sheet now also pins the page where it is (`body` fixed at `--core-sheet-lock-y`, minus the scroll position) and puts it back at the same spot on close, with no smooth-scroll jump. Non-blocking sheets (the desktop cookie bar) still leave the page alone. Webflow's Modal has no page scroll lock setting, and Finsweet's Disable Scrolling would add a second script for the same job, so the fix stays in Core.
+
+Module versions: Base v3.1.1 (`core-base.css`), Sheet v3.0.2.
+
+**Tests:** the page is pinned at the scroll position while a sheet is open, unpinned on close, and the scroll position is kept.
+
 ## v2.4.0 — 2026-11-15
 
 Not breaking. Two new options, plus Webflow master updates promoted from the Mayes Digital site.
