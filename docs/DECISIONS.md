@@ -34,10 +34,11 @@
 | 2026-11-14 | Sizing follows Tailwind's scale | David uses Tailwind in Next.js and wants sites to look and feel familiar. See ARCHITECTURE.md › Tokens |
 | 2026-11-14 | Off-scale sizes are `calc()` from the base size, not new primitives | e.g. 0.875rem = `calc(var(--_primitives---base--font-size) * 0.875)` |
 | 2026-11-14 | Buttons: 14px text (16px for `is-large`); form inputs 14px on desktop and 16px on phones | 14px matches Amazon and most app UIs; 16px inputs stop phone browsers zooming in on focus |
-| 2026-11-19 | Standard bottom nav: Home · Services · Call · Our Work · Quote. Home is always first and Call always in the middle; Services is second | Replaces the 2026-11-07 Home · Services · Call · Location · Quote. David: tabs 4 and 5 are "Swapped per trade or per client some may want something different". Not yet built in the master, which still shows Home · Services · Book · Location · Quote |
-| 2026-11-19 | The ⋯ in the top nav opens one sheet of general business info: hours, location and directions, Add to Home Screen, cookie settings. Location is no longer a tab, and Sheet / Location retires | David: "We should not need location as a tab anymore" |
-| 2026-11-19 | Services show prices: Card / Service and Card / Service Item get a Price prop and a Show Price switch | David: Services "will have pricing" |
+| 2026-11-19 | Standard bottom nav: Home · Services · Call · Our Work · Quote. Home is always first and Call always in the middle; Services is second | Replaces the 2026-11-07 Home · Services · Call · Location · Quote. David: tabs 4 and 5 are "Swapped per trade or per client some may want something different". Built in the master 2026-11-19 |
+| 2026-11-19 | The ⋯ in the top nav opens one sheet of general business info: hours, location and directions, Add to Home Screen, cookie settings. Location is no longer a tab, and Sheet / Location retires | David: "We should not need location as a tab anymore". Hours & location built into the ⋯ sheet 2026-11-19 |
+| 2026-11-19 | Services show prices: Card / Service and Card / Service Item get a Price prop and a Show Price switch | David: Services "will have pricing". Built in the master 2026-11-19 (Section / Service List also gets Show Prices and Item 1–8 Price) |
 | 2026-11-19 | The quote is quiz-style: 3–4 tap questions, then name and phone, sent as one native Webflow form; it opens as a sheet from the Quote tab and buttons and can sit inline on a page | David: "even quotes could be quiz like". The working reference is the quiz in Mayes Digital 2.0's own Page Shell; it moves into Core |
+| 2026-11-19 | Webflow first: anything Webflow can do natively (elements, forms, Interactions, CMS, component props) is built in Webflow; script only covers what Webflow can't | David: "If it can be done in webflow then we use webflow first" |
 
 ## Open
 

@@ -96,9 +96,9 @@ So a site built on Core feels familiar, and so values carry over to Next.js + Ta
 Desktop is a normal website. Phones and tablets get an app-style layer from Core:
 
 - **Brand bar:** logo plus a ⋯ button that opens the business info and settings sheet.
-- **Bottom nav:** 5 tabs, standard set decided 2026-11-19: Home · Services (with prices) · Call (middle) · Our Work · Quote (quiz-style). Home, Services and Call are fixed; tabs 4 and 5 can be swapped per trade or per client. Each tab is a link (a sheet tab adds `data-sheet-open="NAME"`); the active tab uses Webflow's Current state. The master still has the earlier Home · Services · Book · Location · Quote until it is updated.
+- **Bottom nav:** 5 tabs, standard set decided 2026-11-19: Home · Services (with prices) · Call (middle) · Our Work · Quote (quiz-style). Home, Services and Call are fixed; tabs 4 and 5 can be swapped per trade or per client. Each tab is a link (a sheet tab adds `data-sheet-open="NAME"`); the active tab uses Webflow's Current state. Built in the master 2026-11-19; the master has no `/our-work` page yet.
 - **Sheets:** each sheet is a native Webflow Modal (`<dialog>`) in its own component, designed as a bottom sheet: full width and flush to the bottom on phones, 36rem wide and centered at the bottom above. Webflow and the browser handle opening and closing links, focus, Escape and the inert page; `core-base.css` adds the slide, backdrop and scroll lock; `core-sheet.js` adds open-by-name, tap-outside for Safari and swipe down to close.
-- **Site Settings (the ⋯ sheet):** today Privacy & cookies and Add to Home Screen. Under the 2026-11-19 standard it also holds the hours and location (address, directions), which replaces the Location tab and sheet.
+- **Site Settings (the ⋯ sheet):** Hours & location (today's hours, Directions, the week's hours), Add to Home Screen, and Privacy & cookies. It replaces the Location tab and sheet (built 2026-11-19).
 
 Markup contract: `data-bottom-nav`, `data-sheet` (on the Modal), `data-sheet-open`, `data-sheet-grabber`, `data-sheet-head`, `data-sheet-close`, `data-install-banner` (and its parts), `data-consent-*`.
 

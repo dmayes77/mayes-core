@@ -45,7 +45,7 @@ Most are in the **Sections** group (heroes are in **Hero**), built from Core cla
 
 Other building blocks: **Section** (universal, with Surface and Content slots), **Slider / Peek-a-boo** (the Card Row slider on its own), **Media / Before After**, **Button / Standard Flat** (every button except form submits: Text, Link, Variant, icon, and the behavior props Opens Sheet, Fills From Business, Business Field, Consent Action, Install Action), **Chip**, the **Icon** and **Social Icons** sets, and the alternative top navs **Navigation / Compact** and **Navigation / Service**.
 
-**Service prices (decided 2026-11-19, not yet in the master):** Card / Service and Card / Service Item get a **Price** prop and a **Show Price** switch, so the Services tab and page can show prices.
+**Service prices (built 2026-11-19):** Card / Service and Card / Service Item have a **Price** prop (default "From $99") and a **Show Price** switch (off by default), shown in a `service-price` line under the title. Section / Service List has a **Show Prices** switch and **Item 1–8 Price** props that feed its eight items.
 
 The top nav defaults to Home, Services and Contact (turn on **Show Link 4** for a fourth); its CTA opens the Quote sheet. The footer defaults to Pages (Home, Services, Contact) and Info (Privacy policy, Request a quote); the newsletter form is off (**Show Subscribe**).
 
@@ -55,7 +55,7 @@ Phones and tablets (991px and below) get a flush top bar and a flush bottom nav,
 
 - **Top bar:** logo and a ⋯ button that opens one sheet of general business info and settings. In the master today that is the Settings sheet (Privacy & cookies, Add to Home Screen). Decided 2026-11-19: it also takes the hours and location (address, directions), so a site needs no Location tab. No dropdown on phones.
 - **Bottom nav (standard, decided 2026-11-19):** Home · Services (with prices) · **Call** (middle) · Our Work · Quote. Home, Services and Call are fixed in that order. Tabs 4 and 5 can be swapped per trade or per client (for example Book, Menu, Shop, or Collab on a creator site). Quote is quiz-style: a few tap questions, then name and phone, sent as one native form.
-- **Bottom nav in the master today:** Home · Services · Book (pages) and Location · Quote (sheets). It moves to the standard above as part of the next master update.
+- **Bottom nav in the master (built 2026-11-19):** Home (`/`) · Services (the Services page) · Call (`data-business-href="phone-href"`, falls back to `/contact`) · Our Work (`/our-work`) · Quote (`data-sheet-open="quote"`). The master has no `/our-work` page yet.
 - **Desktop:** the ⋯ button is hidden; the footer's "Cookie settings" link opens the same Settings sheet.
 
 In the Webflow master:
@@ -64,11 +64,11 @@ In the Webflow master:
 |---|---|---|
 | Page Shell | page body | One slot: **Main Content**. Everything else is built in and identical on every page: the announcement bar (`announcement-bar`, filled from Business Settings, hidden when empty), the top nav (`shell-header`), footer (`shell-footer`), bottom nav (`shell-mobile-nav`, 991px and below), the sheets (`shell-sheets`, native Modals) and Core / Install Banner. Change any of them once in its component |
 | Navigation / Glass | inside the Page Shell (`shell-header`) | Flush top bar: logo, links, and a Get a quote button (`data-sheet-open="quote"`, text from the CTA Text prop, hidden with Show CTA); ⋯ button (`data-sheet-open="site-settings"`) on phones |
-| Navigation / Site Bottom Nav | inside the Page Shell (`shell-mobile-nav`) | Variants **Base** (flush bar) and **Float** (inset, rounded, floating). Today: Home, Services, Book (pages) and Location, Quote (sheets); moving to the standard above. Each tab is a link (`bottom-nav_hit`) with its icon and label inside; a sheet tab carries `data-sheet-open="NAME"`. The active tab is the link's **Current** state in Webflow |
+| Navigation / Site Bottom Nav | inside the Page Shell (`shell-mobile-nav`) | Variants **Base** (flush bar) and **Float** (inset, rounded, floating). Tabs: Home, Services, Call, Our Work (links) and Quote (sheet), the standard above. Each tab is a link (`bottom-nav_hit`) with its icon and label inside; a sheet tab carries `data-sheet-open="NAME"`. The active tab is the link's **Current** state in Webflow |
 | Core / Install Banner | Page Shell root, once | Add to Home Screen banner; its look is the `install-banner_*` classes. Preview it by adding the `is-visible` combo |
-| Sheet / Site Settings | inside the Page Shell (`shell-sheets` div), once | `site-settings` sheet (opened by ⋯; takes hours and location under the 2026-11-19 standard) + `cookie-notice` sheet (a full-width bar on desktop with the `is-banner` combo). Switches use `settings_switch` with the `is-on` and `is-disabled` combos; buttons use `button` and `button is-secondary` |
+| Sheet / Site Settings | inside the Page Shell (`shell-sheets` div), once | `site-settings` sheet (opened by ⋯): Hours & location (today's hours, a Directions row filled from `directions-url`, the week's hours), Add to Home Screen, Privacy & cookies + `cookie-notice` sheet (a full-width bar on desktop with the `is-banner` combo). Switches use `settings_switch` with the `is-on` and `is-disabled` combos; buttons use `button` and `button is-secondary` |
 | Sheet / Services | inside the Page Shell (`shell-sheets` div) | `services` sheet: quick list with an icon tile per row (`sheet-row_icon`) and an All services link |
-| Sheet / Location | inside the Page Shell (`shell-sheets` div) | `location` sheet: today's hours, address, Directions, Call, the week's hours. Retires once its content moves into the ⋯ sheet (2026-11-19) |
+| Sheet / Location | inside the Page Shell (`shell-sheets` div) | `location` sheet: today's hours, address, Directions, Call, the week's hours. No tab opens it since 2026-11-19, when its content moved into the ⋯ sheet; remove it from the Page Shell when convenient |
 | Sheet / Quote | inside the Page Shell (`shell-sheets` div) | `quote` sheet with a native Webflow form (Name, Phone, What do you need?); rename to Collab on creator sites. Becomes the quiz-style quote (2026-11-19) |
 | Footer / Standard | inside the Page Shell (`shell-footer`) | Logo, copyright and social icons fill from Business Settings; empty social links hide; "Cookie settings" link |
 | Business data layer | every page, next to the Page Shell (comes with the Page Template) | Hidden. Renders the Business Settings item and the 7 Business Hours items for `core-business.js` |
