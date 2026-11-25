@@ -1,6 +1,8 @@
 # Changelog
 
-## v2.5.0 — 2026-11-25
+## v2.5.1 — 2026-11-25
+
+The v2.5.0 tag was cut from main before these changes landed and contains the same code as v2.4.1. Use v2.5.1.
 
 Not breaking. Keyboard and screen-reader basics, found by running the Mayes Digital UX law check on the Apex site.
 
