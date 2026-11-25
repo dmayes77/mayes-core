@@ -57,6 +57,7 @@ def run():
         pg.on("pageerror", lambda e: errors.append(str(e)))
         pg.on("console", lambda m: m.type == "error" and not m.text.startswith("Failed to load resource") and errors.append(m.text))
         pg.on("response", lambda r: r.status >= 400 and not r.url.endswith("placeholder.svg") and errors.append(f"{r.status} {r.url}"))
+        pg.add_init_script("window.__ev = []; ['sheet:open','sheet:close'].forEach(t => document.addEventListener(t, e => __ev.push(t + ':' + e.target.getAttribute('data-sheet'))))")
         pg.goto(base + plain); pg.wait_for_load_state("load")
         check("globals present, no retired modules", pg.evaluate("!!(window.CoreSheet && window.CoreConsent && window.CoreBusiness && window.CoreInstall) && !window.CoreAnnouncement && !window.CoreMotion && !window.__coreBottomNav"))
         check("versions: Sheet 3.0.1, Consent and Install 2.1.0, Business 2.0.0", pg.evaluate("CoreSheet.version === '3.0.1' && CoreConsent.version === '2.1.0' && CoreInstall.version === '2.1.0' && CoreBusiness.version === '2.0.0'"))
@@ -117,7 +118,6 @@ def run():
         S = lambda n: f"document.querySelector('dialog[data-sheet=\"{n}\"]')"
         is_open = lambda n: pg.evaluate(f"{S(n)}.open && {S(n)}.matches(':modal')")
         R = lambda n: pg.evaluate(f"(() => {{ const r = {S(n)}.getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top), Math.round(r.right), Math.round(r.bottom)]; }})()")
-        pg.evaluate("window.__ev = []; ['sheet:open','sheet:close'].forEach(t => document.addEventListener(t, e => __ev.push(t + ':' + e.target.getAttribute('data-sheet'))))")
         check("sheets closed: not displayed", pg.evaluate("[...document.querySelectorAll('dialog[data-sheet]:not([data-sheet=cookie-notice])')].every(d => !d.open && getComputedStyle(d).display === 'none')"))
         # cookie notice appears ~1.2s after first visit (handled first, so it can't cover the links below)
         pg.wait_for_function("CoreSheet.current() !== null", timeout=5000)
@@ -135,6 +135,7 @@ def run():
         pg.evaluate("history.replaceState(null, '', location.pathname)")
         pg.click("#open-missing"); pg.wait_for_timeout(200)
         check("data-sheet-open with no such sheet: plain link", pg.evaluate("location.hash === '#no-such-sheet' && !CoreSheet.current() && CoreSheet.open('nope') === null"))
+        check("data-sheet-open with no such sheet: no button role or dialog promise", pg.evaluate("(() => { const a = document.getElementById('open-missing'); return !a.hasAttribute('role') && !a.hasAttribute('aria-haspopup'); })()"))
         pg.evaluate("history.replaceState(null, '', location.pathname)")
         check("button component: empty behavior attributes leave a plain link", pg.evaluate("""(() => { const a = document.getElementById('cb-plain-link');
             return a.getAttribute('href') === '#cb-target' && !a.hasAttribute('role') && !a.hasAttribute('tabindex'); })()"""))

@@ -22,6 +22,8 @@ Module versions: Base v3.2.0 (`core-base.css`), Accessibility v1.0.0 (new), Shee
 
 **Hero fills the screen under the announcement bar.** Business v2.2.0 sets `--core-announcement-height` on `<html>` while the bar is showing (and removes it when the bar is hidden or empty), following it if its text wraps. The Page Shell hero now has `min-height: calc(100dvh - var(--core-announcement-height, 0px))`, so the hero plus the bar fill exactly one screen instead of overflowing by the bar's height.
 
+A sheet link whose named sheet is missing from the page stays a plain link: no button role, no dialog promise, and Space scrolls as usual.
+
 **Tests:** the skip link is first, parked off screen, shown and focus-ringed on the first Tab, and Enter moves focus into `<main>`; sheet links get the role and `aria-haspopup`, a real button and an empty-name link are left alone, and Space opens a sheet.
 
 ## v2.4.1 — 2026-11-20

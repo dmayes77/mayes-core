@@ -873,6 +873,9 @@
 
   function triggers(){
     document.querySelectorAll('[data-sheet-open]:not([data-sheet-open=""])').forEach(function(t){
+      /* only when the named sheet is on the page; a link whose sheet is missing keeps its plain link meaning (it navigates) */
+      var n = t.getAttribute('data-sheet-open'), esc = window.CSS && CSS.escape ? CSS.escape(n) : n.replace(/"/g, '\\"');
+      if(!document.querySelector('[data-sheet="' + esc + '"]')) return;
       if(t.tagName !== 'BUTTON' && !t.hasAttribute('role')) t.setAttribute('role', 'button');
       if(!t.hasAttribute('aria-haspopup')) t.setAttribute('aria-haspopup', 'dialog');
     });
@@ -881,7 +884,7 @@
   /* a link acts on Enter only; a button also acts on Space */
   document.addEventListener('keydown', function(e){
     if(e.key !== ' ' && e.key !== 'Spacebar') return;
-    var t = e.target && e.target.closest && e.target.closest('a[role="button"][data-sheet-open]');
+    var t = e.target && e.target.closest && e.target.closest('a[role="button"][data-sheet-open][aria-haspopup="dialog"]');
     if(!t) return;
     e.preventDefault();
     t.click();
