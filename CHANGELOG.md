@@ -1,5 +1,15 @@
 # Changelog
 
+## v2.5.2 — 2026-11-25
+
+Not breaking. A slide-down for `<details>`.
+
+**Slide-down for a details block.** Add the attribute `data-core-slide` to a `<details>` element and its content slides down and fades in when opened, and folds back when closed. Chrome and Edge animate the height; other browsers fade and drop the content in. Visitors who prefer reduced motion get no animation. Without the attribute, `<details>` behaves as before.
+
+Module versions: Base v3.3.0 (`core-base.css`).
+
+**Tests:** a details with `data-core-slide` has no panel height closed, animates to full height on open, and folds back to nothing.
+
 ## v2.5.1 — 2026-11-25
 
 The v2.5.0 tag was cut from main before these changes landed and contains the same code as v2.4.1. Use v2.5.1.

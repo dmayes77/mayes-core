@@ -1,6 +1,6 @@
 /* Mayes Core – core.css – built from: css/core-base.css */
 
-/* Mayes Core – Base v3.2.0
+/* Mayes Core – Base v3.3.0
  * The only CSS Core ships: rules Webflow's style panel cannot express. Everything else (the sheet's look and position,
  * bottom nav, consent switches, hours rows, install banner, safe areas, the announcement bar) is Webflow classes and
  * is-* combos.
@@ -56,3 +56,23 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{
   font:600 1rem/1.2 system-ui,-apple-system,"Segoe UI",sans-serif;text-decoration:none;transform:translateY(-300%)}
 [data-skip-link]:focus{transform:none}
 main[tabindex="-1"]:focus{outline:none}
+
+/* Slide-down for <details data-core-slide> (v3.3.0). The panel grows from nothing to its height and fades in when opened,
+ * and folds back on close. Chrome and Edge animate the height (interpolate-size); other browsers fade and drop the content
+ * in instead. No motion when the visitor prefers reduced motion. */
+details[data-core-slide]{interpolate-size:allow-keywords}
+details[data-core-slide]::details-content{block-size:0;overflow:clip;opacity:0;
+  transition:block-size .35s ease,opacity .3s ease,content-visibility .35s allow-discrete}
+details[data-core-slide][open]::details-content{block-size:auto;opacity:1}
+@supports not (interpolate-size:allow-keywords){
+  details[data-core-slide]::details-content{block-size:auto;transition:opacity .3s ease,content-visibility .3s allow-discrete}
+  details[data-core-slide][open]>:not(summary){animation:core-slide-down .35s ease}
+}
+@supports not selector(::details-content){
+  details[data-core-slide][open]>:not(summary){animation:core-slide-down .35s ease}
+}
+@keyframes core-slide-down{from{opacity:0;transform:translateY(-.75rem)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  details[data-core-slide]::details-content{transition:none}
+  details[data-core-slide][open]>:not(summary){animation:none}
+}

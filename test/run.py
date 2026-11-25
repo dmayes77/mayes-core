@@ -235,6 +235,20 @@ def run():
         # core-base.css
         check("[hidden] wins over a Webflow class display", pg.evaluate("(() => { const b = document.getElementById('banner'); b.classList.add('is-visible'); b.hidden = true; const d = getComputedStyle(b).display; b.hidden = false; b.classList.remove('is-visible'); return d; })()") == "none")
         check("html keeps a stable scrollbar gutter", pg.evaluate("getComputedStyle(document.documentElement).scrollbarGutter") == "stable")
+        # details slide-down (core-base.css v3.3.0)
+        pg.evaluate("""(() => { const d = document.createElement('details'); d.id = 'slide-d'; d.setAttribute('data-core-slide', '');
+          d.innerHTML = '<summary>More</summary><div id="slide-c" style="height:120px">Content</div>'; document.body.appendChild(d); })()""")
+        PH = "(function(){var d=document.getElementById('slide-d');return Math.round(d.getBoundingClientRect().height-d.firstElementChild.getBoundingClientRect().height)})()"
+        check("slide-down: closed panel has no height", pg.evaluate(PH) == 0)
+        pg.evaluate("document.getElementById('slide-d').open = true")
+        pg.wait_for_timeout(120)
+        mid = pg.evaluate(PH)
+        pg.wait_for_timeout(500)
+        end = pg.evaluate(PH)
+        check("slide-down: opens to full height and animates on the way", end == 120 and (mid < 120 or not pg.evaluate("CSS.supports('interpolate-size','allow-keywords')")), (mid, end))
+        pg.evaluate("document.getElementById('slide-d').open = false"); pg.wait_for_timeout(500)
+        check("slide-down: folds back to nothing", pg.evaluate(PH) == 0)
+        pg.evaluate("document.getElementById('slide-d').remove()")
         check("no JS errors (phone)", not errors, errors)
         ctx.close()
 
