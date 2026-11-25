@@ -60,6 +60,23 @@ def run():
         pg.goto(base + plain); pg.wait_for_load_state("load")
         check("globals present, no retired modules", pg.evaluate("!!(window.CoreSheet && window.CoreConsent && window.CoreBusiness && window.CoreInstall) && !window.CoreAnnouncement && !window.CoreMotion && !window.__coreBottomNav"))
         check("versions: Sheet 3.0.1, Consent and Install 2.1.0, Business 2.0.0", pg.evaluate("CoreSheet.version === '3.0.1' && CoreConsent.version === '2.1.0' && CoreInstall.version === '2.1.0' && CoreBusiness.version === '2.0.0'"))
+        check("announcement height: --core-announcement-height matches the visible bar", pg.evaluate("getComputedStyle(document.documentElement).getPropertyValue('--core-announcement-height').trim() === document.getElementById('bar').getBoundingClientRect().height + 'px'") and pg.evaluate("document.getElementById('bar').getBoundingClientRect().height") > 0)
+        # accessibility: skip link, sheet trigger semantics, focus ring
+        check("a11y: CoreA11y 1.0.0 present", pg.evaluate("!!window.CoreA11y && CoreA11y.version === '1.0.0'"))
+        check("a11y: skip link injected first, pointing at <main>", pg.evaluate("(function(){var a=document.body.firstElementChild,m=document.querySelector('main');return a.hasAttribute('data-skip-link')&&m.id!==''&&a.getAttribute('href')==='#'+m.id&&a.textContent==='Skip to main content'})()"))
+        check("a11y: skip link parked off screen until focused", pg.evaluate("document.querySelector('[data-skip-link]').getBoundingClientRect().bottom < 0"))
+        pg.keyboard.press("Tab")
+        check("a11y: first Tab lands on the skip link and shows it", pg.evaluate("document.activeElement.hasAttribute('data-skip-link') && document.activeElement.getBoundingClientRect().top >= 0"))
+        check("a11y: focus ring is drawn on keyboard focus", pg.evaluate("(function(){var s=getComputedStyle(document.activeElement);return s.outlineStyle==='solid'&&parseFloat(s.outlineWidth)>=2&&s.boxShadow!=='none'})()"))
+        pg.keyboard.press("Enter")
+        check("a11y: Enter on the skip link moves focus into <main>", pg.evaluate("document.activeElement === document.querySelector('main')"))
+        check("a11y: sheet link gets role=button and aria-haspopup=dialog", pg.evaluate("(function(){var t=document.getElementById('tab-services');return t.getAttribute('role')==='button'&&t.getAttribute('aria-haspopup')==='dialog'&&t.getAttribute('href')==='/services'})()"))
+        check("a11y: a real button and an empty-name link are left alone", pg.evaluate("document.getElementById('open-services').getAttribute('role')===null && document.getElementById('open-empty').getAttribute('role')===null"))
+        pg.focus("#tab-services")
+        pg.keyboard.press("Space")
+        pg.wait_for_timeout(400)
+        check("a11y: Space on a sheet link opens the sheet", pg.evaluate("!!document.querySelector('dialog[data-sheet=\"services\"][open]')"))
+        pg.evaluate("CoreSheet.close(CoreSheet.get('services'))"); pg.wait_for_timeout(400)
         css = open(os.path.join(ROOT, "dist/core.css")).read()
         rules = css.split("*/", 1)[1] if "*/" in css else css
         import re as _re

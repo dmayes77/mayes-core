@@ -44,11 +44,11 @@ Head (consent snippet first, above any Google tag; then the app snippet; then th
 
     <!-- paste dist/core-consent-head.html here -->
     <!-- paste dist/core-app-head.html here (set the short name and theme color) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v2.4.1/dist/core.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v2.5.0/dist/core.css">
 
 Footer:
 
-    <script src="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v2.4.1/dist/core.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/gh/dmayes77/mayes-core@v2.5.0/dist/core.js" defer></script>
 
 `core.js` = sheet + consent + business (+ JSON-LD) + install. Each module also ships alone in `dist/`.
 
@@ -62,6 +62,7 @@ Sites built on v1 (DetailFlow, ShopFlow) stay pinned to their v1 tag until they'
 | Consent | `CoreConsent.get/set/open` | `data-consent-switch`, `data-consent-action`, `data-consent` (gated scripts) |
 | Business | `CoreBusiness.get/all/hours/fill` | `data-business-field` (source), `data-business` (target), `data-business-href`, `data-business-empty="hide"`, `data-business-hours`, `data-business-today` |
 | Install (Add to Home Screen) | `CoreInstall.show/hide/state` | the Core / Install Banner component (`data-install-banner`) is required; `data-install-open` trigger; `<html data-install="off">`, `data-install-name`, `data-install-delay`; sets `--core-install-offset` |
+| Accessibility | `CoreA11y.refresh` | skip link injected before `<main>` (`<meta name="core-skip-link" content="off">`, `core-skip-link-text`, `data-skip-link`); links with `data-sheet-open` get `role="button"` and `aria-haspopup="dialog"` |
 | Before and After (optional, separate file) | `CoreBeforeAfter.init` | `data-before-after`, `data-before-after-range` |
 
 ## Checks and tests

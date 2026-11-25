@@ -1,6 +1,6 @@
 /* Mayes Core – core.css – built from: css/core-base.css */
 
-/* Mayes Core – Base v3.1.1
+/* Mayes Core – Base v3.2.0
  * The only CSS Core ships: rules Webflow's style panel cannot express. Everything else (the sheet's look and position,
  * bottom nav, consent switches, hours rows, install banner, safe areas, the announcement bar) is Webflow classes and
  * is-* combos.
@@ -14,6 +14,8 @@
  *   The scroll lock holds only while a sheet is modal (a non-blocking banner leaves the page scrollable).
  * - -webkit-tap-highlight-color is rejected by Webflow
  * - "reduce motion" media queries are not available in Webflow
+ * - the keyboard focus ring: Webflow cannot style :focus-visible on every link, button and field at once (v3.2.0)
+ * - the skip link that core-a11y.js adds, hidden until it has focus (v3.2.0)
  */
 [hidden]{display:none!important}
 html{scrollbar-gutter:stable;overscroll-behavior-x:none}
@@ -39,3 +41,18 @@ html[data-core-sheet-lock] body{position:fixed;top:var(--core-sheet-lock-y,0px);
 @media (prefers-reduced-motion:reduce){
   dialog[data-sheet],dialog[data-sheet]::backdrop,[data-install-banner],[data-bottom-nav] *{transition:none!important}
 }
+
+/* Keyboard focus ring (v3.2.0). Two tones, white inside and near-black outside, so it keeps 3:1 against any background,
+ * light or dark. Only keyboard focus shows it (:focus-visible), never a mouse click. Override per site with
+ * --core-focus-inner and --core-focus-outer. Fields repeat with [class] so they beat Webflow's own focus outline reset. */
+a:focus-visible,button:focus-visible,summary:focus-visible,[role="button"]:focus-visible,[role="switch"]:focus-visible,
+[tabindex]:not([tabindex="-1"]):focus-visible,
+input[class]:focus-visible,select[class]:focus-visible,textarea[class]:focus-visible,
+input:focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:2px solid var(--core-focus-inner,#fff);outline-offset:0;box-shadow:0 0 0 4px var(--core-focus-outer,#111)}
+
+/* Skip link (core-a11y.js): parked above the screen until it has keyboard focus. */
+[data-skip-link]{position:fixed;top:.75rem;left:.75rem;z-index:2147483647;padding:.75rem 1rem;border-radius:.5rem;background:#111;color:#fff;
+  font:600 1rem/1.2 system-ui,-apple-system,"Segoe UI",sans-serif;text-decoration:none;transform:translateY(-300%)}
+[data-skip-link]:focus{transform:none}
+main[tabindex="-1"]:focus{outline:none}

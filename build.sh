@@ -21,6 +21,7 @@ cp "$JS/privacy/core-consent.js"        "$OUT/core-consent.js"
 cp "$JS/privacy/core-consent-head.html" "$OUT/core-consent-head.html"
 cp "$JS/utilities/core-business.js"     "$OUT/core-business.js"
 cp "$JS/components/core-install.js"     "$OUT/core-install.js"
+cp "$JS/components/core-a11y.js"        "$OUT/core-a11y.js"
 cp "$JS/components/core-app-head.html"  "$OUT/core-app-head.html"
 # Optional module (not in the bundles): load only on sites that use it.
 cp "$JS/components/core-before-after.js" "$OUT/core-before-after.js"
@@ -36,7 +37,7 @@ bundle() { # bundle <output> <files...>
 }
 bundle core.css "$CSS/core-base.css"
 bundle core.js  "$JS/components/core-sheet.js" "$JS/privacy/core-consent.js" "$JS/utilities/core-business.js" \
-                "$JS/components/core-install.js"
+                "$JS/components/core-install.js" "$JS/components/core-a11y.js"
 
 echo "Build complete:"
 ls -l "$OUT"
