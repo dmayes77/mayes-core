@@ -1,4 +1,4 @@
-/* Mayes Core – core.js – built from: javascript/components/core-sheet.js javascript/privacy/core-consent.js javascript/utilities/core-business.js javascript/components/core-install.js */
+/* Mayes Core – core.js – built from: javascript/components/core-sheet.js javascript/privacy/core-consent.js javascript/utilities/core-business.js javascript/components/core-install.js javascript/components/core-a11y.js */
 
 /* Mayes Core – Sheet v3.0.2
  * Sheets are native Webflow Modals (<dialog>), designed in Webflow as bottom sheets. Webflow and the browser do the work:
@@ -291,7 +291,7 @@
   window.CoreConsent = { version: '2.1.0', key: KEY, get: read, set: set, open: open, mode: function(){ return optOut() ? 'opt-out' : 'opt-in'; }, effective: effective };
 })();
 
-/* Mayes Core – Business v2.1.0 – one business record, shown anywhere on the page.
+/* Mayes Core – Business v2.2.0 – one business record, shown anywhere on the page.
  *
  * MISSING DATA LAYER – Webflow can't put a CMS Collection List inside a component, so the data layer (shell-data,
  *   [data-business-source]) sits on each page. A page without it logs one console warning, so a page built from scratch
@@ -341,6 +341,8 @@
  *   HVACBusiness, AutoRepair, …) with <meta name="core-schema-type" content="Plumber"> in the site head, or bind a
  *   data-business-field="schema-type" in the data layer. Turn it off with <meta name="core-schema" content="off">.
  *   Leave Webflow's page-level JSON-LD empty on Core sites, or the business is described twice.
+ *
+ * ANNOUNCEMENT HEIGHT – sets --core-announcement-height on <html> while the announcement bar shows (v2.2.0); the Page Shell hero uses it.
  *
  * Public API: window.CoreBusiness = { get(field), all(), hours(), groupedHours(), fill(), schema() }
  */
@@ -572,7 +574,20 @@
     document.documentElement.classList.add('business-filled');
   }
 
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fill); else fill();
+  /* The announcement bar's height, as --core-announcement-height on <html> (0 and removed while the bar is hidden or empty), so a
+   * full-screen hero can be calc(100dvh - var(--core-announcement-height, 0px)). It follows the bar when its text wraps. */
+  function trackAnnouncement(){
+    var bar = document.querySelector('[data-business="announcement"]'), root = document.documentElement;
+    function set(){
+      var h = bar && !bar.hidden ? Math.round(bar.getBoundingClientRect().height) : 0;
+      if(h) root.style.setProperty('--core-announcement-height', h + 'px'); else root.style.removeProperty('--core-announcement-height');
+    }
+    set();
+    if(bar && window.ResizeObserver) new ResizeObserver(set).observe(bar);
+    window.addEventListener('resize', set);
+  }
+  function start(){ fill(); trackAnnouncement(); }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
   window.addEventListener('load', fill);
 
   window.CoreBusiness = {
@@ -823,4 +838,60 @@
     hide: function(){ hide(true); },
     state: function(){ var s = read(); return {platform: platform(), standalone: standalone(), mobile: mobile(), snoozed: snoozed(s), views: s.views || 0, canPrompt: !!deferred, start: startPath(), atStart: atStart()}; }
   };
+})();
+
+/* Mayes Core – Accessibility v1.0.0 – a skip link, and button semantics for sheet triggers.
+ *
+ * SKIP LINK    – the first Tab on any page with a <main> lands on "Skip to main content". It is injected here, hidden until it
+ *                has focus (core-base.css), so a Webflow page needs no extra element. Skip it with
+ *                <meta name="core-skip-link" content="off">, change the words with <meta name="core-skip-link-text" content="...">,
+ *                or place your own link with data-skip-link and Core adds none. <main> gets an id (main-content) if it has none.
+ * SHEET TRIGGERS – a link with data-sheet-open (the bottom nav's Services and Quote tabs, a row in a sheet) opens a dialog, but a
+ *                screen reader hears "link". Core gives it role="button" and aria-haspopup="dialog", and Space opens it like a button.
+ *                The href stays, so the link still works without JavaScript.
+ *
+ * FOCUS RING   – lives in core-base.css (a two-tone ring that shows on light and dark backgrounds).
+ */
+(function(){
+  'use strict';
+  if(window.CoreA11y) return;
+
+  function meta(name){ var m = document.querySelector('meta[name="' + name + '"]'); return m ? m.getAttribute('content') : null; }
+
+  function skipLink(){
+    if(meta('core-skip-link') === 'off' || document.querySelector('[data-skip-link]')) return;
+    var main = document.querySelector('main, [role="main"]');
+    if(!main) return;
+    if(!main.id) main.id = 'main-content';
+    if(!main.hasAttribute('tabindex')) main.setAttribute('tabindex', '-1');   /* lets the link move focus into <main> */
+    var a = document.createElement('a');
+    a.setAttribute('data-skip-link', '');
+    a.href = '#' + main.id;
+    a.textContent = meta('core-skip-link-text') || 'Skip to main content';
+    document.body.insertBefore(a, document.body.firstChild);
+  }
+
+  function triggers(){
+    document.querySelectorAll('[data-sheet-open]:not([data-sheet-open=""])').forEach(function(t){
+      /* only when the named sheet is on the page; a link whose sheet is missing keeps its plain link meaning (it navigates) */
+      var n = t.getAttribute('data-sheet-open'), esc = window.CSS && CSS.escape ? CSS.escape(n) : n.replace(/"/g, '\\"');
+      if(!document.querySelector('[data-sheet="' + esc + '"]')) return;
+      if(t.tagName !== 'BUTTON' && !t.hasAttribute('role')) t.setAttribute('role', 'button');
+      if(!t.hasAttribute('aria-haspopup')) t.setAttribute('aria-haspopup', 'dialog');
+    });
+  }
+
+  /* a link acts on Enter only; a button also acts on Space */
+  document.addEventListener('keydown', function(e){
+    if(e.key !== ' ' && e.key !== 'Spacebar') return;
+    var t = e.target && e.target.closest && e.target.closest('a[role="button"][data-sheet-open][aria-haspopup="dialog"]');
+    if(!t) return;
+    e.preventDefault();
+    t.click();
+  });
+
+  function init(){ skipLink(); triggers(); }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+
+  window.CoreA11y = { version: '1.0.0', refresh: triggers };
 })();

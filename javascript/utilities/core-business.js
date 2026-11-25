@@ -1,4 +1,4 @@
-/* Mayes Core – Business v2.1.0 – one business record, shown anywhere on the page.
+/* Mayes Core – Business v2.2.0 – one business record, shown anywhere on the page.
  *
  * MISSING DATA LAYER – Webflow can't put a CMS Collection List inside a component, so the data layer (shell-data,
  *   [data-business-source]) sits on each page. A page without it logs one console warning, so a page built from scratch
@@ -48,6 +48,8 @@
  *   HVACBusiness, AutoRepair, …) with <meta name="core-schema-type" content="Plumber"> in the site head, or bind a
  *   data-business-field="schema-type" in the data layer. Turn it off with <meta name="core-schema" content="off">.
  *   Leave Webflow's page-level JSON-LD empty on Core sites, or the business is described twice.
+ *
+ * ANNOUNCEMENT HEIGHT – sets --core-announcement-height on <html> while the announcement bar shows (v2.2.0); the Page Shell hero uses it.
  *
  * Public API: window.CoreBusiness = { get(field), all(), hours(), groupedHours(), fill(), schema() }
  */
@@ -279,7 +281,20 @@
     document.documentElement.classList.add('business-filled');
   }
 
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fill); else fill();
+  /* The announcement bar's height, as --core-announcement-height on <html> (0 and removed while the bar is hidden or empty), so a
+   * full-screen hero can be calc(100dvh - var(--core-announcement-height, 0px)). It follows the bar when its text wraps. */
+  function trackAnnouncement(){
+    var bar = document.querySelector('[data-business="announcement"]'), root = document.documentElement;
+    function set(){
+      var h = bar && !bar.hidden ? Math.round(bar.getBoundingClientRect().height) : 0;
+      if(h) root.style.setProperty('--core-announcement-height', h + 'px'); else root.style.removeProperty('--core-announcement-height');
+    }
+    set();
+    if(bar && window.ResizeObserver) new ResizeObserver(set).observe(bar);
+    window.addEventListener('resize', set);
+  }
+  function start(){ fill(); trackAnnouncement(); }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
   window.addEventListener('load', fill);
 
   window.CoreBusiness = {

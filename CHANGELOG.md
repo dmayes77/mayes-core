@@ -1,5 +1,31 @@
 # Changelog
 
+## v2.5.1 — 2026-11-25
+
+The v2.5.0 tag was cut from main before these changes landed and contains the same code as v2.4.1. Use v2.5.1.
+
+Not breaking. Keyboard and screen-reader basics, found by running the Mayes Digital UX law check on the Apex site.
+
+**A clear keyboard focus ring.** Links, buttons, switches and form fields now show a two-tone ring (white inside, near-black outside) when reached with the keyboard, never on a mouse click. It keeps 3:1 contrast on light and dark backgrounds; the browser's default 1px blue ring was thin on the dark header. Override with `--core-focus-inner` and `--core-focus-outer`. The ring replaces any box-shadow on the focused element while it has keyboard focus.
+
+**A skip link.** New module Accessibility v1.0.0 (`core-a11y.js`, in the `core.js` bundle) injects "Skip to main content" as the first focusable element on any page with a `<main>`, hidden until it has focus. Turn it off with `<meta name="core-skip-link" content="off">`, change the words with `core-skip-link-text`, or place your own link with `data-skip-link`.
+
+**Sheet triggers read as buttons.** A link with `data-sheet-open` (the bottom nav's Services and Quote tabs) now gets `role="button"` and `aria-haspopup="dialog"`, and Space opens it like a button. The `href` stays, so the link works without JavaScript.
+
+Module versions: Base v3.2.0 (`core-base.css`), Accessibility v1.0.0 (new), Sheet v3.0.2.
+
+**Webflow master (Core Design System 2.0), no code needed:**
+- The Page Shell's slot is a `main`, its header wrapper a `header` and its footer wrapper a `footer`, so screen readers get landmarks.
+- `hero-shell` min-height is `calc(100dvh - var(--core-announcement-height, 0px))`.
+- Hero overlay (`hero-overlay`): full strength, darker behind the copy (about 80% at the right edge of the text), and an even dark layer on tablet and phone, so white hero text keeps 4.5:1 over a bright photo.
+- Review avatars use the lighter brand background with dark initials; stars use a darker amber.
+
+**Hero fills the screen under the announcement bar.** Business v2.2.0 sets `--core-announcement-height` on `<html>` while the bar is showing (and removes it when the bar is hidden or empty), following it if its text wraps. The Page Shell hero now has `min-height: calc(100dvh - var(--core-announcement-height, 0px))`, so the hero plus the bar fill exactly one screen instead of overflowing by the bar's height.
+
+A sheet link whose named sheet is missing from the page stays a plain link: no button role, no dialog promise, and Space scrolls as usual.
+
+**Tests:** the skip link is first, parked off screen, shown and focus-ringed on the first Tab, and Enter moves focus into `<main>`; sheet links get the role and `aria-haspopup`, a real button and an empty-name link are left alone, and Space opens a sheet.
+
 ## v2.4.1 — 2026-11-20
 
 Not breaking. The page behind a sheet stays still on iPhone.
