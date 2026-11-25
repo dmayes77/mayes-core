@@ -57,6 +57,7 @@ About 220 of Core's ~1,100 JS lines (bottom nav, motion, announcement) could go 
 - **v2.4.0 (2026-11-15):** opt-out consent is a `<meta>` setting instead of custom head code, and Add to Home Screen opens from the start page. The Webflow side got 44px buttons, aligned pricing cards (Card Row › Pricing variant) and icon tiles in the Services sheet, all native Webflow styles.
 - **v2.4.1 (2026-11-20):** the scroll lock holds on iPhone. Webflow's Modal has no page scroll lock setting, so Core pins the page while a sheet is open and puts it back on close (Finsweet's Disable Scrolling would add a second script for the same job).
 - **v2.5.1 (2026-11-25):** the focus ring and the skip link are Core because Webflow can't style `:focus-visible` on every link, button and field at once or add a link that exists only for keyboard users. Landmarks (`main`, `header`, `footer`) and the hero overlay stay in the Webflow master.
+- **v2.5.2 (2026-11-25):** the details slide-down is Core because Webflow's style panel can't animate the height of a `<details>` panel (it needs `::details-content` and `interpolate-size`). Opt in with `data-core-slide`.
 
 ## Release plan
 
