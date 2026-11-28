@@ -39,7 +39,8 @@ CI (`.github/workflows/ci.yml`) runs `./check.sh` and `test/run.py` on every pul
 | `v2.4.1` | Scroll lock holds on iPhone: while a sheet is modal the page is pinned where it was (body fixed at `--core-sheet-lock-y`) and put back on close, because Safari scrolls the page under a swipe that starts on the backdrop. Not breaking | superseded by v2.5.0 |
 | `v2.5.0` | Do not use. Tagged from main before the changes landed; the code is identical to v2.4.1. Superseded by v2.5.1. |
 | `v2.5.1` | Keyboard and screen-reader basics: a two-tone focus ring on links, buttons and fields; a skip link (new Accessibility module `core-a11y.js`); sheet-trigger links get `role="button"` and `aria-haspopup="dialog"` and open on Space. Not breaking | superseded by v2.5.2 |
-| `v2.5.2` | A slide-down for `<details data-core-slide>` (Base v3.3.0). Not breaking | latest; the $500 Base site and every new site. v1 sites stay on v1 tags |
+| `v2.5.2` | A slide-down for `<details data-core-slide>` (Base v3.3.0). Not breaking | superseded by v2.5.3 |
+| `v2.5.3` | App layer behaviors (no bounce, Add to Home Screen) start at 767px and below, was 991px (Base v3.3.1, Install v2.1.1) | latest once tagged; the $500 Base site and every new site. v1 sites stay on v1 tags |
 
 ## Cutting a release
 

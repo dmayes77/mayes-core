@@ -51,18 +51,18 @@ The top nav defaults to Home, Services and Contact (turn on **Show Link 4** for 
 
 ## Mobile app layer
 
-Phones and tablets (991px and below) get a flush top bar and a flush bottom nav, like an app. Neither floats, and the page doesn't bounce under them. Desktop keeps a normal header and footer.
+Screens 767px and narrower get a flush top bar and a flush bottom nav, like an app. Neither floats, and the page doesn't bounce under them. Wider screens, including tablets, keep a normal header and footer.
 
 - **Top bar:** logo and a ⋯ button that opens one sheet of general business info and settings. In the master today that is the Settings sheet (Privacy & cookies, Add to Home Screen). Decided 2026-11-19: it also takes the hours and location (address, directions), so a site needs no Location tab. No dropdown on phones.
 - **Bottom nav (standard, decided 2026-11-19):** Home · Services (with prices) · **Call** (middle) · Our Work · Quote. Home, Services and Call are fixed in that order. Tabs 4 and 5 can be swapped per trade or per client (for example Book, Menu, Shop, or Collab on a creator site). Quote is quiz-style: a few tap questions, then name and phone, sent as one native form.
-- **Bottom nav in the master (built 2026-11-19):** Home (`/`) · Services (the Services page) · Call (`data-business-href="phone-href"`, falls back to `/contact`) · Our Work (`/our-work`) · Quote (`data-sheet-open="quote"`). The master has no `/our-work` page yet.
+- **Bottom nav in the master (built 2026-11-19):** Home (`/`) · Services (the Services page) · Call (`data-business-href="phone-href"`, falls back to `/contact`) · Our Work (`/our-work`) · Quote (`data-sheet-open="quote"`).
 - **Desktop:** the ⋯ button is hidden; the footer's "Cookie settings" link opens the same Settings sheet.
 
 In the Webflow master:
 
 | Component | Goes in | Notes |
 |---|---|---|
-| Page Shell | page body | One slot: **Main Content**. Everything else is built in and identical on every page: the announcement bar (`announcement-bar`, filled from Business Settings, hidden when empty), the top nav (`shell-header`), footer (`shell-footer`), bottom nav (`shell-mobile-nav`, 991px and below), the sheets (`shell-sheets`, native Modals) and Core / Install Banner. Change any of them once in its component |
+| Page Shell | page body | One slot: **Main Content**. Everything else is built in and identical on every page: the announcement bar (`announcement-bar`, filled from Business Settings, hidden when empty), the top nav (`shell-header`), footer (`shell-footer`), bottom nav (`shell-mobile-nav`, 767px and below), the sheets (`shell-sheets`, native Modals) and Core / Install Banner. Change any of them once in its component |
 | Navigation / Glass | inside the Page Shell (`shell-header`) | Flush top bar: logo, links, and a Get a quote button (`data-sheet-open="quote"`, text from the CTA Text prop, hidden with Show CTA); ⋯ button (`data-sheet-open="site-settings"`) on phones |
 | Navigation / Site Bottom Nav | inside the Page Shell (`shell-mobile-nav`) | Variants **Base** (flush bar) and **Float** (inset, rounded, floating). Tabs: Home, Services, Call, Our Work (links) and Quote (sheet), the standard above. Each tab is a link (`bottom-nav_hit`) with its icon and label inside; a sheet tab carries `data-sheet-open="NAME"`. The active tab is the link's **Current** state in Webflow |
 | Core / Install Banner | Page Shell root, once | Add to Home Screen banner; its look is the `install-banner_*` classes. Preview it by adding the `is-visible` combo |

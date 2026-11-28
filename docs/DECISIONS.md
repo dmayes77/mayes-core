@@ -39,6 +39,8 @@
 | 2026-11-19 | Services show prices: Card / Service and Card / Service Item get a Price prop and a Show Price switch | David: Services "will have pricing". Built in the master 2026-11-19 (Section / Service List also gets Show Prices and Item 1–8 Price) |
 | 2026-11-19 | The quote is quiz-style: 3–4 tap questions, then name and phone, sent as one native Webflow form; it opens as a sheet from the Quote tab and buttons and can sit inline on a page | David: "even quotes could be quiz like". The working reference is the quiz in Mayes Digital 2.0's own Page Shell; it moves into Core |
 | 2026-11-19 | Webflow first: anything Webflow can do natively (elements, forms, Interactions, CMS, component props) is built in Webflow; script only covers what Webflow can't | David: "If it can be done in webflow then we use webflow first" |
+| 2026-11-28 | The app layer starts at 767px and below (Webflow's Mobile landscape breakpoint). Tablets from 768px get the normal website, with no bottom nav, install banner or no-bounce rule | David: "app layer should stat at 767px". Replaces 991px |
+| 2026-11-28 | Media containers are `media-16x9`, `media-4x3`, `media-3x4` and `media-1x1`; layout classes are `layout-row` and `layout-column`. This replaces the `image-*`, `is-row`, `is-column` and `mobile-column` names in the 2026-09-20 addendum | David: media is "more flexible than image-4x3 what if its a video" |
 
 ## Open
 

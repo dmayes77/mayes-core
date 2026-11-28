@@ -353,6 +353,14 @@ def run():
         check("stability: desktop scrolling unchanged", pg.evaluate("getComputedStyle(document.documentElement).overscrollBehaviorY") == "auto")
         ctx.close()
 
+        for w, on in ((767, True), (768, False), (800, False)):
+            ctx = browser.new_context(viewport={"width": w, "height": 1024}, is_mobile=True, has_touch=True)
+            pg = ctx.new_page(); pg.goto(base + plain); pg.wait_for_load_state("load")
+            check(f"app layer: no-bounce and install at {w}px = {on}",
+                  (pg.evaluate("getComputedStyle(document.documentElement).overscrollBehaviorY") == "none") == on
+                  and pg.evaluate("CoreInstall.state().mobile") == on)
+            ctx.close()
+
         # ---------- safe areas (the master's Webflow classes with Core's combos; iPhone notch + home bar emulated) ----------
         def notched(w, h, insets):
             c = browser.new_context(viewport={"width": w, "height": h}, is_mobile=True, has_touch=True)

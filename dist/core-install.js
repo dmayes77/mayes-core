@@ -1,9 +1,9 @@
-/* Mayes Core – Install v2.1.0 – "Add to Home Screen" banner for the mobile app layer.
+/* Mayes Core – Install v2.1.1 – "Add to Home Screen" banner for the mobile app layer.
  *
  * Pairs with the head snippet dist/core-app-head.html (full-screen launch, status bar, theme color) and the
  * Webflow webclip (Site settings › General), which is the home-screen icon.
  *
- * WHEN IT SHOWS – phones and tablets only, on the visitor's 2nd page view or later, never:
+ * WHEN IT SHOWS – screens 767px and narrower only (the app layer), on the visitor's 2nd page view or later, never:
  *   · when the site is already open from the home screen (standalone)
  *   · while a sheet is open, including the cookie notice (shows once it closes, whether or not a choice was made)
  *   · for 30 days after the visitor closes it
@@ -65,7 +65,7 @@
   function android(){ return /Android/.test(ua); }
   function inApp(){ return /Instagram|FBAN|FBAV|FB_IAB|musical_ly|BytedanceWebview|TikTok|Snapchat|Pinterest|LinkedInApp|Line\//i.test(ua); }
   function mobile(){
-    var narrow = window.matchMedia ? matchMedia('(max-width: 991px)').matches : window.innerWidth <= 991;
+    var narrow = window.matchMedia ? matchMedia('(max-width: 767px)').matches : window.innerWidth <= 767;
     return narrow && (ios() || android() || (window.matchMedia && matchMedia('(pointer: coarse)').matches));
   }
   function platform(){
