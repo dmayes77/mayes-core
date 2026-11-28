@@ -1,5 +1,18 @@
 # Changelog
 
+## v2.5.3 — 2026-11-28
+
+A fix. Core's phone-only behaviors now start at the same width as the app layer: **767px and below** (they were 991px and below).
+
+- The no-bounce / no pull-to-refresh rule applies at 767px and below.
+- The Add to Home Screen banner and its install buttons show only on screens 767px and narrower.
+
+**Upgrade note:** screens from 768 to 991px, including most tablets in portrait, no longer get either one. Sheets are unchanged; `data-sheet-nonmodal="desktop"` still starts at 992px.
+
+Module versions: Base v3.3.1 (`core-base.css`), Install v2.1.1.
+
+**Tests:** at 800px with touch there is no bounce lock and no install banner; at 767px both apply.
+
 ## v2.5.2 — 2026-11-25
 
 Not breaking. A slide-down for `<details>`.

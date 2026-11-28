@@ -112,8 +112,7 @@ section-small | section-medium | section-large
         └── container-*
             │
             └── section-content
-                + is-row | is-column
-                + responsive direction utility
+                + layout-row | layout-column | layout-split | layout-grid-*
                 + gap-*
                 │
                 └── content
@@ -146,18 +145,16 @@ Core provides established layout utilities.
 ### Row layout
 
 ```text
-section-content
-    + is-row
+layout-row
     + gap-*
 ```
 
-Use for horizontal arrangements.
+Use for horizontal arrangements. It does not stack by itself.
 
 ### Column layout
 
 ```text
-section-content
-    + is-column
+layout-column
     + gap-*
 ```
 
@@ -166,18 +163,16 @@ Use for vertically stacked content.
 ### Responsive stacking
 
 ```text
-section-content
-    + is-row
-    + mobile-column
+layout-split | layout-grid-2 | layout-grid-3 | layout-grid-4
     + gap-*
 ```
 
-The documented `mobile-column` utility changes the layout to a column at Mobile Landscape and below.
+These become one column at 767px and below. `layout-grid-3` and `layout-grid-4` use two columns on tablets.
 
 ### Rules
 
-- Use established responsive modifiers.
-- Do not assume `mobile-column` changes layout at Tablet.
+- Use the grid layouts above for content that must stack.
+- Check each component's tablet behavior; Section / Split stacks on tablets too.
 - Preserve logical reading order.
 - Avoid unnecessary absolute positioning.
 - Ensure content remains readable when stacked.
@@ -240,15 +235,15 @@ Do not shrink text excessively to preserve a desktop composition.
 
 ## 7. Responsive Images
 
-Core uses fluid image containers.
+Core uses fluid media wrappers.
 
-Supported ratios:
+Supported wrappers:
 
 ```text
-image-16x9
-image-3x2
-image-4x3
-image-1x1
+media-4x3 (default)
+media-3x4 (portrait)
+media-16x9
+media-1x1
 ```
 
 ### Responsibilities
@@ -262,13 +257,13 @@ The image controls cropping.
 ### Standard structure
 
 ```text
-image-3x2
-    └── image
+media-4x3
+    └── card-image
 ```
 
 ### Image behavior
 
-The global image class uses:
+`card-image` uses (heroes use `hero-image_media` with `hero-image_img`):
 
 ```css
 width: 100%;
@@ -304,6 +299,18 @@ Do not assume a desktop hero image will automatically provide an effective mobil
 
 ---
 
+## The App Layer Breakpoint
+
+The app layer starts at **767px and below** (David, 2026-11-28). This covers the bottom navigation, its page clearance, the phone header, the no-bounce scrolling and the install banner. At 768px and up, tablets included, sites use the desktop header with no app layer.
+
+- 768px to 991px is still a tablet range to test; it is not part of the app layer.
+- The 767px code behaviors need mayes-core v2.5.3 or later. Check which release the site loads.
+- Known gap to check: the Navigation / Compact and Navigation / Service alternates were still switching at 991px on 2026-11-28. With either one, tablets can end up with no visible nav links. Verify before using them.
+- Check that the desktop header's links and button fit at 768px to 991px.
+- This does not change `data-sheet-nonmodal="desktop"` sheet behavior, which has its own 992px rule.
+
+---
+
 ## 8. Mobile Header
 
 The standard Mayes Digital mobile experience uses a flush top navigation bar.
@@ -319,7 +326,26 @@ The standard Mayes Digital mobile experience uses a flush top navigation bar.
 
 The Site Settings control opens the established native sheet.
 
-Do not introduce a separate mobile menu system when the existing navigation architecture satisfies the requirement.
+Do not introduce a separate mobile menu system when the existing navigation architecture satisfies the requirement. The approved exception is the top nav only option below.
+
+### Top nav only option
+
+The bottom navigation is the default. A site may use the top nav only setup instead, keeping 44px tap targets, Call one tap away, and the menu as a bottom sheet (Sheet / Menu).
+
+Switch a site once, inside the Page Shell definition:
+
+1. Set the Navigation / Glass instance to the App Menu variant.
+2. Turn off visibility on the bottom navigation (shell-mobile-nav).
+3. Change the page-shell bottom padding at the small breakpoint to `env(safe-area-inset-bottom, 0px)`.
+
+### Pairing rule
+
+A site uses one phone navigation setup, never both.
+
+- **Bottom nav sites:** use Navigation / Glass Base. Its phone top bar shows only the logo and the settings button.
+- **Top nav only sites:** use Navigation / Glass App Menu, turn off the bottom navigation and remove its bottom spacing.
+
+On phones, Call appears exactly once.
 
 ---
 
@@ -356,7 +382,7 @@ The fourth and fifth positions may vary by business.
 
 The standard Base presentation is flush with the viewport.
 
-Do not introduce floating navigation unless the project explicitly uses an approved variant.
+Do not introduce floating navigation unless the project explicitly uses an approved variant. The master offers Base (flush, the default), Float, and Float Raised Call (a slim floating bar with Call as a raised, icon-only circle).
 
 ### Content clearance
 

@@ -145,10 +145,9 @@ section-small | section-medium | section-large
 
 Use layout modifiers where appropriate:
 
-- is-row
-- is-column
+- layout-row and layout-column (direction; neither one stacks by itself on phones)
+- layout-split and layout-grid-2 / 3 / 4 (grids that become one column at 767px and below)
 - gap-*
-- mobile-column
 
 Keep class responsibilities separate.
 
@@ -192,28 +191,35 @@ references/component-standards.md
 
 ## Image Architecture
 
-Use fluid image containers.
+Every image sits in a media wrapper. The wrapper can also hold a video, which is why the names say media.
 
-Supported ratios:
+Supported wrappers:
 
-- image-16x9
-- image-3x2
-- image-4x3
-- image-1x1
+- media-4x3 (the default)
+- media-3x4 (portrait)
+- media-16x9 (wide scenes)
+- media-1x1 (square)
 
-The parent layout controls available width.
+Do not use 4:5 or add other ratios without approval.
 
-The image container controls aspect ratio.
+The parent layout controls available width (each wrapper also has a maximum width).
 
-The image controls cropping.
+The wrapper controls aspect ratio and clipping.
 
-Use the global image class for actual images.
+The image controls cropping: use card-image inside a media wrapper.
 
-Use is-portrait only on supported rectangular ratio containers.
+Full-bleed hero photos use hero-image_media with hero-image_img inside.
 
-Use is-avatar only with image-1x1.
+Every image needs alt text.
 
-Do not create unnecessary fixed-size image variants.
+## House Rules
+
+- Buttons always sit in a button-group, even a single button. Do not leave an empty group visible.
+- Images always sit in a media wrapper (heroes use hero-image_media).
+- container-xlarge is the default desktop container. Use another width only for a clear content reason.
+- Navigation bars run full width.
+- Buttons use the Primary, Secondary and Ghost styles.
+- Prefer "dark" over "inverse" when naming new options.
 
 ## Responsive Design
 
@@ -225,7 +231,7 @@ Maintain consistent spacing and hierarchy across breakpoints.
 
 Respect safe areas.
 
-Preserve the established app-like mobile navigation.
+Preserve the established app-like mobile navigation. The app layer (bottom navigation and app behaviors) starts at 767px and below; 768px and up, tablets included, uses the desktop header.
 
 Do not introduce floating navigation where the current Core standard requires flush navigation.
 

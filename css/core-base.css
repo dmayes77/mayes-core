@@ -1,4 +1,4 @@
-/* Mayes Core – Base v3.3.0
+/* Mayes Core – Base v3.3.1
  * The only CSS Core ships: rules Webflow's style panel cannot express. Everything else (the sheet's look and position,
  * bottom nav, consent switches, hours rows, install banner, safe areas, the announcement bar) is Webflow classes and
  * is-* combos.
@@ -17,7 +17,7 @@
  */
 [hidden]{display:none!important}
 html{scrollbar-gutter:stable;overscroll-behavior-x:none}
-@media (max-width:991px){html,body{overscroll-behavior-y:none}}
+@media (max-width:767px){html,body{overscroll-behavior-y:none}}
 
 /* Timing comes from the Webflow Motion collection (Duration/standard, Duration/fast); the fallbacks keep the old timing on sites without it. */
 dialog[data-sheet]{transform:translateY(100%);transition:transform calc(var(--_motion---duration--standard,260)*1ms) cubic-bezier(.2,.8,.2,1),overlay calc(var(--_motion---duration--standard,260)*1ms) allow-discrete,display calc(var(--_motion---duration--standard,260)*1ms) allow-discrete}

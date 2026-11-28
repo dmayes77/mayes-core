@@ -98,7 +98,7 @@ Communicate relationships through intentional spacing.
 - Keep labels close to their associated fields.
 - Position buttons near relevant content.
 - Separate unrelated content.
-- Use larger gaps between distinct groups.
+- Use larger gaps between distinct groups: about twice the gap used inside a group.
 
 ### Webflow example
 

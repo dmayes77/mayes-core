@@ -91,12 +91,12 @@ So a site built on Core feels familiar, and so values carry over to Next.js + Ta
 - **Page padding:** 2rem desktop, 1.5rem tablet and mobile landscape, 1rem mobile portrait.
 - **Components:** navbar 4rem tall; buttons 14px text (16px on `is-large`); feature cards padded 1.5rem; form inputs at least 2.5rem tall, 14px on desktop and 16px on phones so the browser doesn't zoom in on focus.
 
-## Mobile app layer (991px and below)
+## Mobile app layer (767px and below)
 
-Desktop is a normal website. Phones and tablets get an app-style layer from Core:
+Screens wider than 767px, including tablets, get a normal website. Screens 767px and narrower get an app-style layer from Core:
 
 - **Brand bar:** logo plus a ⋯ button that opens the business info and settings sheet.
-- **Bottom nav:** 5 tabs, standard set decided 2026-11-19: Home · Services (with prices) · Call (middle) · Our Work · Quote (quiz-style). Home, Services and Call are fixed; tabs 4 and 5 can be swapped per trade or per client. Each tab is a link (a sheet tab adds `data-sheet-open="NAME"`); the active tab uses Webflow's Current state. Built in the master 2026-11-19; the master has no `/our-work` page yet.
+- **Bottom nav:** 5 tabs, standard set decided 2026-11-19: Home · Services (with prices) · Call (middle) · Our Work · Quote (quiz-style). Home, Services and Call are fixed; tabs 4 and 5 can be swapped per trade or per client. Each tab is a link (a sheet tab adds `data-sheet-open="NAME"`); the active tab uses Webflow's Current state. Built in the master 2026-11-19.
 - **Sheets:** each sheet is a native Webflow Modal (`<dialog>`) in its own component, designed as a bottom sheet: full width and flush to the bottom on phones, 36rem wide and centered at the bottom above. Webflow and the browser handle opening and closing links, focus, Escape and the inert page; `core-base.css` adds the slide, backdrop and scroll lock; `core-sheet.js` adds open-by-name, tap-outside for Safari and swipe down to close.
 - **Site Settings (the ⋯ sheet):** Hours & location (today's hours, Directions, the week's hours), Add to Home Screen, and Privacy & cookies. It replaces the Location tab and sheet (built 2026-11-19).
 
