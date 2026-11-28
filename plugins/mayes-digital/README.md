@@ -1,6 +1,6 @@
 # Mayes Digital Webflow Plugin
 
-Version: 1.0.0  
+Version: 1.2.0  
 Author: Mayes Digital  
 Website: https://getmayesdigital.com
 
@@ -85,19 +85,37 @@ mayes-digital-webflow-plugin/
 │   │       ├── webflow-examples.md
 │   │       └── audit-checklist.md
 │   ├── webflow-development/
-│   │   └── SKILL.md
+│   │   ├── SKILL.md
+│   │   └── references/
+│   │       ├── native-first.md
+│   │       ├── cms-architecture.md
+│   │       ├── custom-code.md
+│   │       ├── integrations.md
+│   │       └── deployment.md
 │   ├── organic-visibility/
-│   │   └── SKILL.md
+│   │   ├── SKILL.md
+│   │   └── references/
+│   │       ├── search-strategy.md
+│   │       ├── local-seo.md
+│   │       ├── content-strategy.md
+│   │       ├── technical-seo.md
+│   │       └── measurement.md
 │   └── quality-assurance/
-│       └── SKILL.md
+│       ├── SKILL.md
+│       └── references/
+│           ├── testing-standards.md
+│           ├── accessibility.md
+│           ├── performance.md
+│           ├── defect-management.md
+│           └── release-checklist.md
 └── README.md
 ```
 
-The plugin contains five specialized skills and eight supporting reference documents.
+The plugin contains five specialized skills and 23 supporting reference documents.
 
 Each skill has a defined responsibility.
 
-Reference documents provide additional implementation guidance without requiring every detail to be loaded for every task.
+Each `SKILL.md` carries the essential workflow and routes to relevant references. Read supporting documents when their topic is needed; an ordinary task does not require loading every reference.
 
 ---
 
@@ -1273,16 +1291,18 @@ Before treating the plugin as production-ready, verify:
 
 ### Configuration
 
-- [ ] `plugin.json` contains valid JSON.
-- [ ] Plugin metadata is accurate.
-- [ ] Plugin version is consistent.
-- [ ] All expected skill directories exist.
-- [ ] All five `SKILL.md` files exist.
-- [ ] All skill frontmatter is valid.
-- [ ] All skill names are unique.
-- [ ] All skill descriptions are present.
-- [ ] All referenced documents exist.
-- [ ] Reference paths are correct.
+- [x] `plugin.json` contains valid JSON.
+- [x] Plugin metadata is accurate.
+- [x] Plugin version is consistent.
+- [x] All expected skill directories exist.
+- [x] All five `SKILL.md` files exist.
+- [x] All skill frontmatter is valid.
+- [x] All skill names are unique.
+- [x] All skill descriptions are present.
+- [x] All referenced documents exist.
+- [x] Reference paths are correct.
+
+Configuration checks passed with `claude plugin validate --strict .` and local skill and reference-path validation. These checks do not establish runtime skill activation or reference loading.
 
 ### Skill behavior
 
@@ -1349,6 +1369,9 @@ Introduces:
 - Quality Assurance skill.
 - Five Core Design System reference documents.
 - Three Experience Design reference documents.
+- Five Webflow Development reference documents.
+- Five Organic Visibility reference documents.
+- Five Quality Assurance reference documents.
 - Native-first development standards.
 - Shared architecture governance.
 - Organic visibility operating standards.
@@ -1356,7 +1379,7 @@ Introduces:
 
 Release status:
 
-Draft pending platform validation and representative workflow testing.
+Draft. Structural validation passes; representative Claude skill activation, reference loading, and cross-skill behavior testing remain pending.
 
 ---
 

@@ -68,8 +68,7 @@ section-small | section-medium | section-large
         └── container-*
             │
             └── section-content
-                + is-row | is-column
-                + responsive direction utility
+                + layout-row | layout-column | layout-split | layout-grid-*
                 + gap-*
                 │
                 └── content
@@ -85,13 +84,14 @@ section-small | section-medium | section-large
 | `padding-global` | Horizontal page gutters |
 | `container-*` | Maximum width and centering |
 | `section-content` | Layout context |
-| `is-row` | Horizontal arrangement |
-| `is-column` | Vertical arrangement |
+| `layout-row` | Horizontal flex arrangement (does not stack by itself) |
+| `layout-column` | Vertical flex arrangement |
+| `layout-split` | Two-part grid; one column at 767px and below |
+| `layout-grid-2` / `3` / `4` | Card grids; one column at 767px and below |
 | `gap-*` | Spacing between layout children |
 | `surface-*` | Surface or background treatment |
 | `radius-*` | Border radius |
 | `shadow-*` | Shadow treatment |
-| `mobile-column` | Changes row layout to column at Mobile Landscape and below |
 
 The section architecture must remain consistent across reusable Core sections.
 
@@ -138,46 +138,27 @@ Layout utilities should control arrangement rather than visual presentation.
 
 ### Row layouts
 
-Use the established row modifier when content should be arranged horizontally.
-
-Example:
+Use `layout-row` when content should be arranged horizontally.
 
 ```text
-section-content
-    + is-row
+layout-row
     + gap-12
 ```
 
 ### Column layouts
 
-Use the established column modifier when content should be stacked vertically.
-
-Example:
+Use `layout-column` when content should be stacked vertically.
 
 ```text
-section-content
-    + is-column
+layout-column
     + gap-*
 ```
 
-### Responsive layouts
+### Layouts that must stack on phones
 
-Use established responsive utilities when layout direction must change.
+`layout-row` has no phone override. When side-by-side content must stack, use `layout-split` (two parts) or `layout-grid-2` / `3` / `4`. These become one column at 767px and below; `layout-grid-3` and `layout-grid-4` use two columns on tablets. Check the component in use, since some set their own tablet behavior (Section / Split stacks on tablets too).
 
-Example:
-
-```text
-section-content
-    + is-row
-    + mobile-column
-    + gap-12
-```
-
-`mobile-column` changes a row layout to a column layout at Mobile Landscape and below.
-
-Do not assume the same behavior applies at tablet breakpoints.
-
-Inspect existing utilities before introducing new responsive modifiers.
+Keep layout utilities pure: padding, color and size belong on the element's own class, not in a combo on a layout utility.
 
 ### Layout rules
 
@@ -217,7 +198,7 @@ Examples include:
 section-content
 padding-global
 container-large
-image
+media-4x3
 ```
 
 ### Surface
@@ -239,10 +220,9 @@ Modifiers adjust an established component or layout.
 Examples include:
 
 ```text
-is-row
-is-column
-is-portrait
-is-avatar
+is-rounded
+is-secondary
+is-split
 ```
 
 Modifiers must have a defined scope.
@@ -263,149 +243,74 @@ Do not create decorative complexity without a clear design purpose.
 
 ## 7. Image Architecture
 
-Core uses a fluid, container-first image system.
+Core uses a fluid, wrapper-first image system. The wrapper can hold an image or a video.
 
-The governing principle is:
+**The layout controls size. The wrapper controls aspect ratio. The image controls cropping.**
 
-**The layout controls size. The container controls aspect ratio. The image controls cropping.**
+These names (David, 2026-11-28) replace the `image-*` containers in the September 20 addendum.
 
-### Standard image containers
+### Media wrappers
 
-```text
-image-16x9
-image-3x2
-image-4x3
-image-1x1
-```
+| Class | Use | Maximum width |
+|---|---|---|
+| `media-4x3` | Default | Small container width |
+| `media-3x4` | Portrait | 28rem |
+| `media-16x9` | Wide scenes | Medium container width |
+| `media-1x1` | Square | 28rem |
 
-Each container owns:
+Each wrapper owns width, aspect ratio and overflow clipping. The parent layout can make it narrower.
 
-- Fluid sizing
-- Aspect ratio
-- Overflow clipping
+Do not use 4:5. Do not add other ratios or Small, Medium or Large variants without approval.
 
-The actual image uses the global class:
+### Standard structure
 
 ```text
-image
+media-4x3
+    + optional is-rounded
+    └── card-image
 ```
 
-### Standard image structure
-
-```text
-image-3x2
-    └── image
-```
-
-### Actual image behavior
+`card-image` fills the wrapper:
 
 ```css
+display: block;
 width: 100%;
 height: 100%;
+max-width: none;
 object-fit: cover;
-display: block;
+object-position: 50% 50%;
 ```
 
-Do not assign the actual image responsibility for the container's aspect ratio.
-
-### Image sizing
-
-The parent layout determines the available width.
-
-Do not create Small, Medium, or Large variants of canonical image-ratio containers.
-
-Avoid introducing:
-
-```text
-image-3x2-small
-image-3x2-medium
-image-3x2-large
-```
-
-Use the parent grid, flex layout, or container width to control image dimensions.
+Every image, including those in other components, sits in a media wrapper and has alt text.
 
 ---
 
-## 8. Image Modifiers
+## 8. Image Variations
 
-### Portrait modifier
+For portrait, use `media-3x4`. There is no portrait or avatar modifier in Core; do not create one without approval.
 
-`is-portrait` is valid on reversible rectangular image containers.
-
-Supported combinations:
-
-| Container | Result |
-|---|---|
-| `image-16x9 + is-portrait` | 9:16 |
-| `image-3x2 + is-portrait` | 2:3 |
-| `image-4x3 + is-portrait` | 3:4 |
-
-Do not use `is-portrait` on `image-1x1`.
-
-### Avatar modifier
-
-`is-avatar` applies the circular avatar treatment.
-
-Valid combination:
-
-```text
-image-1x1
-    + is-avatar
-```
-
-Do not use `is-avatar` as a generic circular-image utility.
-
-### Radius utilities
-
-Radius remains independent of image type.
-
-Example:
-
-```text
-image-3x2
-    + radius-rounded
-```
-
-Do not introduce image-specific radius classes when an existing global radius utility is sufficient.
+`is-rounded` is a combo class. It was verified on `media-4x3`; check that it exists before using it on another wrapper.
 
 ---
 
 ## 9. Hero Image Architecture
 
-Full-bleed hero imagery uses the established container pattern.
+Full-bleed hero photos use this structure:
 
 ```text
 Hero Section
-    │
-    └── image-hero
-        │
-        └── image
+    └── hero-image_media
+        └── hero-image_img
 ```
 
-The hero section establishes the positioning context.
-
-The `image-hero` container owns:
-
-```css
-position: absolute;
-top: 0;
-right: 0;
-bottom: 0;
-left: 0;
-overflow: hidden;
-z-index: 0;
-```
-
-The actual image retains the global `image` behavior.
+`hero-image_media` is positioned absolutely on all four sides, clips overflow and sits at z-index 0. `hero-image_img` fills it with `object-fit: cover`.
 
 ### Rules
 
-- Use the established hero container pattern.
 - Preserve the hero section's positioning context.
 - Keep imagery separate from content structure.
 - Verify content remains readable over the image.
 - Validate cropping at responsive breakpoints.
-- Migrate legacy hero classes only when structurally safe.
 
 ---
 
@@ -552,7 +457,7 @@ Respect reduced-motion preferences.
 
 ## 14. Validated Structural Example
 
-The September 20 Implementation Addendum documents a split trust section.
+This follows the September 20 Addendum's split trust section, updated to the current class names.
 
 ```text
 section-medium
@@ -562,12 +467,11 @@ section-medium
         └── container-xlarge
             │
             └── section-content
-                + is-row
-                + mobile-column
+                + layout-split
                 + gap-12
                 │
-                ├── image-3x2
-                │   └── image
+                ├── media-4x3
+                │   └── card-image
                 │
                 └── client-specific content
 ```
@@ -647,10 +551,10 @@ Evaluate each applicable requirement.
 
 ### Images
 
-- [ ] Standard image containers are used.
-- [ ] Images use the global `image` class.
+- [ ] Every image sits in a media wrapper (heroes use `hero-image_media`).
+- [ ] Images fill the wrapper (`card-image` or `hero-image_img`) and have alt text.
 - [ ] Aspect ratio belongs to the container.
-- [ ] Image modifiers are applied correctly.
+- [ ] No unapproved ratios or image modifiers were added.
 - [ ] Hero images follow the approved container pattern.
 
 ### Responsive behavior

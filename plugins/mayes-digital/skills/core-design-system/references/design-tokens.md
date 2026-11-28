@@ -62,6 +62,17 @@ Requirements:
 
 Do not introduce arbitrary typography values when existing variables satisfy the requirement.
 
+Type and readability rules:
+
+- Use Core's existing text styles. Do not add new font sizes or weights, or override them on single elements, without approval.
+- Core's styles use weights 400, 500, 600 and 700. That is expected; do not report it as a defect or change a Core style to reduce the count.
+- On each screen, use only as many of the approved styles as the hierarchy needs, so it stays clear what to read first.
+- Use one font family, or two at most (one for headings, one for body).
+- Load only the font weights and families the site actually uses.
+- Keep paragraph text no wider than about 600px (roughly 65 to 75 characters per line). A block that also holds headings may be wider: Core's hero-copy is 40rem (640px) and stays as it is.
+- Set body text line height at 1.4 to 1.6 times the font size; headings can be tighter.
+- Space paragraphs about 20 to 30px apart.
+
 ### Spacing
 
 Follow the established Tailwind-inspired spacing scale.
@@ -72,6 +83,7 @@ Requirements:
 - Prefer layout gaps for spacing between flex and grid children.
 - Use established section classes for vertical spacing.
 - Use `padding-global` for horizontal page gutters.
+- On phones, `padding-global` keeps 16 to 24px side gutters so content never touches the screen edge.
 - Avoid duplicating spacing responsibilities.
 - Verify spacing across responsive breakpoints.
 
@@ -239,6 +251,12 @@ Evaluate the following:
 - [ ] Existing variables are reused.
 - [ ] No duplicate semantic values were introduced.
 - [ ] Typography follows established scales.
+- [ ] Only Core's existing text styles are used, with no one-off sizes or weights.
+- [ ] No screen uses more than two font families.
+- [ ] Only the font weights and families the site actually uses are loaded.
+- [ ] Paragraph text stays within about 600px wide.
+- [ ] Body text line height is 1.4 to 1.6 times the font size.
+- [ ] Phone side gutters are 16 to 24px.
 - [ ] Spacing follows established scales.
 - [ ] Color naming follows current conventions.
 - [ ] Surface responsibilities remain separate.

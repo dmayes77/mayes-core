@@ -41,6 +41,20 @@ Core owns reusable structures.
 
 Products and client websites consume those structures and provide their own content, branding, and integrations.
 
+### Component levels
+
+Sort every Core component into one of three levels:
+
+- **Parts:** the smallest pieces, such as buttons, badges, icons, labels and inputs.
+- **Groups:** a few parts that work as one unit, such as cards, form fields and price rows.
+- **Sections:** larger blocks built from groups and parts, such as the header, footer, hero and service grid.
+
+Rules:
+
+1. Build each level from the level below it. A section uses existing groups and parts rather than its own one-off copies.
+2. Keep each component to one job.
+3. When content breaks a component, fix the problem at the smallest level that causes it. A button that wraps badly is fixed in the button, not patched inside every section that uses it.
+
 ### Core responsibilities
 
 Core owns:
@@ -206,6 +220,21 @@ The settings control opens the Site Settings sheet.
 
 Avoid introducing unnecessary mobile dropdown navigation when the established bottom navigation and settings sheet already provide the required functionality.
 
+### Top nav only option
+
+The bottom navigation is the default. A site may use the top nav only setup instead, keeping 44px tap targets, Call one tap away, and the menu as a bottom sheet (Sheet / Menu).
+
+In the App Menu variant, the phone top bar shows the logo, a Call button and a Menu button. The Menu button opens the Sheet / Menu bottom sheet, which links the primary pages and opens the Site Settings sheet.
+
+### Pairing rule
+
+A site uses one phone navigation setup, never both.
+
+- **Bottom nav sites:** use Navigation / Glass Base. Its phone top bar shows only the logo and the settings button.
+- **Top nav only sites:** use Navigation / Glass App Menu, turn off the bottom navigation and remove its bottom spacing.
+
+On phones, Call appears exactly once.
+
 ### Rules
 
 - Reuse existing navigation components.
@@ -214,6 +243,15 @@ Avoid introducing unnecessary mobile dropdown navigation when the established bo
 - Avoid duplicate navigation controls.
 - Maintain consistent responsive behavior.
 - Preserve the current-page state where applicable.
+
+---
+
+## Button Placement and Image Wrapping
+
+- Every button sits in a `button-group`, even a single button. The group owns spacing, wrapping and stacking. Use `is-split` for equal-width buttons. Hide a group that would be empty. Form submit buttons and sheet footers follow the same rule.
+- Every image sits in a `media-*` wrapper with alt text. Full-bleed heroes use `hero-image_media`.
+- `container-xlarge` is the default desktop container.
+- Navigation bars run full width.
 
 ---
 
@@ -267,12 +305,15 @@ The existing component documentation identifies:
 
 With variants:
 
-- Base
+- Base (default)
 - Float
+- Float Raised Call
+
+The app layer, including this navigation, shows at 767px and below. Keep targets at least 44px.
 
 The standard Mayes Digital mobile experience uses the flush Base presentation.
 
-Do not assume that the existence of the Float variant authorizes its use in the standard Base website.
+Do not assume that the existence of a floating variant authorizes its use in the standard Base website.
 
 ---
 
@@ -718,6 +759,7 @@ Before creating a component, Claude must:
 8. Determine responsive requirements.
 9. Confirm the component belongs in Core or the client project.
 10. Explain why a new component is necessary.
+11. Identify its level (part, group or section) and the existing smaller components it will be built from.
 
 ### Creation rule
 

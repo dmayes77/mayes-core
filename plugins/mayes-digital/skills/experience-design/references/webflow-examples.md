@@ -561,11 +561,10 @@ section-medium
     padding-global
         container-xlarge
             section-content
-                is-row
-                mobile-column
+                layout-split
                 gap-12
-                    image-3x2
-                        image
+                    media-4x3
+                        card-image
                     Content
                         Heading
                         Description
@@ -585,9 +584,7 @@ Verify the actual class availability before implementation.
 
 ### Responsive behavior
 
-The `mobile-column` utility changes the row arrangement to a column at Mobile Landscape and below.
-
-Do not assume the same stacking behavior at Tablet.
+`layout-split` becomes one column at 767px and below. Check the component's tablet behavior (Section / Split stacks on tablets too).
 
 ### Validation
 
@@ -961,6 +958,8 @@ Navigate essential content and contact the business without unnecessary effort.
 
 Reuse the approved mobile bottom navigation component.
 
+The bottom navigation is the default. A site may use the top nav only setup instead (Navigation / Glass App Menu with the bottom navigation turned off), keeping 44px tap targets, Call one tap away, and the menu as a bottom sheet. Never use both.
+
 Preserve:
 
 - Flush presentation.
@@ -1168,6 +1167,8 @@ Verify whether the reusable implementation has been migrated into the current Co
 
 - Use clear question labels.
 - Present understandable choices.
+- Show answers as large tappable choices with an icon and a label, not small radio buttons.
+- Add an "Other" choice that reveals a short text field when no option fits.
 - Preserve previous answers when navigating backward.
 - Provide accurate progress indicators when appropriate.
 - Request only necessary information.
@@ -1225,6 +1226,7 @@ Use existing service card price properties and visibility controls.
 - Keep pricing associated with the relevant service.
 - Do not hide unavoidable fees.
 - Do not invent pricing information.
+- Show the price or number larger and bolder than its label (for example, $499 over a smaller "Starting at").
 
 ### Validation
 
@@ -1367,10 +1369,10 @@ Use native form validation, established error states, and approved custom enhanc
 
 - Avoid vague error messages.
 - Do not blame the customer.
-- Preserve entered information when practical.
+- Keep everything the customer typed when a submission fails; never clear the form.
 - Associate errors with relevant fields.
 - Provide accessible error feedback.
-- Offer a legitimate alternative contact method when appropriate.
+- When a submission fails, offer Call (the business phone from Business Settings) as the fallback.
 
 ### Validation
 
@@ -1827,6 +1829,7 @@ Do not:
 - Fabricate reviews or project evidence.
 - Hide material pricing conditions.
 - Use deceptive conversion patterns.
+- Show pop-ups or banners that cover most of a phone screen (newsletter, promo, or consent). Cookie settings open in the Settings sheet only when the customer asks.
 - Apply Base navigation to incompatible product experiences.
 - Treat planned components as implemented.
 - Invent measurable conversion improvements.

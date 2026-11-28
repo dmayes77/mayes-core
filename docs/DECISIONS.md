@@ -41,6 +41,9 @@
 | 2026-11-19 | Webflow first: anything Webflow can do natively (elements, forms, Interactions, CMS, component props) is built in Webflow; script only covers what Webflow can't | David: "If it can be done in webflow then we use webflow first" |
 | 2026-11-28 | The app layer starts at 767px and below (Webflow's Mobile landscape breakpoint). Tablets from 768px get the normal website, with no bottom nav, install banner or no-bounce rule | David: "app layer should stat at 767px". Replaces 991px |
 | 2026-11-28 | Media containers are `media-16x9`, `media-4x3`, `media-3x4` and `media-1x1`; layout classes are `layout-row` and `layout-column`. This replaces the `image-*`, `is-row`, `is-column` and `mobile-column` names in the 2026-09-20 addendum | David: media is "more flexible than image-4x3 what if its a video" |
+| 2026-11-28 | `media-4x3` is the default shape and `media-3x4` is portrait; no 4:5. Every image sits in a media wrapper (full-bleed heroes use `hero-image_media`) | Keeps one small set of shapes for images and video |
+| 2026-11-28 | Core keeps its type styles (weights 400, 500, 600 and 700). There is no per-screen cap on sizes or weights: use the existing text styles and add no new sizes or weights without approval. The ~600px width guide is for paragraphs; `hero-copy` stays at 40rem because it also holds the heading | The plugin's four-size, two-weight cap would have failed standard Core pages. David asked for this to be decided and the recommended option was applied; revisit if the look should change |
+| 2026-11-28 | Top nav only is an approved option beside the default bottom nav (Navigation / Glass App Menu with Sheet / Menu). A site uses one phone navigation setup, never both | Documented here to match the master and the plugin |
 
 ## Open
 

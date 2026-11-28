@@ -363,7 +363,7 @@ Evaluate consistency across pages and components.
 
 - [ ] Heading styles are consistent.
 - [ ] Body typography is consistent.
-- [ ] Font sizes follow established Core variables.
+- [ ] Font sizes and weights come from Core's existing text styles.
 - [ ] Line heights remain readable.
 - [ ] Text treatments communicate consistent meanings.
 
@@ -453,6 +453,8 @@ Evaluate the mental effort required to understand and use the website.
 
 ### Mobile navigation
 
+Every website uses one phone navigation setup, never both: Glass Base with the bottom navigation, or Glass App Menu without it. On phones, Call appears exactly once.
+
 For websites using the standard Base architecture, evaluate:
 
 - [ ] Flush top navigation is preserved.
@@ -528,6 +530,8 @@ Evaluate mobile as a primary customer experience.
 - 1440px.
 
 These are practical testing targets, not additional Webflow breakpoints.
+
+The app layer starts at 767px and below: compare 767px with 768px, and confirm tablets have working header navigation.
 
 Coordinate detailed responsive testing with the Core Design System and Quality Assurance skills.
 

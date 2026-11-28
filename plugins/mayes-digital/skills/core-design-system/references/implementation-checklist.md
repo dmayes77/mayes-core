@@ -360,25 +360,26 @@ Before modifying a shared component:
 
 ### Image structure
 
-- [ ] Existing image-ratio containers are used.
-- [ ] Actual images use the established global image class.
+- [ ] Every image sits in a media wrapper.
+- [ ] Images fill the wrapper (`card-image`) and have alt text.
 - [ ] Parent layouts control available width.
-- [ ] Containers control aspect ratio.
+- [ ] Wrappers control aspect ratio.
 - [ ] Images control cropping.
 
-### Supported containers
+### Supported wrappers
 
-- `image-16x9`
-- `image-3x2`
-- `image-4x3`
-- `image-1x1`
+- `media-4x3` (default)
+- `media-3x4` (portrait)
+- `media-16x9`
+- `media-1x1`
 
-### Image modifiers
+### House rules
 
-- [ ] `is-portrait` is applied only to supported rectangular containers.
-- [ ] `is-avatar` is applied only to the supported square container.
-- [ ] Existing radius utilities are reused.
-- [ ] Unnecessary fixed-size image variants are avoided.
+- [ ] Every button sits in a `button-group`, and no empty group is visible.
+- [ ] `container-xlarge` is used on desktop unless the content calls for another width.
+- [ ] No 4:5 or other unapproved ratios were added.
+- [ ] Existing radius treatments are reused.
+- [ ] The app layer starts at 767px; tablets show the desktop header with working navigation.
 
 ### Hero imagery
 
@@ -462,6 +463,18 @@ For projects using the standard Base mobile architecture:
 - [ ] Remaining navigation positions match business requirements.
 - [ ] Active states function correctly.
 - [ ] Fixed navigation does not obscure content.
+
+For projects using the top nav only option:
+
+- [ ] Navigation / Glass uses the App Menu variant.
+- [ ] The bottom navigation is turned off.
+- [ ] Page Shell leaves no empty bottom gap at phone widths.
+- [ ] The Menu button opens Sheet / Menu as a bottom sheet.
+
+For every project:
+
+- [ ] The site uses one phone navigation setup, never both.
+- [ ] Call appears exactly once on phones.
 
 Do not impose Base website navigation requirements on product-specific experiences when approved product architecture differs.
 
